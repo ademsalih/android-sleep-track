@@ -39,48 +39,6 @@ public class CustomWebSocketServer extends WebSocketServer {
     public CustomWebSocketServer(int port) {
         super(new InetSocketAddress(port));
 
-        /*try {
-            // load up the key store
-            String STORETYPE = "BKS";
-            String KEYSTORE = "src/main/java/com/example/fitbit_tracker/keystore.bks";
-            String STOREPASSWORD = "password";
-            String KEYPASSWORD = "password";
-
-            KeyStore ks = KeyStore.getInstance(STORETYPE);
-            File kf = new File(KEYSTORE);
-            ks.load(null, STOREPASSWORD.toCharArray());
-
-            *//*KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-            kmf.init(ks, KEYPASSWORD.toCharArray());
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
-            tmf.init(ks);*//*
-
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-
-            sslContext.init(null, new TrustManager[]{
-                    new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
-
-                        }
-
-                        @Override
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
-
-                        }
-
-                        @Override
-                        public X509Certificate[] getAcceptedIssuers() {
-                            return new X509Certificate[0];
-                        }
-                    }
-            }, new SecureRandom());
-
-            this.setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sslContext));
-
-        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException | KeyManagementException exception) {
-            exception.printStackTrace();
-        }*/
     }
 
     @Override

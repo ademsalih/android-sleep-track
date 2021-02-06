@@ -6,7 +6,7 @@ public class CustomWebSocketServerTask implements Runnable {
 
     @Override
     public void run() {
-        CustomWebSocketServer customWebSocketServer = new CustomWebSocketServer(8890);
+        CustomWebSocketServer customWebSocketServer = new CustomWebSocketServer(8887);
         customWebSocketServer.start();
     }
 }
