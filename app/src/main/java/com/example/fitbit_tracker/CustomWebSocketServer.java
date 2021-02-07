@@ -1,11 +1,16 @@
 package com.example.fitbit_tracker;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 import org.java_websocket.server.WebSocketServer;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,21 +35,33 @@ import javax.net.ssl.X509TrustManager;
 public class CustomWebSocketServer extends WebSocketServer {
 
     private final String TAG = this.getClass().getSimpleName();
+    private ProgressBar progressBar;
+    private TextView textView;
 
-    public CustomWebSocketServer(String host,int port) {
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
+    }
+
+    public CustomWebSocketServer(String host, int port) {
         super(new InetSocketAddress(host, port));
 
     }
 
     public CustomWebSocketServer(int port) {
         super(new InetSocketAddress(port));
-
     }
+
+    public void setTextView(TextView textView) {
+        this.textView = textView;
+    }
+
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         Log.d(TAG, "A client has connected: " + conn.getRemoteSocketAddress());
         conn.send("Welcome to the Android server!");
+        progressBar.setVisibility(View.INVISIBLE);
+        textView.setText("Connected");
     }
 
     @Override
@@ -55,6 +72,19 @@ public class CustomWebSocketServer extends WebSocketServer {
     @Override
     public void onMessage(WebSocket conn, String message) {
         Log.d(TAG, "Received message from " + conn.getRemoteSocketAddress() + ": " + message);
+
+        try {
+            JSONObject json = new JSONObject(message);
+            if (json.getString("messageType") == "deviceInfo") {
+                JSONObject messageObject = json.getJSONObject("message");
+                String modelName = messageObject.getString("modelName");
+                textView.setText(textView.getText() + " Fitbit " + modelName);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @Override

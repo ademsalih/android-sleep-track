@@ -25,16 +25,17 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textView);
 
-        ActivityManager am = (ActivityManager)this.getSystemService( ACTIVITY_SERVICE );
-        List<ActivityManager.RunningAppProcessInfo> listProcess = am.getRunningAppProcesses();
-        for(ActivityManager.RunningAppProcessInfo runningProInfo:listProcess){
-            Log.d("Running Processes", ":"+runningProInfo.processName);
-        }
 
         Executor executor = Executors.newSingleThreadExecutor();
-
-
-        executor.execute(new CustomWebSocketServerTask());
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                CustomWebSocketServer customWebSocketServer = new CustomWebSocketServer(8887);
+                customWebSocketServer.setProgressBar(progressBar);
+                customWebSocketServer.setTextView(textView);
+                customWebSocketServer.start();
+            }
+        });
     }
 
     @Override
