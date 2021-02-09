@@ -2,20 +2,23 @@ package com.example.fitbit_tracker;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ActivityManager;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import com.example.fitbit_tracker.handlers.WebSocketCallback;
 
-public class MainActivity extends AppCompatActivity {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+public class MainActivity extends AppCompatActivity implements WebSocketCallback {
     private final String TAG = this.getClass().getSimpleName();
     private ProgressBar progressBar;
     private TextView textView;
+    private CustomWebSocketServer customWebSocketServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,15 +28,46 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textView);
 
+        customWebSocketServer = new CustomWebSocketServer(this, 8887);
+        customWebSocketServer.start();
+    }
 
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(new Runnable() {
+    @Override
+    public void onOpen() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                CustomWebSocketServer customWebSocketServer = new CustomWebSocketServer(8887);
-                customWebSocketServer.setProgressBar(progressBar);
-                customWebSocketServer.setTextView(textView);
-                customWebSocketServer.start();
+                progressBar.setVisibility(View.INVISIBLE);
+                textView.setText("Connected to Hypnos");
+            }
+        });
+
+    }
+
+    @Override
+    public void onClose() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.VISIBLE);
+                textView.setText("Looking for Fitbit device");
+            }
+        });
+    }
+
+    @Override
+    public void onMessage(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONObject json = new JSONObject(message);
+                    String model = json.getString("modelName");
+                    textView.setText(textView.getText() + " on Fitbit " + model);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
     }
@@ -44,12 +78,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            customWebSocketServer.stop();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            customWebSocketServer.stop();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
