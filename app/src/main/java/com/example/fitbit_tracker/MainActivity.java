@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         textView = findViewById(R.id.textView);
 
         customWebSocketServer = new CustomWebSocketServer(this, 8887);
+        customWebSocketServer.setReuseAddr(true);
         customWebSocketServer.start();
     }
 
@@ -90,13 +91,6 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     @Override
     protected void onStop() {
         super.onStop();
-        try {
-            customWebSocketServer.stop();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
