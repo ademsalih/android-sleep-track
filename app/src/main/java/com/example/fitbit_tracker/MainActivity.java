@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     private final String TAG = this.getClass().getSimpleName();
     private ProgressBar progressBar;
     private TextView textView;
+    private ImageView imageView;
     private CustomWebSocketServer customWebSocketServer;
 
     @Override
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textView);
+        imageView = findViewById(R.id.imageView);
 
         customWebSocketServer = new CustomWebSocketServer(this, 8887);
         customWebSocketServer.setReuseAddr(true);
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                imageView.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.INVISIBLE);
                 textView.setText("Connected to Hypnos");
             }
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                imageView.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
                 textView.setText("Looking for Fitbit device");
             }
