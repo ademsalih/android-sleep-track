@@ -1,13 +1,19 @@
-package com.example.fitbit_tracker;
+package com.example.fitbit_tracker.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.fitbit_tracker.CustomWebSocketServer;
+import com.example.fitbit_tracker.NyxDbHelper;
+import com.example.fitbit_tracker.R;
+import com.example.fitbit_tracker.DatabaseContract;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
 
 import org.json.JSONException;
@@ -21,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     private TextView textView;
     private ImageView imageView;
     private CustomWebSocketServer customWebSocketServer;
+    private NyxDbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +38,19 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         textView = findViewById(R.id.textView);
         imageView = findViewById(R.id.imageView);
 
-        customWebSocketServer = new CustomWebSocketServer(this, 8887);
+        dbHelper = new NyxDbHelper(getApplicationContext());
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseContract.Session.END_TIME, "0");
+        cv.put(DatabaseContract.Session.START_TIME, "0");
+
+        db.insert(DatabaseContract.Session.TABLE_NAME, null, cv);
+
+        /*customWebSocketServer = new CustomWebSocketServer(this, 8887);
         customWebSocketServer.setReuseAddr(true);
-        customWebSocketServer.start();
+        customWebSocketServer.start();*/
     }
 
     @Override
@@ -101,11 +118,11 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        dbHelper.close();
         try {
             customWebSocketServer.stop();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
