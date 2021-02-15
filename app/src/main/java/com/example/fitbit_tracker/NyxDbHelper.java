@@ -16,6 +16,12 @@ public class NyxDbHelper extends SQLiteOpenHelper {
                     Session.START_TIME + " TEXT," +
                     Session.END_TIME + " TEXT)";
 
+    private static final String SQL_CREATE_TABLE_READING =
+            "CREATE TABLE " + Session.TABLE_NAME + " (" +
+                    Session._ID + " INTEGER PRIMARY KEY," +
+                    Session.START_TIME + " TEXT," +
+                    Session.END_TIME + " TEXT)";
+
     private static final String SQL_DELETE_TABLE_SESSION = "DROP TABLE IF EXISTS " + Session.TABLE_NAME;
 
     public NyxDbHelper(Context context) {

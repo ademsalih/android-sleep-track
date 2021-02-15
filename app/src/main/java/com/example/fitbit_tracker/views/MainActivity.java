@@ -3,8 +3,10 @@ package com.example.fitbit_tracker.views;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -18,8 +20,11 @@ import com.example.fitbit_tracker.handlers.WebSocketCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements WebSocketCallback {
     private final String TAG = this.getClass().getSimpleName();
@@ -34,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        WebSocketCallback webSocketCallback = this;
+
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textView);
         imageView = findViewById(R.id.imageView);
@@ -41,16 +48,20 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         dbHelper = new NyxDbHelper(getApplicationContext());
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         ContentValues cv = new ContentValues();
-        cv.put(DatabaseContract.Session.END_TIME, "0");
-        cv.put(DatabaseContract.Session.START_TIME, "0");
-
+        cv.put(DatabaseContract.Session.END_TIME, "1");
+        cv.put(DatabaseContract.Session.START_TIME, "1");
         db.insert(DatabaseContract.Session.TABLE_NAME, null, cv);
 
-        /*customWebSocketServer = new CustomWebSocketServer(this, 8887);
-        customWebSocketServer.setReuseAddr(true);
-        customWebSocketServer.start();*/
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                customWebSocketServer = new CustomWebSocketServer(webSocketCallback, 8887);
+                customWebSocketServer.setReuseAddr(true);
+                customWebSocketServer.start();
+            }
+        });
     }
 
     @Override
@@ -80,11 +91,15 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
     @Override
     public void onMessage(String message) {
+
+        Log.d(TAG, message);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
                     JSONObject json = new JSONObject(message);
+
                     String model = json.getString("modelName");
                     textView.setText(textView.getText() + " on Fitbit " + model);
                 } catch (JSONException e) {
