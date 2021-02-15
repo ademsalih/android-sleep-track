@@ -94,14 +94,16 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
         Log.d(TAG, message);
 
+        String newMessage = message.replace('"','\"');
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    JSONObject json = new JSONObject(message);
+                    JSONObject json = new JSONObject(newMessage);
 
                     String model = json.getString("modelName");
-                    textView.setText(textView.getText() + " on Fitbit " + model);
+                    textView.setText(textView.getText() + "\n on Fitbit " + model);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
