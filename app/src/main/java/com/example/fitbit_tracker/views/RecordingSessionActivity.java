@@ -1,8 +1,10 @@
-package com.example.fitbit_tracker;
+package com.example.fitbit_tracker.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.fitbit_tracker.R;
 
 public class RecordingSessionActivity extends AppCompatActivity {
 

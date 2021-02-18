@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fitbit_tracker.CustomWebSocketServer;
 import com.example.fitbit_tracker.NyxDbHelper;
@@ -22,6 +24,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -33,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     private ImageView imageView;
     private CustomWebSocketServer customWebSocketServer;
     private NyxDbHelper dbHelper;
+    private Context c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         setContentView(R.layout.activity_main);
 
         WebSocketCallback webSocketCallback = this;
+
+        c = this.getApplicationContext();
 
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textView);
@@ -91,11 +98,17 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
     @Override
     public void onMessage(String message) {
-
         Log.d(TAG, message);
+        /*runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(c, message, Toast.LENGTH_SHORT).show();
+            }
+        });*/
 
-        String newMessage = message.replace('"','\"');
+        writeFileOnInternalStorage(this,"testing.txt", message);
 
+        /*String newMessage = message.replace('"','\"');
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -109,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                 }
 
             }
-        });
+        });*/
     }
 
     @Override
@@ -144,5 +157,25 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         }
     }
 
+    public void writeFileOnInternalStorage(Context mcoContext, String sFileName, String sBody){
+        File dir = new File(mcoContext.getFilesDir(), "mydir");
+        if(!dir.exists()){
+            dir.mkdir();
+        }
 
+        try {
+            File gpxfile = new File(dir, sFileName);
+            FileWriter writer = new FileWriter(gpxfile, true);
+            writer.append(sBody + "\n");
+            writer.flush();
+            writer.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void onSessionsButtonClick(View view) {
+        Intent intent = new Intent(MainActivity.this,SessionsActivity.class);
+        startActivity(intent);
+    }
 }

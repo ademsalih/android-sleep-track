@@ -53,6 +53,7 @@
             android:layout_height="wrap_content"
             android:height="100dp"
             android:text="Sessions"
+            android:onClick="onSessionsButtonClick"
             android:textSize="22sp" />
 
         <Button
@@ -63,13 +64,6 @@
             android:text="Settings"
             android:textSize="22sp" />
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:height="100dp"
-            android:text="Help"
-            android:textSize="22sp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
