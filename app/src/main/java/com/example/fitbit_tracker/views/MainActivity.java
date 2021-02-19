@@ -12,17 +12,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.fitbit_tracker.CustomWebSocketServer;
-import com.example.fitbit_tracker.NyxDbHelper;
+import com.example.fitbit_tracker.db.NyxDbHelper;
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.DatabaseContract;
+import com.example.fitbit_tracker.db.DatabaseContract;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONStringer;
 
 import java.io.File;
 import java.io.FileWriter;
