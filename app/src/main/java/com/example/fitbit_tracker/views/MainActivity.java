@@ -14,14 +14,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.fitbit_tracker.CustomWebSocketServer;
+import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.db.NyxDbHelper;
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.db.DatabaseContract;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
+import com.example.fitbit_tracker.model.Session;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -33,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     private CustomWebSocketServer customWebSocketServer;
     private NyxDbHelper dbHelper;
     private Context c;
+    private NyxDatabase nyxDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,15 +54,9 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         textView = findViewById(R.id.textView);
         imageView = findViewById(R.id.imageView);
 
-        dbHelper = new NyxDbHelper(getApplicationContext());
+        nyxDatabase = new NyxDatabase(getApplicationContext());
 
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put(DatabaseContract.Session.END_TIME, "1");
-        cv.put(DatabaseContract.Session.START_TIME, "1");
-        db.insert(DatabaseContract.Session.TABLE_NAME, null, cv);
-
-        Executor executor = Executors.newSingleThreadExecutor();
+        /*Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                 customWebSocketServer.setReuseAddr(true);
                 customWebSocketServer.start();
             }
-        });
+        });*/
     }
 
     @Override
@@ -94,30 +95,57 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     @Override
     public void onMessage(String message) {
         Log.d(TAG, message);
-        /*runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(c, message, Toast.LENGTH_SHORT).show();
-            }
-        });*/
 
+        String newMessage = message.replace('"','\"');
+
+        try {
+            JSONObject json = new JSONObject(newMessage);
+            String command = json.getString("command");
+
+            switch (command) {
+                case "ADD_READING":
+                    JSONObject readingObject = json.getJSONObject("data");
+
+                    String sensorIdentifier = readingObject.getString("sensorIdentifier");
+                    String sessionIdentifier = readingObject.getString("sessionIdentifier");
+                    String timeStamp = readingObject.getString("timeStamp");
+
+                    switch (sensorIdentifier) {
+                        case "HEARTRATE":
+                            JSONObject bpmData = readingObject.getJSONObject("data");
+                            int bpm = bpmData.getInt("bpm");
+                            nyxDatabase.addHeartrateReading(sessionIdentifier, timeStamp, bpm);
+                            break;
+                        case "ACCELEROMETER":
+                            JSONObject accelerometerData = readingObject.getJSONObject("data");
+                            double xAcceleration = accelerometerData.getDouble("x");
+                            double yAcceleration = accelerometerData.getDouble("y");
+                            double zAcceleration = accelerometerData.getDouble("z");
+                            nyxDatabase.addAccelerometerReading(sessionIdentifier, timeStamp, xAcceleration, yAcceleration, zAcceleration);
+                        default:
+                            break;
+                    }
+
+                    break;
+                case "START_SESSION":
+                    /*Intent intent = new Intent(MainActivity.this, RecordingSessionActivity.class);
+                    startActivity(intent);*/
+                    JSONObject sessionObject = json.getJSONObject("data");
+                    String sessionId = sessionObject.getString("sessionIdentifier");
+
+                    nyxDatabase.createSession(sessionId,"0","0",0);
+                    break;
+                case "STOP_SESSION":
+                    break;
+                default:
+                    break;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+
+        }
         writeFileOnInternalStorage(this,"testing.txt", message);
-
-        /*String newMessage = message.replace('"','\"');
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    JSONObject json = new JSONObject(newMessage);
-
-                    String model = json.getString("modelName");
-                    textView.setText(textView.getText() + "\n on Fitbit " + model);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });*/
     }
 
     @Override

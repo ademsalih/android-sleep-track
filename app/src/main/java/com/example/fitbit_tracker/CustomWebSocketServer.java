@@ -47,7 +47,6 @@ public class CustomWebSocketServer extends WebSocketServer {
         Log.d(TAG, "Received message from " + conn.getRemoteSocketAddress() + ": " + message);
 
         webSocketOpenCallback.onMessage(message);
-
     }
 
     @Override

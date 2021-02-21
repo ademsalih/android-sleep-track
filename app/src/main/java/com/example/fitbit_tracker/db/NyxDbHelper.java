@@ -7,29 +7,31 @@ import com.example.fitbit_tracker.db.DatabaseContract.*;
 
 public class NyxDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 8;
     public static final String DATABASE_NAME = "SessionStore.db";
 
-    private static final String SQL_CREATE_TABLE_SESSION =
-            "CREATE TABLE " + Session.TABLE_NAME + " (" +
-                    Session._ID + " INTEGER PRIMARY KEY," +
-                    Session.START_TIME + " TEXT," +
-                    Session.END_TIME + " TEXT," +
-                    Session.NUMBER_OF_READINGS + " INTEGER)";
+    private static final String SQL_CREATE_TABLE_SESSION = "CREATE TABLE " +
+            Session.TABLE_NAME + " (" +
+            Session._ID + " INTEGER PRIMARY KEY," +
+            Session.UUID + " TEXT," +
+            Session.START_TIME + " TEXT," +
+            Session.END_TIME + " TEXT," +
+            Session.NUMBER_OF_READINGS + " INTEGER)";
 
-    private static final String SQL_CREATE_TABLE_ACCELEROMETER_READING =
-            "CREATE TABLE " + AccelerometerReading.TABLE_NAME + " (" +
-                    AccelerometerReading.SESSION_ID + " INTEGER PRIMARY KEY," +
-                    AccelerometerReading.TIME_STAMP + " INTEGER," +
-                    AccelerometerReading.X_ACCELERATION + " REAL," +
-                    AccelerometerReading.Y_ACCELERATION + " REAL," +
-                    AccelerometerReading.Z_ACCELERATION + " REAL)";
+    private static final String SQL_CREATE_TABLE_ACCELEROMETER_READING = "CREATE TABLE " +
+            AccelerometerReading.TABLE_NAME + " (" +
+            AccelerometerReading.SESSION_ID + " INTEGER PRIMARY KEY," +
+            AccelerometerReading.TIME_STAMP + " INTEGER," +
+            AccelerometerReading.X_ACCELERATION + " REAL," +
+            AccelerometerReading.Y_ACCELERATION + " REAL," +
+            AccelerometerReading.Z_ACCELERATION + " REAL)";
 
-    private static final String SQL_CREATE_TABLE_HEARTRATE_READING =
-            "CREATE TABLE " + HeartRateReading.TABLE_NAME + " (" +
-                    HeartRateReading.SESSION_ID + " INTEGER PRIMARY KEY," +
-                    HeartRateReading.TIME_STAMP + " INTEGER," +
-                    HeartRateReading.HEARTRATE + " INTEGER)";
+    private static final String SQL_CREATE_TABLE_HEARTRATE_READING = "CREATE TABLE " +
+            HeartRateReading.TABLE_NAME + " (" +
+            HeartRateReading._ID + " INTEGER PRIMARY KEY," +
+            HeartRateReading.SESSION_ID + " TEXT," +
+            HeartRateReading.TIME_STAMP + " INTEGER," +
+            HeartRateReading.HEARTRATE + " INTEGER)";
 
     private static final String SQL_DELETE_TABLE_SESSION = "DROP TABLE IF EXISTS " + Session.TABLE_NAME;
     private static final String SQL_DELETE_TABLE_ACCELEROMETER_READING = "DROP TABLE IF EXISTS " + AccelerometerReading.TABLE_NAME;

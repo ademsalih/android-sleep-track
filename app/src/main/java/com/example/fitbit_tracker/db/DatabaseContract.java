@@ -8,6 +8,7 @@ public class DatabaseContract {
 
     public static class Session implements BaseColumns {
         public static final String TABLE_NAME = "session";
+        public static final String UUID = "uuid";
         public static final String START_TIME = "start_time";
         public static final String END_TIME = "end_time";
         public static final String NUMBER_OF_READINGS = "number_of_readings";
