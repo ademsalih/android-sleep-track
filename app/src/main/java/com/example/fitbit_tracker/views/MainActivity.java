@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
         nyxDatabase = new NyxDatabase(getApplicationContext());
 
-        /*Executor executor = Executors.newSingleThreadExecutor();
+        Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                 customWebSocketServer.setReuseAddr(true);
                 customWebSocketServer.start();
             }
-        });*/
+        });
     }
 
     @Override
@@ -101,23 +101,25 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         try {
             JSONObject json = new JSONObject(newMessage);
             String command = json.getString("command");
+            JSONObject dataObject = json.getJSONObject("data");
+
+            String sessionIdentifier = dataObject.getString("sessionIdentifier");
 
             switch (command) {
                 case "ADD_READING":
-                    JSONObject readingObject = json.getJSONObject("data");
 
-                    String sensorIdentifier = readingObject.getString("sensorIdentifier");
-                    String sessionIdentifier = readingObject.getString("sessionIdentifier");
-                    String timeStamp = readingObject.getString("timeStamp");
+                    String sensorIdentifier = dataObject.getString("sensorIdentifier");
+
+                    String timeStamp = dataObject.getString("timeStamp");
 
                     switch (sensorIdentifier) {
                         case "HEARTRATE":
-                            JSONObject bpmData = readingObject.getJSONObject("data");
+                            JSONObject bpmData = dataObject.getJSONObject("data");
                             int bpm = bpmData.getInt("bpm");
                             nyxDatabase.addHeartrateReading(sessionIdentifier, timeStamp, bpm);
                             break;
                         case "ACCELEROMETER":
-                            JSONObject accelerometerData = readingObject.getJSONObject("data");
+                            JSONObject accelerometerData = dataObject.getJSONObject("data");
                             double xAcceleration = accelerometerData.getDouble("x");
                             double yAcceleration = accelerometerData.getDouble("y");
                             double zAcceleration = accelerometerData.getDouble("z");
@@ -127,15 +129,26 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                     }
 
                     break;
+                case "INIT_SESSION":
+                    nyxDatabase.createSession(sessionIdentifier,null,null,0);
+                    break;
                 case "START_SESSION":
+                    long startTime = dataObject.getLong("startTime");
+                    nyxDatabase.updateSessionStartTime(sessionIdentifier, startTime);
+
                     /*Intent intent = new Intent(MainActivity.this, RecordingSessionActivity.class);
                     startActivity(intent);*/
-                    JSONObject sessionObject = json.getJSONObject("data");
-                    String sessionId = sessionObject.getString("sessionIdentifier");
-
-                    nyxDatabase.createSession(sessionId,"0","0",0);
                     break;
                 case "STOP_SESSION":
+                    long endTime = dataObject.getLong("endTime");
+                    nyxDatabase.updateSessionEndTime(sessionIdentifier, endTime);
+
+                    // Add end time to the current session
+
+                    // Add number of readings to current session
+
+                    // Close recording activity
+
                     break;
                 default:
                     break;
@@ -145,7 +158,8 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
             e.printStackTrace();
 
         }
-        writeFileOnInternalStorage(this,"testing.txt", message);
+
+        //writeFileOnInternalStorage(this,"testing.txt", message);
     }
 
     @Override

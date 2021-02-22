@@ -1,6 +1,10 @@
 package com.example.fitbit_tracker.views;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 import android.content.Context;
@@ -10,69 +14,31 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.fitbit_tracker.R;
+import com.example.fitbit_tracker.SessionRecyclerViewAdapter;
+import com.example.fitbit_tracker.db.NyxDatabase;
+import com.example.fitbit_tracker.model.Session;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.List;
 
-public class SessionsActivity extends AppCompatActivity {
-
-    private TextView textView;
+public class SessionsActivity extends AppCompatActivity implements LifecycleOwner {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sessions);
 
-        textView = findViewById(R.id.textView3);
+        List<Session> sessions = new NyxDatabase(this).getAllSessions();
 
-        String data = readFileOnInternalStorage(this,"testing.txt");
+        RecyclerView recyclerView = findViewById(R.id.sessionsRecyclerView);
 
-        textView.setText(data);
-        textView.setMovementMethod(new ScrollingMovementMethod());
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new SessionRecyclerViewAdapter(this, sessions));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+
     }
 
-    public String readFileOnInternalStorage(Context mcoContext, String sFileName){
-        File dir = new File(mcoContext.getFilesDir(), "mydir");
-        String content = "";
-
-        try {
-            File gpxfile = new File(dir, sFileName);
-
-            FileReader reader = new FileReader(gpxfile);
-
-            int i;
-            while((i=reader.read())!=-1)
-                content+=(char)i;
-
-            reader.close();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return content;
-    }
-
-    public void onClearButtonClick(View view) {
-        writeFileOnInternalStorage(this,"testing.txt","");
-        String data = readFileOnInternalStorage(this,"testing.txt");
-        textView.setText(data);
-    }
-
-    public void writeFileOnInternalStorage(Context mcoContext, String sFileName, String sBody){
-        File dir = new File(mcoContext.getFilesDir(), "mydir");
-        if(!dir.exists()){
-            dir.mkdir();
-        }
-
-        try {
-            File gpxfile = new File(dir, sFileName);
-            FileWriter writer = new FileWriter(gpxfile);
-            writer.append(sBody + "\n");
-            writer.flush();
-            writer.close();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 }

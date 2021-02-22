@@ -35,8 +35,41 @@ public class NyxDatabase {
         cv.put(DatabaseContract.Session.END_TIME, startTime);
         cv.put(DatabaseContract.Session.START_TIME, endTime);
         cv.put(DatabaseContract.Session.NUMBER_OF_READINGS, numberOfReadings);
-
         writableDb.insert(DatabaseContract.Session.TABLE_NAME, null, cv);
+    }
+
+    public int updateSessionStartTime(String uuid, long startTime) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseContract.Session.START_TIME, startTime);
+
+        String selection = DatabaseContract.Session.UUID + " LIKE ?";
+        String[] selectionArgs = { uuid };
+
+        int count = writableDb.update(
+                DatabaseContract.Session.TABLE_NAME,
+                cv,
+                selection,
+                selectionArgs
+        );
+
+        return count;
+    }
+
+    public int updateSessionEndTime(String uuid, long endTime) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseContract.Session.END_TIME, endTime);
+
+        String selection = DatabaseContract.Session.UUID + " LIKE ?";
+        String[] selectionArgs = { uuid };
+
+        int count = writableDb.update(
+                DatabaseContract.Session.TABLE_NAME,
+                cv,
+                selection,
+                selectionArgs
+        );
+
+        return count;
     }
 
     public List<Session> getAllSessions() {
@@ -44,6 +77,7 @@ public class NyxDatabase {
 
         String[] projection = {
                 DatabaseContract.Session._ID,
+                DatabaseContract.Session.UUID,
                 DatabaseContract.Session.START_TIME,
                 DatabaseContract.Session.END_TIME,
                 DatabaseContract.Session.NUMBER_OF_READINGS
@@ -63,12 +97,14 @@ public class NyxDatabase {
 
         while(cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.Session._ID));
+            String UUID = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Session.UUID));
             String startTime = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Session.START_TIME));
             String endTime = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Session.END_TIME));
             int numberOfReadings = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.Session.NUMBER_OF_READINGS));
 
             Session session = new Session();
             session.set_id(id);
+            session.setUuid(UUID);
             session.setStartTime(startTime);
             session.setEndTime(endTime);
             session.setNumberOfReadings(numberOfReadings);
@@ -95,7 +131,6 @@ public class NyxDatabase {
         cv.put(DatabaseContract.AccelerometerReading.X_ACCELERATION, x);
         cv.put(DatabaseContract.AccelerometerReading.Y_ACCELERATION, y);
         cv.put(DatabaseContract.AccelerometerReading.Z_ACCELERATION, z);
-
         writableDb.insert(DatabaseContract.AccelerometerReading.TABLE_NAME,null, cv);
     }
 

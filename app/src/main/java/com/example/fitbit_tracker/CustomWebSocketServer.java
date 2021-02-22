@@ -1,6 +1,5 @@
 package com.example.fitbit_tracker;
 
-import android.app.Activity;
 import android.util.Log;
 
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
@@ -8,8 +7,6 @@ import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
 
