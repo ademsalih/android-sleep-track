@@ -55,9 +55,10 @@ public class NyxDatabase {
         return count;
     }
 
-    public int updateSessionEndTime(String uuid, long endTime) {
+    public int updateSessionEndTime(String uuid, long endTime, int readingCount) {
         ContentValues cv = new ContentValues();
         cv.put(DatabaseContract.Session.END_TIME, endTime);
+        cv.put(DatabaseContract.Session.NUMBER_OF_READINGS, readingCount);
 
         String selection = DatabaseContract.Session.UUID + " LIKE ?";
         String[] selectionArgs = { uuid };
@@ -98,8 +99,8 @@ public class NyxDatabase {
         while(cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.Session._ID));
             String UUID = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Session.UUID));
-            String startTime = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Session.START_TIME));
-            String endTime = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Session.END_TIME));
+            long startTime = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.Session.START_TIME));
+            long endTime = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.Session.END_TIME));
             int numberOfReadings = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.Session.NUMBER_OF_READINGS));
 
             Session session = new Session();

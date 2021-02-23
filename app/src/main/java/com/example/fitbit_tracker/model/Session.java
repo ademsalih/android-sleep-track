@@ -4,17 +4,9 @@ public class Session {
 
     private long _id;
     private String uuid;
-    private String startTime;
-    private String endTime;
+    private long startTime;
+    private long endTime;
     private int numberOfReadings;
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 
     public long get_id() {
         return _id;
@@ -24,19 +16,27 @@ public class Session {
         this._id = _id;
     }
 
-    public String getStartTime() {
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
 
-    public String getEndTime() {
+    public long getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(long endTime) {
         this.endTime = endTime;
     }
 

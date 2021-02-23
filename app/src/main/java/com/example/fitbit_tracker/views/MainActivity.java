@@ -134,14 +134,15 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                     break;
                 case "START_SESSION":
                     long startTime = dataObject.getLong("startTime");
-                    nyxDatabase.updateSessionStartTime(sessionIdentifier, startTime);
+                    int count = nyxDatabase.updateSessionStartTime(sessionIdentifier, startTime);
 
                     /*Intent intent = new Intent(MainActivity.this, RecordingSessionActivity.class);
                     startActivity(intent);*/
                     break;
                 case "STOP_SESSION":
                     long endTime = dataObject.getLong("endTime");
-                    nyxDatabase.updateSessionEndTime(sessionIdentifier, endTime);
+                    int readingCount = dataObject.getInt("readingsCount");
+                    int count2 = nyxDatabase.updateSessionEndTime(sessionIdentifier, endTime, readingCount);
 
                     // Add end time to the current session
 

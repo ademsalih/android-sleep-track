@@ -7,15 +7,15 @@ import com.example.fitbit_tracker.db.DatabaseContract.*;
 
 public class NyxDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 9;
+    public static final int DATABASE_VERSION = 12;
     public static final String DATABASE_NAME = "SessionStore.db";
 
     private static final String SQL_CREATE_TABLE_SESSION = "CREATE TABLE " +
             Session.TABLE_NAME + " (" +
             Session._ID + " INTEGER PRIMARY KEY," +
             Session.UUID + " TEXT," +
-            Session.START_TIME + " TEXT," +
-            Session.END_TIME + " TEXT," +
+            Session.START_TIME + " INTEGER," +
+            Session.END_TIME + " INTEGER," +
             Session.NUMBER_OF_READINGS + " INTEGER)";
 
     private static final String SQL_CREATE_TABLE_ACCELEROMETER_READING = "CREATE TABLE " +

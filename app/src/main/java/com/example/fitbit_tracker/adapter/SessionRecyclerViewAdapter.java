@@ -1,25 +1,18 @@
-package com.example.fitbit_tracker;
+package com.example.fitbit_tracker.adapter;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.views.SessionDetailsActivity;
-import com.example.fitbit_tracker.views.SessionsActivity;
 
 import java.util.List;
 
@@ -42,7 +35,12 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
     @Override
     public void onBindViewHolder(@NonNull SessionsViewHolder holder, final int position) {
         final Session session = sessions.get(position);
-        holder.description.setText(session.getUuid());
+        holder.sessionUUIDTextView.setText(session.getUuid());
+        holder.sessionTimeTextView.setText("Time: " + session.getEndTime());
+        holder.readingCountTextView.setText(session.getNumberOfReadings() + " readings");
+
+        long duration = session.getEndTime() - session.getStartTime();
+        holder.sessionDurationTextView.setText("Duration: " + duration + " ms");
     }
 
     @Override
@@ -51,11 +49,17 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
     }
 
     class SessionsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView description;
+        TextView sessionUUIDTextView;
+        TextView sessionTimeTextView;
+        TextView readingCountTextView;
+        TextView sessionDurationTextView;
 
         SessionsViewHolder(View view) {
             super(view);
-            description = view.findViewById(R.id.sessionUUIDTextView);
+            sessionUUIDTextView = view.findViewById(R.id.sessionUUIDTextView);
+            sessionTimeTextView = view.findViewById(R.id.sessionTimeTextView);
+            readingCountTextView = view.findViewById(R.id.readingCountTextView);
+            sessionDurationTextView = view.findViewById(R.id.sessionDurationTextView);
             itemView.setOnClickListener(this);
         }
 
