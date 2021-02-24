@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 
 import java.util.ArrayList;
@@ -133,6 +134,46 @@ public class NyxDatabase {
         cv.put(DatabaseContract.AccelerometerReading.Y_ACCELERATION, y);
         cv.put(DatabaseContract.AccelerometerReading.Z_ACCELERATION, z);
         writableDb.insert(DatabaseContract.AccelerometerReading.TABLE_NAME,null, cv);
+    }
+
+    public List<HeartrateReading> getAllHeartrates(String uuid) {
+        List<HeartrateReading> heartrateReadings = new ArrayList<>();
+
+        String[] projection = {
+                DatabaseContract.HeartRateReading._ID,
+                DatabaseContract.HeartRateReading.SESSION_ID,
+                DatabaseContract.HeartRateReading.TIME_STAMP,
+                DatabaseContract.HeartRateReading.HEARTRATE
+        };
+
+        String sortOrder = DatabaseContract.HeartRateReading.TIME_STAMP + " ASC";
+
+        String selection = DatabaseContract.HeartRateReading.SESSION_ID + " LIKE ?";
+        String[] selectionArgs = { uuid };
+
+        Cursor cursor = readableDb.query(
+                DatabaseContract.HeartRateReading.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+
+        while(cursor.moveToNext()) {
+            long timeStamp = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.HeartRateReading.TIME_STAMP));
+            int heartrate = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.HeartRateReading.HEARTRATE));
+
+            HeartrateReading heartrateReading = new HeartrateReading();
+            heartrateReading.setTimeStamp(timeStamp);
+            heartrateReading.setHeartRate(heartrate);
+
+            heartrateReadings.add(heartrateReading);
+        }
+        cursor.close();
+
+        return heartrateReadings;
     }
 
 

@@ -6,15 +6,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fitbit_tracker.R;
+import com.example.fitbit_tracker.db.NyxDatabase;
+import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.views.SessionDetailsActivity;
 
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecyclerViewAdapter.SessionsViewHolder> {
     private final List<Session> sessions;
@@ -36,11 +41,15 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
     public void onBindViewHolder(@NonNull SessionsViewHolder holder, final int position) {
         final Session session = sessions.get(position);
         holder.sessionUUIDTextView.setText(session.getUuid());
-        holder.sessionTimeTextView.setText("Time: " + session.getEndTime());
+
+        Date time = new Date(session.getEndTime());
+
+        holder.sessionTimeTextView.setText(time.toString());
         holder.readingCountTextView.setText(session.getNumberOfReadings() + " readings");
 
         long duration = session.getEndTime() - session.getStartTime();
-        holder.sessionDurationTextView.setText("Duration: " + duration + " ms");
+
+        holder.sessionDurationTextView.setText("Duration: " + duration/1000 + " s");
     }
 
     @Override
@@ -65,8 +74,24 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(context, SessionDetailsActivity.class);
-            context.startActivity(intent);
+
+            NyxDatabase db = new NyxDatabase(context);
+
+            TextView textView =  v.findViewById(R.id.sessionUUIDTextView);
+
+
+            List<HeartrateReading> readings = db.getAllHeartrates(textView.getText().toString());
+
+            String show = "";
+
+            for (HeartrateReading h: readings) {
+                show += h.getTimeStamp() + " " + h.getHeartRate() + "\n";
+            }
+
+            Toast.makeText(context, show, Toast.LENGTH_SHORT).show();
+
+            /*Intent intent = new Intent(context, SessionDetailsActivity.class);
+            context.startActivity(intent);*/
         }
     }
 }

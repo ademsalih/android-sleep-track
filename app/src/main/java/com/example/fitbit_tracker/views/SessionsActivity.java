@@ -14,6 +14,7 @@ import com.example.fitbit_tracker.adapter.SessionRecyclerViewAdapter;
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.model.Session;
 
+import java.util.Collections;
 import java.util.List;
 
 public class SessionsActivity extends AppCompatActivity implements LifecycleOwner {
@@ -24,6 +25,7 @@ public class SessionsActivity extends AppCompatActivity implements LifecycleOwne
         setContentView(R.layout.activity_sessions);
 
         List<Session> sessions = new NyxDatabase(this).getAllSessions();
+        Collections.reverse(sessions);
 
         RecyclerView recyclerView = findViewById(R.id.sessionsRecyclerView);
 
