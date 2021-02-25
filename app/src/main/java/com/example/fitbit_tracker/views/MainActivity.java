@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         WebSocketCallback webSocketCallback = this;
 
         c = this.getApplicationContext();
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
         nyxDatabase = new NyxDatabase(getApplicationContext());
 
-        Executor executor = Executors.newSingleThreadExecutor();
+        /*Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                 customWebSocketServer.setReuseAddr(true);
                 customWebSocketServer.start();
             }
-        });
+        });*/
     }
 
     @Override

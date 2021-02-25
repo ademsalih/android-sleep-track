@@ -2,6 +2,7 @@ package com.example.fitbit_tracker.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fitbit_tracker.R;
@@ -50,6 +52,21 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
         long duration = session.getEndTime() - session.getStartTime();
 
         holder.sessionDurationTextView.setText("Duration: " + duration/1000 + " s");
+
+        holder.sessionContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, SessionDetailsActivity.class);
+
+                Bundle bundle = new Bundle();
+                bundle.putString("SESSION_UUID", session.getUuid());
+
+                intent.putExtras(bundle);
+
+                context.startActivity(intent);
+
+            }
+        });
     }
 
     @Override
@@ -57,11 +74,12 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
         return sessions.size();
     }
 
-    class SessionsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class SessionsViewHolder extends RecyclerView.ViewHolder {
         TextView sessionUUIDTextView;
         TextView sessionTimeTextView;
         TextView readingCountTextView;
         TextView sessionDurationTextView;
+        ConstraintLayout sessionContainer;
 
         SessionsViewHolder(View view) {
             super(view);
@@ -69,29 +87,7 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
             sessionTimeTextView = view.findViewById(R.id.sessionTimeTextView);
             readingCountTextView = view.findViewById(R.id.readingCountTextView);
             sessionDurationTextView = view.findViewById(R.id.sessionDurationTextView);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-
-            NyxDatabase db = new NyxDatabase(context);
-
-            TextView textView =  v.findViewById(R.id.sessionUUIDTextView);
-
-
-            List<HeartrateReading> readings = db.getAllHeartrates(textView.getText().toString());
-
-            String show = "";
-
-            for (HeartrateReading h: readings) {
-                show += h.getTimeStamp() + " " + h.getHeartRate() + "\n";
-            }
-
-            Toast.makeText(context, show, Toast.LENGTH_SHORT).show();
-
-            /*Intent intent = new Intent(context, SessionDetailsActivity.class);
-            context.startActivity(intent);*/
+            sessionContainer = (ConstraintLayout) view;
         }
     }
 }
