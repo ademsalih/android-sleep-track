@@ -13,10 +13,10 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FitbitTracker">
-        <activity android:name=".views.SessionDetailsActivity"></activity>
-        <activity android:name=".views.SessionsActivity" />
-        <activity android:name=".views.RecordingSessionActivity" />
-        <activity android:name=".views.MainActivity">
+        <activity android:name=".views.SessionDetailsActivity" android:screenOrientation="portrait"></activity>
+        <activity android:name=".views.SessionsActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".views.RecordingSessionActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".views.MainActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
