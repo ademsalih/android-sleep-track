@@ -47,7 +47,7 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
         Date time = new Date(session.getEndTime());
 
         holder.sessionTimeTextView.setText(time.toString());
-        holder.readingCountTextView.setText(session.getNumberOfReadings() + " readings");
+        holder.readingCountTextView.setText(session.getReadingsCount() + " readings");
 
         long duration = session.getEndTime() - session.getStartTime();
 

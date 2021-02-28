@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.fitbit_tracker.model.AccelerometerReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 
@@ -30,12 +31,13 @@ public class NyxDatabase {
         this.writableDb = this.dbHelper.getWritableDatabase();
     }
 
-    public void createSession(String uuid, String startTime, String endTime, int numberOfReadings) {
+    public void createSession(String uuid, String startTime, String endTime, String deviceModel, int readingsCount) {
         ContentValues cv = new ContentValues();
         cv.put(DatabaseContract.Session.UUID, uuid);
         cv.put(DatabaseContract.Session.END_TIME, startTime);
         cv.put(DatabaseContract.Session.START_TIME, endTime);
-        cv.put(DatabaseContract.Session.NUMBER_OF_READINGS, numberOfReadings);
+        cv.put(DatabaseContract.Session.DEVICE_MODEL, deviceModel);
+        cv.put(DatabaseContract.Session.READINGS_COUNT, readingsCount);
         writableDb.insert(DatabaseContract.Session.TABLE_NAME, null, cv);
     }
 
@@ -59,7 +61,7 @@ public class NyxDatabase {
     public int updateSessionEndTime(String uuid, long endTime, int readingCount) {
         ContentValues cv = new ContentValues();
         cv.put(DatabaseContract.Session.END_TIME, endTime);
-        cv.put(DatabaseContract.Session.NUMBER_OF_READINGS, readingCount);
+        cv.put(DatabaseContract.Session.READINGS_COUNT, readingCount);
 
         String selection = DatabaseContract.Session.UUID + " LIKE ?";
         String[] selectionArgs = { uuid };
@@ -82,7 +84,7 @@ public class NyxDatabase {
                 DatabaseContract.Session.UUID,
                 DatabaseContract.Session.START_TIME,
                 DatabaseContract.Session.END_TIME,
-                DatabaseContract.Session.NUMBER_OF_READINGS
+                DatabaseContract.Session.READINGS_COUNT
         };
 
         String sortOrder = DatabaseContract.Session.START_TIME + " ASC";
@@ -102,14 +104,14 @@ public class NyxDatabase {
             String UUID = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Session.UUID));
             long startTime = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.Session.START_TIME));
             long endTime = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.Session.END_TIME));
-            int numberOfReadings = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.Session.NUMBER_OF_READINGS));
+            int numberOfReadings = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.Session.READINGS_COUNT));
 
             Session session = new Session();
             session.set_id(id);
             session.setUuid(UUID);
             session.setStartTime(startTime);
             session.setEndTime(endTime);
-            session.setNumberOfReadings(numberOfReadings);
+            session.setReadingsCount(numberOfReadings);
 
             sessions.add(session);
         }
@@ -174,6 +176,52 @@ public class NyxDatabase {
         cursor.close();
 
         return heartrateReadings;
+    }
+
+    public List<AccelerometerReading> getAllAccelerometerReadings(String uuid) {
+        List<AccelerometerReading> accelerometerReadings = new ArrayList<>();
+
+        String[] projection = {
+                DatabaseContract.AccelerometerReading._ID,
+                DatabaseContract.AccelerometerReading.SESSION_ID,
+                DatabaseContract.AccelerometerReading.TIME_STAMP,
+                DatabaseContract.AccelerometerReading.X_ACCELERATION,
+                DatabaseContract.AccelerometerReading.Y_ACCELERATION,
+                DatabaseContract.AccelerometerReading.Z_ACCELERATION,
+        };
+
+        String sortOrder = DatabaseContract.AccelerometerReading.TIME_STAMP + " ASC";
+
+        String selection = DatabaseContract.AccelerometerReading.SESSION_ID + " LIKE ?";
+        String[] selectionArgs = { uuid };
+
+        Cursor cursor = readableDb.query(
+                DatabaseContract.AccelerometerReading.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+
+        while(cursor.moveToNext()) {
+            long timeStamp = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.AccelerometerReading.TIME_STAMP));
+            double x = cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseContract.AccelerometerReading.X_ACCELERATION));
+            double y = cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseContract.AccelerometerReading.Y_ACCELERATION));
+            double z = cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseContract.AccelerometerReading.Z_ACCELERATION));
+
+            AccelerometerReading accelerometerReading = new AccelerometerReading();
+            accelerometerReading.setTimeStamp(timeStamp);
+            accelerometerReading.setX(x);
+            accelerometerReading.setY(y);
+            accelerometerReading.setZ(z);
+
+            accelerometerReadings.add(accelerometerReading);
+        }
+        cursor.close();
+
+        return accelerometerReadings;
     }
 
 

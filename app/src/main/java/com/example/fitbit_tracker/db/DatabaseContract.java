@@ -11,7 +11,8 @@ public class DatabaseContract {
         public static final String UUID = "uuid";
         public static final String START_TIME = "start_time";
         public static final String END_TIME = "end_time";
-        public static final String NUMBER_OF_READINGS = "number_of_readings";
+        public static final String DEVICE_MODEL = "device_model";
+        public static final String READINGS_COUNT = "readings_count";
     }
 
     public static abstract class Reading {

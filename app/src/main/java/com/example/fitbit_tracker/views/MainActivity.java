@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
         nyxDatabase = new NyxDatabase(getApplicationContext());
 
-        /*Executor executor = Executors.newSingleThreadExecutor();
+        Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                 customWebSocketServer.setReuseAddr(true);
                 customWebSocketServer.start();
             }
-        });*/
+        });
     }
 
     @Override
@@ -133,7 +133,8 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
                     break;
                 case "INIT_SESSION":
-                    nyxDatabase.createSession(sessionIdentifier,null,null,0);
+                    String deviceModel = dataObject.getString("deviceModel");
+                    nyxDatabase.createSession(sessionIdentifier,null,null, deviceModel, 0);
                     break;
                 case "START_SESSION":
                     long startTime = dataObject.getLong("startTime");

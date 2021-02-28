@@ -6,7 +6,8 @@ public class Session {
     private String uuid;
     private long startTime;
     private long endTime;
-    private int numberOfReadings;
+    private String deviceModel;
+    private int readingsCount;
 
     public long get_id() {
         return _id;
@@ -40,11 +41,19 @@ public class Session {
         this.endTime = endTime;
     }
 
-    public int getNumberOfReadings() {
-        return numberOfReadings;
+    public String getDeviceModel() {
+        return deviceModel;
     }
 
-    public void setNumberOfReadings(int numberOfReadings) {
-        this.numberOfReadings = numberOfReadings;
+    public void setDeviceModel(String deviceModel) {
+        this.deviceModel = deviceModel;
+    }
+
+    public int getReadingsCount() {
+        return readingsCount;
+    }
+
+    public void setReadingsCount(int readingsCount) {
+        this.readingsCount = readingsCount;
     }
 }
