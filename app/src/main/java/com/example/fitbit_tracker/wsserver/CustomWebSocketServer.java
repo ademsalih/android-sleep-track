@@ -1,4 +1,4 @@
-package com.example.fitbit_tracker;
+package com.example.fitbit_tracker.wsserver;
 
 import android.util.Log;
 
@@ -43,7 +43,7 @@ public class CustomWebSocketServer extends WebSocketServer {
     public void onMessage(WebSocket conn, String message) {
         Log.d(TAG, "Received message from " + conn.getRemoteSocketAddress() + ": " + message);
 
-        webSocketOpenCallback.onMessage(message);
+        //webSocketOpenCallback.onMessage(message);
     }
 
     @Override

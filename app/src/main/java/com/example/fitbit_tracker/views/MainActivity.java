@@ -2,25 +2,20 @@ package com.example.fitbit_tracker.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.fitbit_tracker.CustomWebSocketServer;
+import com.example.fitbit_tracker.wsserver.CustomWebSocketServer;
+import com.example.fitbit_tracker.wsserver.CustomWebSocketServerService;
 import com.example.fitbit_tracker.db.NyxDatabase;
-import com.example.fitbit_tracker.db.NyxDbHelper;
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.db.DatabaseContract;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
-import com.example.fitbit_tracker.model.Session;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,9 +23,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements WebSocketCallback {
     private final String TAG = this.getClass().getSimpleName();
@@ -38,8 +30,6 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     private TextView textView;
     private ImageView imageView;
     private CustomWebSocketServer customWebSocketServer;
-    private NyxDbHelper dbHelper;
-    private Context c;
     private NyxDatabase nyxDatabase;
 
     @Override
@@ -47,11 +37,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         WebSocketCallback webSocketCallback = this;
-
-        c = this.getApplicationContext();
 
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textView);
@@ -59,7 +45,12 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
         nyxDatabase = new NyxDatabase(getApplicationContext());
 
-        Executor executor = Executors.newSingleThreadExecutor();
+
+        // Should start the service in a thread
+        Intent intent = new Intent(this, CustomWebSocketServerService.class);
+        startService(intent);
+
+/*        Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -67,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                 customWebSocketServer.setReuseAddr(true);
                 customWebSocketServer.start();
             }
-        });
+        });*/
     }
 
     @Override
@@ -191,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     protected void onDestroy() {
         super.onDestroy();
 
-        dbHelper.close();
         try {
             customWebSocketServer.stop();
         } catch (IOException | InterruptedException e) {
