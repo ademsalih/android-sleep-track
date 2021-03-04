@@ -25,6 +25,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -146,8 +147,27 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         JSONObject jsonObject = new JSONObject();
         try {
-
             jsonObject.put("sessionUUID", sessionUUID);
+
+            JSONArray accArray = new JSONArray();
+            for (AccelerometerReading accelerometerReading : accelerometerReadings) {
+                JSONObject acc = new JSONObject();
+                acc.put("x",accelerometerReading.getX());
+                acc.put("y",accelerometerReading.getY());
+                acc.put("z",accelerometerReading.getZ());
+                acc.put("timestamp",accelerometerReading.getTimeStamp());
+                accArray.put(acc);
+            }
+            jsonObject.put("accelerometerReadings", accArray);
+
+            JSONArray hrArray = new JSONArray();
+            for (HeartrateReading heartrateReading : heartrateReadings) {
+                JSONObject hr = new JSONObject();
+                hr.put("bpm", heartrateReading.getHeartRate());
+                hr.put("timestamp", heartrateReading.getTimeStamp());
+                hrArray.put(hr);
+            }
+            jsonObject.put("heartrateReadings", hrArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
