@@ -2,64 +2,38 @@ package com.example.fitbit_tracker.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.fitbit_tracker.wsserver.CustomWebSocketServer;
-import com.example.fitbit_tracker.wsserver.CustomWebSocketServerService;
-import com.example.fitbit_tracker.db.NyxDatabase;
-import com.example.fitbit_tracker.R;
+import com.example.fitbit_tracker.handlers.ServiceCallback;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
+import com.example.fitbit_tracker.wsserver.CustomWebSocketServerService;
+import com.example.fitbit_tracker.R;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity implements WebSocketCallback {
+public class MainActivity extends AppCompatActivity implements ServiceCallback {
     private final String TAG = this.getClass().getSimpleName();
     private ProgressBar progressBar;
     private TextView textView;
     private ImageView imageView;
-    private CustomWebSocketServer customWebSocketServer;
-    private NyxDatabase nyxDatabase;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        WebSocketCallback webSocketCallback = this;
-
-        progressBar = findViewById(R.id.progressBar);
-        textView = findViewById(R.id.textView);
-        imageView = findViewById(R.id.imageView);
-
-        nyxDatabase = new NyxDatabase(getApplicationContext());
-
-
-        // Should start the service in a thread
-        Intent intent = new Intent(this, CustomWebSocketServerService.class);
-        startService(intent);
-
-/*        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                customWebSocketServer = new CustomWebSocketServer(webSocketCallback, 8887);
-                customWebSocketServer.setReuseAddr(true);
-                customWebSocketServer.start();
-            }
-        });*/
-    }
+    private Context context;
+    private Intent websocketServerServiceIntent;
 
     @Override
     public void onOpen() {
@@ -71,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                 textView.setText("Connected to Hypnos");
             }
         });
-
     }
 
     @Override
@@ -88,74 +61,50 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
 
     @Override
     public void onMessage(String message) {
-        Log.d(TAG, message);
 
-        String newMessage = message.replace('"','\"');
+    }
 
-        try {
-            JSONObject json = new JSONObject(newMessage);
-            String command = json.getString("command");
-            JSONObject dataObject = json.getJSONObject("data");
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-            String sessionIdentifier = dataObject.getString("sessionIdentifier");
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-            switch (command) {
-                case "ADD_READING":
+        context = this;
+        progressBar = findViewById(R.id.progressBar);
+        textView = findViewById(R.id.textView);
+        imageView = findViewById(R.id.imageView);
 
-                    String sensorIdentifier = dataObject.getString("sensorIdentifier");
+        websocketServerServiceIntent = new Intent(context, CustomWebSocketServerService.class);
 
-                    String timeStamp = dataObject.getString("timeStamp");
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                startService(websocketServerServiceIntent);
+            }
+        });
 
-                    switch (sensorIdentifier) {
-                        case "HEARTRATE":
-                            JSONObject bpmData = dataObject.getJSONObject("data");
-                            int bpm = bpmData.getInt("bpm");
-                            nyxDatabase.addHeartrateReading(sessionIdentifier, timeStamp, bpm);
-                            break;
-                        case "ACCELEROMETER":
-                            JSONObject accelerometerData = dataObject.getJSONObject("data");
-                            double xAcceleration = accelerometerData.getDouble("x");
-                            double yAcceleration = accelerometerData.getDouble("y");
-                            double zAcceleration = accelerometerData.getDouble("z");
-                            nyxDatabase.addAccelerometerReading(sessionIdentifier, timeStamp, xAcceleration, yAcceleration, zAcceleration);
-                        default:
-                            break;
-                    }
 
-                    break;
-                case "INIT_SESSION":
-                    String deviceModel = dataObject.getString("deviceModel");
-                    nyxDatabase.createSession(sessionIdentifier,null,null, deviceModel, 0);
-                    break;
-                case "START_SESSION":
-                    long startTime = dataObject.getLong("startTime");
-                    int count = nyxDatabase.updateSessionStartTime(sessionIdentifier, startTime);
-
-                    /*Intent intent = new Intent(MainActivity.this, RecordingSessionActivity.class);
-                    startActivity(intent);*/
-                    break;
-                case "STOP_SESSION":
-                    long endTime = dataObject.getLong("endTime");
-                    int readingCount = dataObject.getInt("readingsCount");
-                    int count2 = nyxDatabase.updateSessionEndTime(sessionIdentifier, endTime, readingCount);
-
-                    // Add end time to the current session
-
-                    // Add number of readings to current session
-
-                    // Close recording activity
-
-                    break;
-                default:
-                    break;
+        bindService(websocketServerServiceIntent, new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                Log.d(TAG, "onServiceConnected");
+                CustomWebSocketServerService.LocalBinder binder = (CustomWebSocketServerService.LocalBinder) service;
+                binder.getService().registerCallBack((ServiceCallback) context);
             }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                Log.d(TAG, "onServiceDisconnected");
+            }
+        }, BIND_AUTO_CREATE);
+    }
 
-        }
-
-        //writeFileOnInternalStorage(this,"testing.txt", message);
+    public void onSessionsButtonClick(View view) {
+        Intent intent = new Intent(MainActivity.this,SessionsActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -181,33 +130,41 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        try {
-            customWebSocketServer.stop();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        stopService(websocketServerServiceIntent);
     }
 
-    public void writeFileOnInternalStorage(Context mcoContext, String sFileName, String sBody){
-        File dir = new File(mcoContext.getFilesDir(), "mydir");
-        if(!dir.exists()){
-            dir.mkdir();
-        }
-
-        try {
-            File gpxfile = new File(dir, sFileName);
-            FileWriter writer = new FileWriter(gpxfile, true);
-            writer.append(sBody + "\n");
-            writer.flush();
-            writer.close();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+    /*@Override
+    public void onFitbitConnect() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                imageView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+                textView.setText("Connected to Hypnos");
+            }
+        });
     }
 
-    public void onSessionsButtonClick(View view) {
-        Intent intent = new Intent(MainActivity.this,SessionsActivity.class);
-        startActivity(intent);
+    @Override
+    public void onSessionStart() {
+
     }
+
+    @Override
+    public void onSessionEnd() {
+
+    }
+
+    @Override
+    public void onFitbitDisconnect() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                imageView.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
+                textView.setText("Looking for Fitbit device");
+            }
+        });
+    }*/
+
 }

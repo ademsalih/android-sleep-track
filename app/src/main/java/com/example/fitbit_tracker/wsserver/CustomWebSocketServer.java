@@ -1,60 +1,122 @@
 package com.example.fitbit_tracker.wsserver;
 
+import android.content.Context;
 import android.util.Log;
+import android.view.View;
 
+import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
 
 public class CustomWebSocketServer extends WebSocketServer {
-
     private final String TAG = this.getClass().getSimpleName();
-    private final WebSocketCallback webSocketOpenCallback;
 
-    public CustomWebSocketServer(WebSocketCallback cb, String host, int port) {
-        super(new InetSocketAddress(host, port));
-        this.webSocketOpenCallback = cb;
+    private NyxDatabase nyxDatabase;
+    private WebSocketCallback webSocketCallback;
 
+    public CustomWebSocketServer(WebSocketCallback webSocketCallback, Context context, int port) {
+        super(new InetSocketAddress(port));
+        this.nyxDatabase = new NyxDatabase(context);
+        this.webSocketCallback = webSocketCallback;
     }
 
-    public CustomWebSocketServer(WebSocketCallback cb, int port) {
-        super(new InetSocketAddress(port));
-        this.webSocketOpenCallback = cb;
+    @Override
+    public void onStart() {
+        Log.d(TAG, "WebSocket server started");
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         Log.d(TAG, "A client has connected: " + conn.getRemoteSocketAddress());
         conn.send("Welcome to the Android server!");
-        webSocketOpenCallback.onOpen();
+        webSocketCallback.onOpen();
+    }
+
+    @Override
+    public void onMessage(WebSocket conn, String message) {
+        Log.d(TAG, message);
+        webSocketCallback.onMessage(message);
+
+        String newMessage = message.replace('"','\"');
+
+        try {
+            JSONObject json = new JSONObject(newMessage);
+            String command = json.getString("command");
+            JSONObject dataObject = json.getJSONObject("data");
+
+            String sessionIdentifier = dataObject.getString("sessionIdentifier");
+
+            switch (command) {
+                case "ADD_READING":
+
+                    String sensorIdentifier = dataObject.getString("sensorIdentifier");
+
+                    String timeStamp = dataObject.getString("timeStamp");
+
+                    switch (sensorIdentifier) {
+                        case "HEARTRATE":
+                            JSONObject bpmData = dataObject.getJSONObject("data");
+                            int bpm = bpmData.getInt("bpm");
+                            nyxDatabase.addHeartrateReading(sessionIdentifier, timeStamp, bpm);
+                            break;
+                        case "ACCELEROMETER":
+                            JSONObject accelerometerData = dataObject.getJSONObject("data");
+                            double xAcceleration = accelerometerData.getDouble("x");
+                            double yAcceleration = accelerometerData.getDouble("y");
+                            double zAcceleration = accelerometerData.getDouble("z");
+                            nyxDatabase.addAccelerometerReading(sessionIdentifier, timeStamp, xAcceleration, yAcceleration, zAcceleration);
+                        default:
+                            break;
+                    }
+
+                    break;
+                case "INIT_SESSION":
+                    String deviceModel = dataObject.getString("deviceModel");
+                    nyxDatabase.createSession(sessionIdentifier,null,null, deviceModel, 0);
+                    break;
+                case "START_SESSION":
+                    long startTime = dataObject.getLong("startTime");
+                    nyxDatabase.updateSessionStartTime(sessionIdentifier, startTime);
+
+                    /*Intent intent = new Intent(MainActivity.this, RecordingSessionActivity.class);
+                    startActivity(intent);*/
+                    break;
+                case "STOP_SESSION":
+                    long endTime = dataObject.getLong("endTime");
+                    int readingCount = dataObject.getInt("readingsCount");
+                    nyxDatabase.updateSessionEndTime(sessionIdentifier, endTime, readingCount);
+
+                    // Add end time to the current session
+                    // Add number of readings to current session
+                    // Close recording activity
+                    break;
+                default:
+                    break;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+
+        }
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         Log.d(TAG, "Connection to " + conn.getRemoteSocketAddress() + " closed due to:" + reason);
-        webSocketOpenCallback.onClose();
-    }
-
-    @Override
-    public void onMessage(WebSocket conn, String message) {
-        Log.d(TAG, "Received message from " + conn.getRemoteSocketAddress() + ": " + message);
-
-        //webSocketOpenCallback.onMessage(message);
+        webSocketCallback.onClose();
     }
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
         Log.d(TAG, "ERROR with connection" + ex);
 
-    }
-
-    @Override
-    public void onStart() {
-        Log.d(TAG, "WebSocket server started");
     }
 
 }
