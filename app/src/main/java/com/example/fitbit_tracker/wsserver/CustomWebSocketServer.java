@@ -2,7 +2,6 @@ package com.example.fitbit_tracker.wsserver;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
@@ -84,18 +83,13 @@ public class CustomWebSocketServer extends WebSocketServer {
                 case "START_SESSION":
                     long startTime = dataObject.getLong("startTime");
                     nyxDatabase.updateSessionStartTime(sessionIdentifier, startTime);
-
-                    /*Intent intent = new Intent(MainActivity.this, RecordingSessionActivity.class);
-                    startActivity(intent);*/
+                    webSocketCallback.onSessionStart();
                     break;
                 case "STOP_SESSION":
                     long endTime = dataObject.getLong("endTime");
                     int readingCount = dataObject.getInt("readingsCount");
                     nyxDatabase.updateSessionEndTime(sessionIdentifier, endTime, readingCount);
-
-                    // Add end time to the current session
-                    // Add number of readings to current session
-                    // Close recording activity
+                    webSocketCallback.onSessionEnd();
                     break;
                 default:
                     break;
@@ -116,7 +110,6 @@ public class CustomWebSocketServer extends WebSocketServer {
     @Override
     public void onError(WebSocket conn, Exception ex) {
         Log.d(TAG, "ERROR with connection" + ex);
-
     }
 
 }

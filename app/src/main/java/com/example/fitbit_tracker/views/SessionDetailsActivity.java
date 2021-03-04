@@ -1,24 +1,47 @@
 package com.example.fitbit_tracker.views;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ShareCompat;
+import androidx.core.content.FileProvider;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.FileObserver;
+import android.os.Parcelable;
+import android.view.View;
 
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.model.AccelerometerReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
+import com.example.fitbit_tracker.model.Session;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.security.AccessController.getContext;
+
 public class SessionDetailsActivity extends AppCompatActivity {
+    private final String TAG = this.getClass().getSimpleName();
+    private String sessionUUID;
+    private NyxDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +49,9 @@ public class SessionDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_session_details);
 
         Bundle b = getIntent().getExtras();
-        String sessionUUID = b.getString("SESSION_UUID");
+        sessionUUID = b.getString("SESSION_UUID");
 
-        NyxDatabase db = new NyxDatabase(this);
+        db = new NyxDatabase(this);
 
         List<HeartrateReading> hrReadings = db.getAllHeartrates(sessionUUID);
 
@@ -114,5 +137,50 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         accelerometerChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
         accelerometerChart.invalidate();
+    }
+
+    public void onExportButtonClicked(View view) {
+        List<HeartrateReading> heartrateReadings = db.getAllHeartrates(sessionUUID);
+        List<AccelerometerReading> accelerometerReadings = db.getAllAccelerometerReadings(sessionUUID);
+        //Session session = db.getAllSessions();
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+
+            jsonObject.put("sessionUUID", sessionUUID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+
+            //Create a file and write the String to it
+            BufferedWriter out;
+            File imagePath = new File(getFilesDir(), "json");
+            imagePath.mkdir();
+            File imageFile = new File(imagePath.getPath(), "session.json");
+
+
+            FileWriter fileWriter = new FileWriter(imageFile.getPath());
+            out = new BufferedWriter(fileWriter);
+            out.write(jsonObject.toString());
+            out.close();
+
+            // Write data in your file
+            Uri uri = FileProvider.getUriForFile(this, "com.example.fileprovider", imageFile);
+
+            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            sendIntent.setType("text/plain");
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            String title = "Share session";
+
+            startActivity(Intent.createChooser(sendIntent, title));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

@@ -8,10 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,7 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.fitbit_tracker.handlers.ServiceCallback;
-import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import com.example.fitbit_tracker.wsserver.CustomWebSocketServerService;
 import com.example.fitbit_tracker.R;
 
@@ -54,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
             public void run() {
                 imageView.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
-                textView.setText("Looking for Fitbit device");
+                textView.setText(R.string.NOT_CONNECTED_TEXT);
             }
         });
     }
@@ -103,7 +99,12 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
     }
 
     public void onSessionsButtonClick(View view) {
-        Intent intent = new Intent(MainActivity.this,SessionsActivity.class);
+        Intent intent = new Intent(MainActivity.this, SessionsActivity.class);
+        startActivity(intent);
+    }
+
+    public void onSettingsButtonClick(View view) {
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(intent);
     }
 
@@ -132,39 +133,5 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
         super.onDestroy();
         stopService(websocketServerServiceIntent);
     }
-
-    /*@Override
-    public void onFitbitConnect() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                imageView.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.INVISIBLE);
-                textView.setText("Connected to Hypnos");
-            }
-        });
-    }
-
-    @Override
-    public void onSessionStart() {
-
-    }
-
-    @Override
-    public void onSessionEnd() {
-
-    }
-
-    @Override
-    public void onFitbitDisconnect() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                imageView.setVisibility(View.INVISIBLE);
-                progressBar.setVisibility(View.VISIBLE);
-                textView.setText("Looking for Fitbit device");
-            }
-        });
-    }*/
 
 }

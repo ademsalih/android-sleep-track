@@ -23,8 +23,10 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.handlers.ServiceCallback;
+import com.example.fitbit_tracker.handlers.SessionEndCallback;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import com.example.fitbit_tracker.views.MainActivity;
+import com.example.fitbit_tracker.views.RecordingSessionActivity;
 
 import java.util.Observable;
 import java.util.Timer;
@@ -37,6 +39,7 @@ public class CustomWebSocketServerService extends Service implements WebSocketCa
     private final IBinder mBinder = new LocalBinder();
     private boolean connected = false;
     private ServiceCallback serviceCallback;
+    private SessionEndCallback sessionEndCallback;
 
     public class LocalBinder extends Binder {
         public CustomWebSocketServerService getService() {
@@ -46,6 +49,10 @@ public class CustomWebSocketServerService extends Service implements WebSocketCa
 
     public void registerCallBack(ServiceCallback myCallback){
         this.serviceCallback = myCallback;
+    }
+
+    public void registerSessionEndCallback(SessionEndCallback sessionEndCallback) {
+        this.sessionEndCallback = sessionEndCallback;
     }
 
     public CustomWebSocketServerService() {
@@ -155,5 +162,18 @@ public class CustomWebSocketServerService extends Service implements WebSocketCa
     public void onMessage(String message) {
         Log.d(TAG, "onMessage");
     }
+
+    @Override
+    public void onSessionStart() {
+        Intent recordingSessionIntent = new Intent(this, RecordingSessionActivity.class);
+        startActivity(recordingSessionIntent);
+
+    }
+
+    @Override
+    public void onSessionEnd() {
+        sessionEndCallback.onSessionEnd();
+    }
+
 
 }

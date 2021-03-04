@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Nyx</string>
+    <string name="NOT_CONNECTED_TEXT">Looking for Fitbit device...</string>
 </resources>

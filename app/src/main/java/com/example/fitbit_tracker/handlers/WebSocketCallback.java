@@ -4,4 +4,6 @@ public interface WebSocketCallback {
     void onOpen();
     void onClose();
     void onMessage(String message);
+    void onSessionStart();
+    void onSessionEnd();
 }
