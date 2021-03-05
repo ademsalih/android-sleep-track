@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.fitbit_tracker.model.AccelerometerReading;
+import com.example.fitbit_tracker.model.BatteryReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 
@@ -138,6 +139,14 @@ public class NyxDatabase {
         writableDb.insert(DatabaseContract.AccelerometerReading.TABLE_NAME,null, cv);
     }
 
+    public void addBatteryeReading(String sessionIdentifier, String timeStamp, int batteryLevel) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseContract.BatteryReading.SESSION_ID, sessionIdentifier);
+        cv.put(DatabaseContract.BatteryReading.TIME_STAMP, timeStamp);
+        cv.put(DatabaseContract.BatteryReading.BATTERY_LEVEL, batteryLevel);
+        writableDb.insert(DatabaseContract.BatteryReading.TABLE_NAME,null, cv);
+    }
+
     public List<HeartrateReading> getAllHeartrates(String uuid) {
         List<HeartrateReading> heartrateReadings = new ArrayList<>();
 
@@ -222,6 +231,46 @@ public class NyxDatabase {
         cursor.close();
 
         return accelerometerReadings;
+    }
+
+    public List<BatteryReading> getAllBatteryLevels(String uuid) {
+        List<BatteryReading> batteryReadings = new ArrayList<>();
+
+        String[] projection = {
+                DatabaseContract.BatteryReading._ID,
+                DatabaseContract.BatteryReading.SESSION_ID,
+                DatabaseContract.BatteryReading.TIME_STAMP,
+                DatabaseContract.BatteryReading.BATTERY_LEVEL
+        };
+
+        String sortOrder = DatabaseContract.BatteryReading.TIME_STAMP + " ASC";
+
+        String selection = DatabaseContract.BatteryReading.SESSION_ID + " LIKE ?";
+        String[] selectionArgs = { uuid };
+
+        Cursor cursor = readableDb.query(
+                DatabaseContract.BatteryReading.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+
+        while(cursor.moveToNext()) {
+            long timeStamp = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.BatteryReading.TIME_STAMP));
+            int batteryLevel = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.BatteryReading.BATTERY_LEVEL));
+
+            BatteryReading batteryReading = new BatteryReading();
+            batteryReading.setTimeStamp(timeStamp);
+            batteryReading.setBatteryPercentage(batteryLevel);
+
+            batteryReadings.add(batteryReading);
+        }
+        cursor.close();
+
+        return batteryReadings;
     }
 
 

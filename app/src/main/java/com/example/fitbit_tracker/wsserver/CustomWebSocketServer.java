@@ -71,6 +71,10 @@ public class CustomWebSocketServer extends WebSocketServer {
                             double yAcceleration = accelerometerData.getDouble("y");
                             double zAcceleration = accelerometerData.getDouble("z");
                             nyxDatabase.addAccelerometerReading(sessionIdentifier, timeStamp, xAcceleration, yAcceleration, zAcceleration);
+                        case "BATTERY":
+                            JSONObject batteryData = dataObject.getJSONObject("data");
+                            int batteryLevel = batteryData.getInt("batteryLevel");
+                            nyxDatabase.addBatteryeReading(sessionIdentifier, timeStamp, batteryLevel);
                         default:
                             break;
                     }

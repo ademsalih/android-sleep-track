@@ -17,6 +17,7 @@ import android.view.View;
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.model.AccelerometerReading;
+import com.example.fitbit_tracker.model.BatteryReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 import com.github.mikephil.charting.charts.LineChart;
@@ -138,12 +139,44 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         accelerometerChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
         accelerometerChart.invalidate();
+
+        // BATTERY
+        List<BatteryReading> batteryReadings = db.getAllBatteryLevels(sessionUUID);
+
+        LineChart batteryChart = (LineChart) findViewById(R.id.batteryChart);
+
+        List<Entry> batteryEntryList = new ArrayList<Entry>();
+
+        int k = 0;
+
+        for (BatteryReading batteryReading : batteryReadings) {
+            batteryEntryList.add(new Entry(k, batteryReading.getBatteryPercentage()));
+            k++;
+        }
+
+        LineDataSet batteryDataSet = new LineDataSet(batteryEntryList, "Battery percentage");
+        batteryDataSet.setColor(Color.rgb(1,1,1));
+        batteryDataSet.setValueTextColor(Color.rgb(1,1,1));
+        batteryDataSet.setCircleHoleRadius(0f);
+        batteryDataSet.setDrawCircleHole(false);
+        batteryDataSet.setColor(0xFFFF9300);
+        batteryDataSet.setCircleColor(0xFFFF9300);
+        batteryDataSet.setCircleRadius(2f);
+
+        LineData batteryLineData = new LineData(batteryDataSet);
+
+        batteryChart.setData(batteryLineData);
+
+        XAxis xAxisBat = batteryChart.getXAxis();
+        xAxisBat.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+
+        batteryChart.invalidate();
     }
 
     public void onExportButtonClicked(View view) {
         List<HeartrateReading> heartrateReadings = db.getAllHeartrates(sessionUUID);
         List<AccelerometerReading> accelerometerReadings = db.getAllAccelerometerReadings(sessionUUID);
-        //Session session = db.getAllSessions();
+        List<BatteryReading> batteryReadings = db.getAllBatteryLevels(sessionUUID);
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -168,6 +201,15 @@ public class SessionDetailsActivity extends AppCompatActivity {
                 hrArray.put(hr);
             }
             jsonObject.put("heartrateReadings", hrArray);
+
+            JSONArray battArray = new JSONArray();
+            for (BatteryReading batteryReading : batteryReadings) {
+                JSONObject batt = new JSONObject();
+                batt.put("bpm", batteryReading.getBatteryPercentage());
+                batt.put("timestamp", batteryReading.getTimeStamp());
+                battArray.put(batt);
+            }
+            jsonObject.put("batteryReadings", hrArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }

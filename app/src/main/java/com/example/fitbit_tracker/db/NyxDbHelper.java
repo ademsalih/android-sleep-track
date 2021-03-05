@@ -7,7 +7,7 @@ import com.example.fitbit_tracker.db.DatabaseContract.*;
 
 public class NyxDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 15;
+    public static final int DATABASE_VERSION = 17;
     public static final String DATABASE_NAME = "SessionStore.db";
 
     private static final String SQL_CREATE_TABLE_SESSION = "CREATE TABLE " +
@@ -35,9 +35,17 @@ public class NyxDbHelper extends SQLiteOpenHelper {
             HeartRateReading.TIME_STAMP + " INTEGER," +
             HeartRateReading.HEARTRATE + " INTEGER)";
 
+    private static final String SQL_CREATE_TABLE_BATTERY_READING = "CREATE TABLE " +
+            BatteryReading.TABLE_NAME + " (" +
+            BatteryReading._ID + " INTEGER PRIMARY KEY," +
+            BatteryReading.SESSION_ID + " TEXT," +
+            BatteryReading.TIME_STAMP + " INTEGER," +
+            BatteryReading.BATTERY_LEVEL + " INTEGER)";
+
     private static final String SQL_DELETE_TABLE_SESSION = "DROP TABLE IF EXISTS " + Session.TABLE_NAME;
     private static final String SQL_DELETE_TABLE_ACCELEROMETER_READING = "DROP TABLE IF EXISTS " + AccelerometerReading.TABLE_NAME;
     private static final String SQL_DELETE_TABLE_HEARTRATE_READING = "DROP TABLE IF EXISTS " + HeartRateReading.TABLE_NAME;
+    private static final String SQL_DELETE_TABLE_BATTERY_READING = "DROP TABLE IF EXISTS " + BatteryReading.TABLE_NAME;
 
     public NyxDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -48,6 +56,7 @@ public class NyxDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_TABLE_SESSION);
         db.execSQL(SQL_CREATE_TABLE_ACCELEROMETER_READING);
         db.execSQL(SQL_CREATE_TABLE_HEARTRATE_READING);
+        db.execSQL(SQL_CREATE_TABLE_BATTERY_READING);
     }
 
     @Override
@@ -55,6 +64,7 @@ public class NyxDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_TABLE_SESSION);
         db.execSQL(SQL_DELETE_TABLE_ACCELEROMETER_READING);
         db.execSQL(SQL_DELETE_TABLE_HEARTRATE_READING);
+        db.execSQL(SQL_DELETE_TABLE_BATTERY_READING);
         onCreate(db);
     }
 

@@ -32,6 +32,11 @@ public class DatabaseContract {
         public static final String HEARTRATE = "heartrate";
     }
 
+    public static class BatteryReading extends Reading implements BaseColumns {
+        public static final String TABLE_NAME = "battery_reading";
+        public static final String BATTERY_LEVEL = "battery_level";
+    }
+
     
 }
 
