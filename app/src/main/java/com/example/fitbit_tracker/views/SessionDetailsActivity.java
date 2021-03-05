@@ -205,11 +205,11 @@ public class SessionDetailsActivity extends AppCompatActivity {
             JSONArray battArray = new JSONArray();
             for (BatteryReading batteryReading : batteryReadings) {
                 JSONObject batt = new JSONObject();
-                batt.put("bpm", batteryReading.getBatteryPercentage());
+                batt.put("batteryLevel", batteryReading.getBatteryPercentage());
                 batt.put("timestamp", batteryReading.getTimeStamp());
                 battArray.put(batt);
             }
-            jsonObject.put("batteryReadings", hrArray);
+            jsonObject.put("batteryReadings", battArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
