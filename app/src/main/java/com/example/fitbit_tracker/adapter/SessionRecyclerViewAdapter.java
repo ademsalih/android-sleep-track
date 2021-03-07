@@ -39,19 +39,63 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
         return new SessionsViewHolder(rootView);
     }
 
+    public String durationPrint(long ms) {
+        long seconds = ms/1000;
+
+        if (seconds < 60) {
+            return seconds + " seconds";
+        } else if (seconds < 3600) {
+            int minute = (int) seconds / 60;
+            int remainderSeconds = (int) seconds % 60;
+            String duration = String.valueOf(minute);
+
+            if (minute > 1) {
+                duration += " minutes";
+            } else {
+                duration += " minute";
+            }
+
+            if (remainderSeconds > 1) {
+                duration += ", " + remainderSeconds + " seconds";
+            } else if (remainderSeconds > 0) {
+                duration += ", " + remainderSeconds + " second";
+            }
+
+            return duration;
+        } else {
+            int hour = (int) seconds/3600;
+            int remainderSeconds = (int) seconds % 3600;
+            int remainderMinutes = (int) remainderSeconds / 60;
+            String duration = String.valueOf(hour);
+
+            if (hour > 1 ) {
+                duration += " hours";
+            } else {
+                duration += " hour";
+            }
+
+            if (remainderMinutes > 1) {
+                duration += ", " + remainderMinutes + " minutes";
+            } else if (remainderMinutes > 0) {
+                duration += ", " + remainderMinutes + " minute";
+            }
+
+            return duration;
+        }
+    }
+
     @Override
     public void onBindViewHolder(@NonNull SessionsViewHolder holder, final int position) {
         final Session session = sessions.get(position);
-        holder.sessionUUIDTextView.setText(session.getUuid());
 
         Date time = new Date(session.getEndTime());
 
-        holder.sessionTimeTextView.setText(time.toString());
+        holder.sessionTimeTextView.setText("5 minutes ago");
         holder.readingCountTextView.setText(session.getReadingsCount() + " readings");
 
         long duration = session.getEndTime() - session.getStartTime();
 
-        holder.sessionDurationTextView.setText("Duration: " + duration/1000 + " s");
+        holder.sessionDurationTextView.setText(durationPrint(30000_000));
 
         holder.sessionContainer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +119,6 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
     }
 
     class SessionsViewHolder extends RecyclerView.ViewHolder {
-        TextView sessionUUIDTextView;
         TextView sessionTimeTextView;
         TextView readingCountTextView;
         TextView sessionDurationTextView;
@@ -83,11 +126,11 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
 
         SessionsViewHolder(View view) {
             super(view);
-            sessionUUIDTextView = view.findViewById(R.id.sessionUUIDTextView);
             sessionTimeTextView = view.findViewById(R.id.sessionTimeTextView);
             readingCountTextView = view.findViewById(R.id.readingCountTextView);
             sessionDurationTextView = view.findViewById(R.id.sessionDurationTextView);
             sessionContainer = (ConstraintLayout) view;
         }
+
     }
 }
