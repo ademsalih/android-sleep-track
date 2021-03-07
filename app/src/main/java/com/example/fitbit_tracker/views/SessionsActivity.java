@@ -25,6 +25,9 @@ public class SessionsActivity extends AppCompatActivity implements LifecycleOwne
         setContentView(R.layout.activity_sessions);
 
         List<Session> sessions = new NyxDatabase(this).getAllSessions();
+
+        getSupportActionBar().setTitle("Sessions" + " (" + sessions.size() + ")");
+
         Collections.reverse(sessions);
 
         RecyclerView recyclerView = findViewById(R.id.sessionsRecyclerView);

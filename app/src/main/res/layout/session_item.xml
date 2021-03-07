@@ -10,7 +10,7 @@
     android:padding="12dp">
 
     <TextView
-        android:id="@+id/timesTextView"
+        android:id="@+id/sessionStartEndTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="11:24 – 07:10"
@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/sessionTimeTextView"
+        android:id="@+id/timeDeltaTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="3 min ago"
@@ -39,7 +39,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timesTextView">
+        app:layout_constraintTop_toBottomOf="@+id/sessionStartEndTextView">
 
         <ImageView
             android:id="@+id/readingsCountImageView"
@@ -108,7 +108,7 @@
             app:srcCompat="@drawable/icons8_apple_watch_60" />
 
         <TextView
-            android:id="@+id/sessionDurationTextView3"
+            android:id="@+id/deviceModelTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"

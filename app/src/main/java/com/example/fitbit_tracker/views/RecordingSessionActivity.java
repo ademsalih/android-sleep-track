@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.WindowManager;
 
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.handlers.ServiceCallback;
@@ -22,6 +23,8 @@ public class RecordingSessionActivity extends AppCompatActivity implements Sessi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording_session);
+        getSupportActionBar().hide();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         Intent intent = new Intent(RecordingSessionActivity.this, CustomWebSocketServerService.class);
 

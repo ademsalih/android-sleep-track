@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getSupportActionBar().setTitle("Welcome to Nyx");
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         context = this;
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
                 startService(websocketServerServiceIntent);
             }
         });
-
 
         bindService(websocketServerServiceIntent, new ServiceConnection() {
             @Override

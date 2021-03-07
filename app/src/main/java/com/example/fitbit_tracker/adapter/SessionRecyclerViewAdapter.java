@@ -7,21 +7,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.db.NyxDatabase;
-import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.views.SessionDetailsActivity;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Locale;
+
+import static com.example.fitbit_tracker.utils.TimeUtils.*;
 
 public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecyclerViewAdapter.SessionsViewHolder> {
     private final List<Session> sessions;
@@ -35,67 +35,33 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
     @NonNull
     @Override
     public SessionsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.session_item, parent, false);
+        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.session_item_2, parent, false);
         return new SessionsViewHolder(rootView);
-    }
-
-    public String durationPrint(long ms) {
-        long seconds = ms/1000;
-
-        if (seconds < 60) {
-            return seconds + " seconds";
-        } else if (seconds < 3600) {
-            int minute = (int) seconds / 60;
-            int remainderSeconds = (int) seconds % 60;
-            String duration = String.valueOf(minute);
-
-            if (minute > 1) {
-                duration += " minutes";
-            } else {
-                duration += " minute";
-            }
-
-            if (remainderSeconds > 1) {
-                duration += ", " + remainderSeconds + " seconds";
-            } else if (remainderSeconds > 0) {
-                duration += ", " + remainderSeconds + " second";
-            }
-
-            return duration;
-        } else {
-            int hour = (int) seconds/3600;
-            int remainderSeconds = (int) seconds % 3600;
-            int remainderMinutes = (int) remainderSeconds / 60;
-            String duration = String.valueOf(hour);
-
-            if (hour > 1 ) {
-                duration += " hours";
-            } else {
-                duration += " hour";
-            }
-
-            if (remainderMinutes > 1) {
-                duration += ", " + remainderMinutes + " minutes";
-            } else if (remainderMinutes > 0) {
-                duration += ", " + remainderMinutes + " minute";
-            }
-
-            return duration;
-        }
     }
 
     @Override
     public void onBindViewHolder(@NonNull SessionsViewHolder holder, final int position) {
-        final Session session = sessions.get(position);
+        Session session = sessions.get(position);
 
-        Date time = new Date(session.getEndTime());
+        Date sessionStartDate = new Date(session.getStartTime());
+        Date sessionEndDate = new Date(session.getEndTime());
 
-        holder.sessionTimeTextView.setText("5 minutes ago");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.US);
+        String sessionStartFormatted = simpleDateFormat.format(sessionStartDate);
+        String sessionEndFormatted = simpleDateFormat.format(sessionEndDate);
+
+        holder.sessionStartEndTextView.setText(sessionStartFormatted + " – " + sessionEndFormatted);
+
+        long timeDelta = System.currentTimeMillis() - session.getEndTime();
+        holder.timeDeltaTextView.setText(timeDeltaLabel(timeDelta));
+
         holder.readingCountTextView.setText(session.getReadingsCount() + " readings");
 
         long duration = session.getEndTime() - session.getStartTime();
 
-        holder.sessionDurationTextView.setText(durationPrint(30000_000));
+        holder.sessionDurationTextView.setText(formattedTimeLabel(duration));
+
+        holder.deviceModelTextView.setText("Fitbit " + session.getDeviceModel());
 
         holder.sessionContainer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,7 +74,6 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
                 intent.putExtras(bundle);
 
                 context.startActivity(intent);
-
             }
         });
     }
@@ -119,16 +84,21 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
     }
 
     class SessionsViewHolder extends RecyclerView.ViewHolder {
-        TextView sessionTimeTextView;
-        TextView readingCountTextView;
+        TextView sessionStartEndTextView;
+        TextView timeDeltaTextView;
         TextView sessionDurationTextView;
+        TextView deviceModelTextView;
+        TextView readingCountTextView;
+
         ConstraintLayout sessionContainer;
 
         SessionsViewHolder(View view) {
             super(view);
-            sessionTimeTextView = view.findViewById(R.id.sessionTimeTextView);
-            readingCountTextView = view.findViewById(R.id.readingCountTextView);
+            sessionStartEndTextView = view.findViewById(R.id.sessionStartEndTextView);
+            timeDeltaTextView = view.findViewById(R.id.timeDeltaTextView);
             sessionDurationTextView = view.findViewById(R.id.sessionDurationTextView);
+            deviceModelTextView = view.findViewById(R.id.deviceModelTextView);
+            readingCountTextView = view.findViewById(R.id.readingCountTextView);
             sessionContainer = (ConstraintLayout) view;
         }
 

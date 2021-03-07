@@ -165,9 +165,9 @@ public class CustomWebSocketServerService extends Service implements WebSocketCa
 
     @Override
     public void onSessionStart() {
-        Intent recordingSessionIntent = new Intent(this, RecordingSessionActivity.class);
+        Intent recordingSessionIntent = new Intent(getApplicationContext(), RecordingSessionActivity.class);
+        recordingSessionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(recordingSessionIntent);
-
     }
 
     @Override

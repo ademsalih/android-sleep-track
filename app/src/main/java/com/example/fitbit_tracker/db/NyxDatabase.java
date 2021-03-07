@@ -85,6 +85,7 @@ public class NyxDatabase {
                 DatabaseContract.Session.UUID,
                 DatabaseContract.Session.START_TIME,
                 DatabaseContract.Session.END_TIME,
+                DatabaseContract.Session.DEVICE_MODEL,
                 DatabaseContract.Session.READINGS_COUNT
         };
 
@@ -105,6 +106,7 @@ public class NyxDatabase {
             String UUID = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Session.UUID));
             long startTime = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.Session.START_TIME));
             long endTime = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.Session.END_TIME));
+            String deviceModel = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Session.DEVICE_MODEL));
             int numberOfReadings = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.Session.READINGS_COUNT));
 
             Session session = new Session();
@@ -112,6 +114,7 @@ public class NyxDatabase {
             session.setUuid(UUID);
             session.setStartTime(startTime);
             session.setEndTime(endTime);
+            session.setDeviceModel(deviceModel);
             session.setReadingsCount(numberOfReadings);
 
             sessions.add(session);
