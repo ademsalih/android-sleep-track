@@ -82,6 +82,7 @@ public class CustomWebSocketServer extends WebSocketServer {
                     break;
                 case "INIT_SESSION":
                     String deviceModel = dataObject.getString("deviceModel");
+                    int batteryPercentage = dataObject.getInt("deviceBatteryPercentage");
                     nyxDatabase.createSession(sessionIdentifier,null,null, deviceModel, 0);
                     break;
                 case "START_SESSION":
@@ -113,7 +114,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
-        Log.d(TAG, "ERROR with connection" + ex);
+        Log.d(TAG, "onError" + ex);
     }
 
 }

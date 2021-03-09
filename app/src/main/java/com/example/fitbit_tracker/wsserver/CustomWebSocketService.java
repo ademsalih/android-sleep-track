@@ -1,20 +1,18 @@
 package com.example.fitbit_tracker.wsserver;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -25,14 +23,12 @@ import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.handlers.ServiceCallback;
 import com.example.fitbit_tracker.handlers.SessionEndCallback;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
-import com.example.fitbit_tracker.views.MainActivity;
 import com.example.fitbit_tracker.views.RecordingSessionActivity;
 
-import java.util.Observable;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.IOException;
 
-public class CustomWebSocketServerService extends Service implements WebSocketCallback {
+
+public class CustomWebSocketService extends Service implements WebSocketCallback {
     private final String TAG = this.getClass().getSimpleName();
 
     private WakeLock wakeLock;
@@ -40,10 +36,11 @@ public class CustomWebSocketServerService extends Service implements WebSocketCa
     private boolean connected = false;
     private ServiceCallback serviceCallback;
     private SessionEndCallback sessionEndCallback;
+    private CustomWebSocketServer customWebSocketServer;
 
     public class LocalBinder extends Binder {
-        public CustomWebSocketServerService getService() {
-            return CustomWebSocketServerService.this;
+        public CustomWebSocketService getService() {
+            return CustomWebSocketService.this;
         }
     }
 
@@ -55,7 +52,7 @@ public class CustomWebSocketServerService extends Service implements WebSocketCa
         this.sessionEndCallback = sessionEndCallback;
     }
 
-    public CustomWebSocketServerService() {
+    public CustomWebSocketService() {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -95,11 +92,12 @@ public class CustomWebSocketServerService extends Service implements WebSocketCa
             startForeground(1, new Notification());
         }
 
-        CustomWebSocketServer customWebSocketServer = new CustomWebSocketServer(this,this,8887);
+        customWebSocketServer = new CustomWebSocketServer(this,this,8887);
         customWebSocketServer.setReuseAddr(true);
         customWebSocketServer.start();
     }
 
+    @SuppressLint("WakelockTimeout")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         wakeLock.acquire();
@@ -110,6 +108,14 @@ public class CustomWebSocketServerService extends Service implements WebSocketCa
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+
+        try {
+            customWebSocketServer.stop();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         wakeLock.release();
         stopForeground(true);
     }

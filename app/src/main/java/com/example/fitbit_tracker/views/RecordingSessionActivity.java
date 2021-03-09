@@ -8,13 +8,11 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.WindowManager;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.handlers.ServiceCallback;
 import com.example.fitbit_tracker.handlers.SessionEndCallback;
-import com.example.fitbit_tracker.wsserver.CustomWebSocketServerService;
+import com.example.fitbit_tracker.wsserver.CustomWebSocketService;
 
 public class RecordingSessionActivity extends AppCompatActivity implements SessionEndCallback {
     private final String TAG = this.getClass().getSimpleName();
@@ -26,13 +24,13 @@ public class RecordingSessionActivity extends AppCompatActivity implements Sessi
         getSupportActionBar().hide();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        Intent intent = new Intent(RecordingSessionActivity.this, CustomWebSocketServerService.class);
+        Intent intent = new Intent(RecordingSessionActivity.this, CustomWebSocketService.class);
 
         bindService(intent, new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 Log.d(TAG, "onServiceConnected");
-                CustomWebSocketServerService.LocalBinder binder = (CustomWebSocketServerService.LocalBinder) service;
+                CustomWebSocketService.LocalBinder binder = (CustomWebSocketService.LocalBinder) service;
                 binder.getService().registerSessionEndCallback(RecordingSessionActivity.this);
             }
 

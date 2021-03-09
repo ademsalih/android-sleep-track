@@ -26,7 +26,7 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <service android:name=".wsserver.CustomWebSocketServerService" />
+        <service android:name=".wsserver.CustomWebSocketService" />
 
         <activity android:name=".views.SettingsActivity"></activity>
         <activity

@@ -16,12 +16,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.fitbit_tracker.handlers.ServiceCallback;
-import com.example.fitbit_tracker.wsserver.CustomWebSocketServerService;
+import com.example.fitbit_tracker.wsserver.CustomWebSocketService;
 import com.example.fitbit_tracker.R;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
 
 public class MainActivity extends AppCompatActivity implements ServiceCallback {
     private final String TAG = this.getClass().getSimpleName();
@@ -30,6 +29,46 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
     private ImageView imageView;
     private Context context;
     private Intent websocketServerServiceIntent;
+    private ServiceConnection serviceConnection;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        getSupportActionBar().setTitle("Welcome to Nyx");
+
+        context = this;
+        progressBar = findViewById(R.id.progressBar);
+        textView = findViewById(R.id.textView);
+        imageView = findViewById(R.id.imageView);
+
+        websocketServerServiceIntent = new Intent(context, CustomWebSocketService.class);
+
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                startService(websocketServerServiceIntent);
+            }
+        });
+
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                Log.d(TAG, "onServiceConnected");
+                CustomWebSocketService.LocalBinder binder = (CustomWebSocketService.LocalBinder) service;
+                binder.getService().registerCallBack((ServiceCallback) context);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                Log.d(TAG, "onServiceDisconnected");
+            }
+        };
+
+        bindService(websocketServerServiceIntent, serviceConnection, BIND_AUTO_CREATE);
+    }
 
     @Override
     public void onOpen() {
@@ -58,44 +97,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
     @Override
     public void onMessage(String message) {
 
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        getSupportActionBar().setTitle("Welcome to Nyx");
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        context = this;
-        progressBar = findViewById(R.id.progressBar);
-        textView = findViewById(R.id.textView);
-        imageView = findViewById(R.id.imageView);
-
-        websocketServerServiceIntent = new Intent(context, CustomWebSocketServerService.class);
-
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                startService(websocketServerServiceIntent);
-            }
-        });
-
-        bindService(websocketServerServiceIntent, new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                Log.d(TAG, "onServiceConnected");
-                CustomWebSocketServerService.LocalBinder binder = (CustomWebSocketServerService.LocalBinder) service;
-                binder.getService().registerCallBack((ServiceCallback) context);
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                Log.d(TAG, "onServiceDisconnected");
-            }
-        }, BIND_AUTO_CREATE);
     }
 
     public void onSessionsButtonClick(View view) {
@@ -131,7 +132,9 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         stopService(websocketServerServiceIntent);
+        unbindService(serviceConnection);
     }
 
 }
