@@ -66,22 +66,33 @@ public class SessionDetailsActivity extends AppCompatActivity {
             public void run() {
                 List<HeartrateReading> hrReadings = db.getAllHeartrates(sessionUUID);
                 updateHeartrateChart(hrReadings);
+            }
+        });
 
+        Executor executor2 = Executors.newCachedThreadPool();
+        executor2.execute(new Runnable() {
+            @Override
+            public void run() {
                 long start1 = System.currentTimeMillis();
                 List<AccelerometerReading> accelerometerReadings = db.getAllAccelerometerReadings(sessionUUID);
                 long time1 = System.currentTimeMillis() - start1;
                 Log.d(TAG, "Get Duration: " + time1);
+            }
+        });
 
-
-                long start2 = System.currentTimeMillis();
-                updateAccelerometerChart(accelerometerReadings);
-                long time2 = System.currentTimeMillis() - start2;
-                Log.d(TAG, "Chart Duration: " + time2);
-
-
+        Executor executor3 = Executors.newCachedThreadPool();
+        executor3.execute(new Runnable() {
+            @Override
+            public void run() {
                 List<BatteryReading> batteryReadings = db.getAllBatteryLevels(sessionUUID);
                 updateBatteryChart(batteryReadings);
+            }
+        });
 
+        Executor executor4 = Executors.newCachedThreadPool();
+        executor4.execute(new Runnable() {
+            @Override
+            public void run() {
                 List<GyroscopeReading> gyroscopeReadings = db.getAllGyroscopeReadings(sessionUUID);
                 updateGyroscopeChart(gyroscopeReadings);
             }
