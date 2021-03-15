@@ -9,6 +9,7 @@ import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -56,7 +57,6 @@ public class CustomWebSocketServer extends WebSocketServer {
                 case "ADD_READING":
 
                     String sensorIdentifier = dataObject.getString("sensorIdentifier");
-
                     String timeStamp = dataObject.getString("timeStamp");
 
                     switch (sensorIdentifier) {
@@ -66,15 +66,44 @@ public class CustomWebSocketServer extends WebSocketServer {
                             nyxDatabase.addHeartrateReading(sessionIdentifier, timeStamp, bpm);
                             break;
                         case "ACCELEROMETER":
-                            JSONObject accelerometerData = dataObject.getJSONObject("data");
-                            double xAcceleration = accelerometerData.getDouble("x");
-                            double yAcceleration = accelerometerData.getDouble("y");
-                            double zAcceleration = accelerometerData.getDouble("z");
-                            nyxDatabase.addAccelerometerReading(sessionIdentifier, timeStamp, xAcceleration, yAcceleration, zAcceleration);
+                            JSONObject items = dataObject.getJSONObject("items");
+
+                            JSONArray x = items.getJSONArray("x");
+                            JSONArray y = items.getJSONArray("y");
+                            JSONArray z = items.getJSONArray("z");
+                            JSONArray timestampArray = items.getJSONArray("timestamp");
+
+                            for (int i = 0; i < x.length(); i++) {
+                                double xAcceleration = x.getDouble(i);
+                                double yAcceleration = y.getDouble(i);
+                                double zAcceleration = z.getDouble(i);
+                                String ts = timestampArray.getString(i);
+                                nyxDatabase.addAccelerometerReading(sessionIdentifier, ts, xAcceleration, yAcceleration, zAcceleration);
+                            }
+                            break;
+                        case "GYROSCOPE":
+                            JSONObject gyroItems = dataObject.getJSONObject("items");
+
+                            JSONArray gyroX = gyroItems.getJSONArray("x");
+                            JSONArray gyroY = gyroItems.getJSONArray("y");
+                            JSONArray gyroZ = gyroItems.getJSONArray("z");
+                            JSONArray gyroTimestamp = gyroItems.getJSONArray("timestamp");
+
+                            for (int i = 0; i < gyroX.length(); i++) {
+                                double vX = gyroX.getDouble(i);
+                                double vY = gyroY.getDouble(i);
+                                double vZ = gyroZ.getDouble(i);
+                                String gyrots = gyroTimestamp.getString(i);
+
+                                nyxDatabase.addGyroscopeReading(sessionIdentifier, gyrots, vX, vY, vZ);
+                            }
+
+                            break;
                         case "BATTERY":
                             JSONObject batteryData = dataObject.getJSONObject("data");
                             int batteryLevel = batteryData.getInt("batteryLevel");
                             nyxDatabase.addBatteryeReading(sessionIdentifier, timeStamp, batteryLevel);
+                            break;
                         default:
                             break;
                     }
@@ -82,7 +111,6 @@ public class CustomWebSocketServer extends WebSocketServer {
                     break;
                 case "INIT_SESSION":
                     String deviceModel = dataObject.getString("deviceModel");
-                    int batteryPercentage = dataObject.getInt("deviceBatteryPercentage");
                     nyxDatabase.createSession(sessionIdentifier,null,null, deviceModel, 0);
                     break;
                 case "START_SESSION":

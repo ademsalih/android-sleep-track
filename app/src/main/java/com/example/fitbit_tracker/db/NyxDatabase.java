@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.fitbit_tracker.model.AccelerometerReading;
 import com.example.fitbit_tracker.model.BatteryReading;
+import com.example.fitbit_tracker.model.GyroscopeReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 
@@ -150,19 +151,28 @@ public class NyxDatabase {
         writableDb.insert(DatabaseContract.BatteryReading.TABLE_NAME,null, cv);
     }
 
+    public void addGyroscopeReading(String sessionIdentifier, String timeStamp, double x, double y, double z) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseContract.GyroscopeReading.SESSION_ID, sessionIdentifier);
+        cv.put(DatabaseContract.GyroscopeReading.TIME_STAMP, timeStamp);
+        cv.put(DatabaseContract.GyroscopeReading.X_VELOCITY, x);
+        cv.put(DatabaseContract.GyroscopeReading.Y_VELOCITY, y);
+        cv.put(DatabaseContract.GyroscopeReading.Z_VELOCITY, z);
+        writableDb.insert(DatabaseContract.GyroscopeReading.TABLE_NAME,null, cv);
+    }
+
     public List<HeartrateReading> getAllHeartrates(String uuid) {
         List<HeartrateReading> heartrateReadings = new ArrayList<>();
 
         String[] projection = {
-                DatabaseContract.HeartRateReading._ID,
                 DatabaseContract.HeartRateReading.SESSION_ID,
                 DatabaseContract.HeartRateReading.TIME_STAMP,
                 DatabaseContract.HeartRateReading.HEARTRATE
         };
 
-        String sortOrder = DatabaseContract.HeartRateReading.TIME_STAMP + " ASC";
+        //String sortOrder = DatabaseContract.HeartRateReading.TIME_STAMP + " ASC";
 
-        String selection = DatabaseContract.HeartRateReading.SESSION_ID + " LIKE ?";
+        String selection = DatabaseContract.HeartRateReading.SESSION_ID + " = ?";
         String[] selectionArgs = { uuid };
 
         Cursor cursor = readableDb.query(
@@ -172,7 +182,7 @@ public class NyxDatabase {
                 selectionArgs,
                 null,
                 null,
-                sortOrder
+                null
         );
 
         while(cursor.moveToNext()) {
@@ -194,7 +204,6 @@ public class NyxDatabase {
         List<AccelerometerReading> accelerometerReadings = new ArrayList<>();
 
         String[] projection = {
-                DatabaseContract.AccelerometerReading._ID,
                 DatabaseContract.AccelerometerReading.SESSION_ID,
                 DatabaseContract.AccelerometerReading.TIME_STAMP,
                 DatabaseContract.AccelerometerReading.X_ACCELERATION,
@@ -202,9 +211,9 @@ public class NyxDatabase {
                 DatabaseContract.AccelerometerReading.Z_ACCELERATION,
         };
 
-        String sortOrder = DatabaseContract.AccelerometerReading.TIME_STAMP + " ASC";
+        //String sortOrder = DatabaseContract.AccelerometerReading.TIME_STAMP + " ASC";
 
-        String selection = DatabaseContract.AccelerometerReading.SESSION_ID + " LIKE ?";
+        String selection = DatabaseContract.AccelerometerReading.SESSION_ID + " = ?";
         String[] selectionArgs = { uuid };
 
         Cursor cursor = readableDb.query(
@@ -214,7 +223,7 @@ public class NyxDatabase {
                 selectionArgs,
                 null,
                 null,
-                sortOrder
+                null
         );
 
         while(cursor.moveToNext()) {
@@ -240,15 +249,14 @@ public class NyxDatabase {
         List<BatteryReading> batteryReadings = new ArrayList<>();
 
         String[] projection = {
-                DatabaseContract.BatteryReading._ID,
                 DatabaseContract.BatteryReading.SESSION_ID,
                 DatabaseContract.BatteryReading.TIME_STAMP,
                 DatabaseContract.BatteryReading.BATTERY_LEVEL
         };
 
-        String sortOrder = DatabaseContract.BatteryReading.TIME_STAMP + " ASC";
+        //String sortOrder = DatabaseContract.BatteryReading.TIME_STAMP + " ASC";
 
-        String selection = DatabaseContract.BatteryReading.SESSION_ID + " LIKE ?";
+        String selection = DatabaseContract.BatteryReading.SESSION_ID + " = ?";
         String[] selectionArgs = { uuid };
 
         Cursor cursor = readableDb.query(
@@ -258,7 +266,7 @@ public class NyxDatabase {
                 selectionArgs,
                 null,
                 null,
-                sortOrder
+                null
         );
 
         while(cursor.moveToNext()) {
@@ -274,6 +282,51 @@ public class NyxDatabase {
         cursor.close();
 
         return batteryReadings;
+    }
+
+    public List<GyroscopeReading> getAllGyroscopeReadings(String uuid) {
+        List<GyroscopeReading> gyroscopeReadings = new ArrayList<>();
+
+        String[] projection = {
+                DatabaseContract.GyroscopeReading.SESSION_ID,
+                DatabaseContract.GyroscopeReading.TIME_STAMP,
+                DatabaseContract.GyroscopeReading.X_VELOCITY,
+                DatabaseContract.GyroscopeReading.Y_VELOCITY,
+                DatabaseContract.GyroscopeReading.Z_VELOCITY,
+        };
+
+        //String sortOrder = DatabaseContract.GyroscopeReading.TIME_STAMP + " ASC";
+
+        String selection = DatabaseContract.GyroscopeReading.SESSION_ID + " = ?";
+        String[] selectionArgs = { uuid };
+
+        Cursor cursor = readableDb.query(
+                DatabaseContract.GyroscopeReading.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+        while(cursor.moveToNext()) {
+            long timeStamp = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseContract.GyroscopeReading.TIME_STAMP));
+            double x = cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseContract.GyroscopeReading.X_VELOCITY));
+            double y = cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseContract.GyroscopeReading.Y_VELOCITY));
+            double z = cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseContract.GyroscopeReading.Z_VELOCITY));
+
+            GyroscopeReading gyroscopeReading = new GyroscopeReading();
+            gyroscopeReading.setTimeStamp(timeStamp);
+            gyroscopeReading.setX(x);
+            gyroscopeReading.setY(y);
+            gyroscopeReading.setZ(z);
+
+            gyroscopeReadings.add(gyroscopeReading);
+        }
+        cursor.close();
+
+        return gyroscopeReadings;
     }
 
 

@@ -36,6 +36,12 @@ public class DatabaseContract {
         public static final String TABLE_NAME = "battery_reading";
         public static final String BATTERY_LEVEL = "battery_level";
     }
+    public static class GyroscopeReading extends Reading implements BaseColumns {
+        public static final String TABLE_NAME = "gyroscope_reading";
+        public static final String X_VELOCITY = "x_velocity";
+        public static final String Y_VELOCITY = "y_velocity";
+        public static final String Z_VELOCITY = "z_velocity";
+    }
 
     
 }

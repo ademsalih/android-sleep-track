@@ -12,12 +12,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileObserver;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 
 import com.example.fitbit_tracker.R;
+import com.example.fitbit_tracker.db.DatabaseContract;
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.model.AccelerometerReading;
 import com.example.fitbit_tracker.model.BatteryReading;
+import com.example.fitbit_tracker.model.GyroscopeReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 import com.github.mikephil.charting.charts.LineChart;
@@ -37,6 +40,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static java.security.AccessController.getContext;
 
@@ -55,15 +60,42 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         db = new NyxDatabase(this);
 
-        List<HeartrateReading> hrReadings = db.getAllHeartrates(sessionUUID);
+        Executor executor = Executors.newCachedThreadPool();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<HeartrateReading> hrReadings = db.getAllHeartrates(sessionUUID);
+                updateHeartrateChart(hrReadings);
 
+                long start1 = System.currentTimeMillis();
+                List<AccelerometerReading> accelerometerReadings = db.getAllAccelerometerReadings(sessionUUID);
+                long time1 = System.currentTimeMillis() - start1;
+                Log.d(TAG, "Get Duration: " + time1);
+
+
+                long start2 = System.currentTimeMillis();
+                updateAccelerometerChart(accelerometerReadings);
+                long time2 = System.currentTimeMillis() - start2;
+                Log.d(TAG, "Chart Duration: " + time2);
+
+
+                List<BatteryReading> batteryReadings = db.getAllBatteryLevels(sessionUUID);
+                updateBatteryChart(batteryReadings);
+
+                List<GyroscopeReading> gyroscopeReadings = db.getAllGyroscopeReadings(sessionUUID);
+                updateGyroscopeChart(gyroscopeReadings);
+            }
+        });
+    }
+
+    public void updateHeartrateChart(List<HeartrateReading> heartrateReadings) {
         LineChart heartrateChart = (LineChart) findViewById(R.id.heartrateChart);
 
         List<Entry> entryList = new ArrayList<Entry>();
 
         int i = 0;
 
-        for (HeartrateReading hrReading: hrReadings) {
+        for (HeartrateReading hrReading: heartrateReadings) {
             entryList.add(new Entry(i,hrReading.getHeartRate()));
             i++;
         }
@@ -85,11 +117,9 @@ public class SessionDetailsActivity extends AppCompatActivity {
         xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
 
         heartrateChart.invalidate();
+    }
 
-        // ACCELEROMETER
-
-        List<AccelerometerReading> accelerometerReadings = db.getAllAccelerometerReadings(sessionUUID);
-
+    public void updateAccelerometerChart(List<AccelerometerReading> accelerometerReadings) {
         LineChart accelerometerChart = (LineChart) findViewById(R.id.accelerometerChart);
 
         List<Entry> accelerometerXEntries = new ArrayList<>();
@@ -139,10 +169,9 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         accelerometerChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
         accelerometerChart.invalidate();
+    }
 
-        // BATTERY
-        List<BatteryReading> batteryReadings = db.getAllBatteryLevels(sessionUUID);
-
+    public void updateBatteryChart(List<BatteryReading> batteryReadings) {
         LineChart batteryChart = (LineChart) findViewById(R.id.batteryChart);
 
         List<Entry> batteryEntryList = new ArrayList<Entry>();
@@ -171,6 +200,58 @@ public class SessionDetailsActivity extends AppCompatActivity {
         xAxisBat.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
 
         batteryChart.invalidate();
+    }
+
+    public void updateGyroscopeChart(List<GyroscopeReading> gyroscopeReadings) {
+        LineChart gyroscopeChart = (LineChart) findViewById(R.id.gyroscopeChart);
+
+        List<Entry> gyroscopeXEntries = new ArrayList<>();
+        List<Entry> gyroscopeYEntries = new ArrayList<>();
+        List<Entry> gyroscopeZEntries = new ArrayList<>();
+
+        int j = 0;
+
+        for (GyroscopeReading r: gyroscopeReadings) {
+            gyroscopeXEntries.add(new Entry(j, (float) r.getX()));
+            gyroscopeYEntries.add(new Entry(j, (float) r.getY()));
+            gyroscopeZEntries.add(new Entry(j, (float) r.getZ()));
+            j++;
+        }
+
+        LineDataSet gyroscopeXDataSet = new LineDataSet(gyroscopeXEntries, "Gyroscope X");
+        gyroscopeXDataSet.setColor(Color.rgb(1,1,1));
+        gyroscopeXDataSet.setValueTextColor(Color.rgb(1,1,1));
+        gyroscopeXDataSet.setDrawCircleHole(false);
+        gyroscopeXDataSet.setColor(Color.RED);
+        gyroscopeXDataSet.setCircleColor(Color.RED);
+        gyroscopeXDataSet.setCircleRadius(2f);
+
+        LineDataSet gyroscopeYDataSet = new LineDataSet(gyroscopeYEntries, "Gyroscope Y");
+        gyroscopeYDataSet.setColor(Color.rgb(1,1,1));
+        gyroscopeYDataSet.setValueTextColor(Color.rgb(1,1,1));
+        gyroscopeYDataSet.setDrawCircleHole(false);
+        gyroscopeYDataSet.setColor(Color.GREEN);
+        gyroscopeYDataSet.setCircleColor(Color.GREEN);
+        gyroscopeYDataSet.setCircleRadius(2f);
+
+        LineDataSet gyroscopeZDataSet = new LineDataSet(gyroscopeZEntries, "Gyroscope Z");
+        gyroscopeZDataSet.setColor(Color.rgb(1,1,1));
+        gyroscopeZDataSet.setValueTextColor(Color.rgb(1,1,1));
+        gyroscopeZDataSet.setCircleHoleRadius(0f);
+        gyroscopeZDataSet.setDrawCircleHole(false);
+        gyroscopeZDataSet.setColor(Color.BLUE);
+        gyroscopeZDataSet.setCircleColor(Color.BLUE);
+        gyroscopeZDataSet.setCircleRadius(2f);
+
+        LineData gyroscopeLineData = new LineData();
+        gyroscopeLineData.addDataSet(gyroscopeXDataSet);
+        gyroscopeLineData.addDataSet(gyroscopeYDataSet);
+        gyroscopeLineData.addDataSet(gyroscopeZDataSet);
+
+        gyroscopeChart.setData(gyroscopeLineData);
+
+        gyroscopeChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+        gyroscopeChart.invalidate();
     }
 
     public void onExportButtonClicked(View view) {
@@ -245,4 +326,5 @@ public class SessionDetailsActivity extends AppCompatActivity {
         }
 
     }
+
 }

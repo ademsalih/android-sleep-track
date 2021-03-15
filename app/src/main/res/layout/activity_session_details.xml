@@ -19,6 +19,8 @@
         android:id="@+id/heartrateChart"
         android:layout_width="match_parent"
         android:layout_height="260dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/exportButton" />
 
     <com.github.mikephil.charting.charts.LineChart
@@ -26,6 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="260dp"
         android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/heartrateChart" />
 
     <com.github.mikephil.charting.charts.LineChart
@@ -33,6 +37,17 @@
         android:layout_width="match_parent"
         android:layout_height="260dp"
         android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/accelerometerChart" />
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/gyroscopeChart"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/batteryChart" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
