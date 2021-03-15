@@ -7,8 +7,8 @@ import com.example.fitbit_tracker.db.DatabaseContract.*;
 
 public class NyxDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 18;
-    public static final String DATABASE_NAME = "SessionStore.db";
+    public static final int DATABASE_VERSION = 1;
+    public static final String DATABASE_NAME = "SessionsDatabase.db";
 
     private static final String SQL_CREATE_TABLE_SESSION = "CREATE TABLE " +
             Session.TABLE_NAME + " (" +

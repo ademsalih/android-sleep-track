@@ -73,10 +73,8 @@ public class SessionDetailsActivity extends AppCompatActivity {
         executor2.execute(new Runnable() {
             @Override
             public void run() {
-                long start1 = System.currentTimeMillis();
                 List<AccelerometerReading> accelerometerReadings = db.getAllAccelerometerReadings(sessionUUID);
-                long time1 = System.currentTimeMillis() - start1;
-                Log.d(TAG, "Get Duration: " + time1);
+                updateAccelerometerChart(accelerometerReadings);
             }
         });
 
