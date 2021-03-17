@@ -3,6 +3,8 @@ package com.example.fitbit_tracker.wsserver;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.room.Room;
+
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
 
@@ -23,7 +25,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 
     public CustomWebSocketServer(WebSocketCallback webSocketCallback, Context context, int port) {
         super(new InetSocketAddress(port));
-        this.nyxDatabase = new NyxDatabase(context);
+        this.nyxDatabase = Room.databaseBuilder(context, NyxDatabase.class, "database-name").build();
         this.webSocketCallback = webSocketCallback;
     }
 
@@ -63,7 +65,7 @@ public class CustomWebSocketServer extends WebSocketServer {
                         case "HEARTRATE":
                             JSONObject bpmData = dataObject.getJSONObject("data");
                             int bpm = bpmData.getInt("bpm");
-                            nyxDatabase.addHeartrateReading(sessionIdentifier, timeStamp, bpm);
+                            //nyxDatabase.addHeartrateReading(sessionIdentifier, timeStamp, bpm);
                             break;
                         case "ACCELEROMETER":
                             JSONObject items = dataObject.getJSONObject("items");
@@ -78,7 +80,7 @@ public class CustomWebSocketServer extends WebSocketServer {
                                 double yAcceleration = y.getDouble(i);
                                 double zAcceleration = z.getDouble(i);
                                 String ts = timestampArray.getString(i);
-                                nyxDatabase.addAccelerometerReading(sessionIdentifier, ts, xAcceleration, yAcceleration, zAcceleration);
+                                //nyxDatabase.addAccelerometerReading(sessionIdentifier, ts, xAcceleration, yAcceleration, zAcceleration);
                             }
                             break;
                         case "GYROSCOPE":
@@ -95,14 +97,14 @@ public class CustomWebSocketServer extends WebSocketServer {
                                 double vZ = gyroZ.getDouble(i);
                                 String gyrots = gyroTimestamp.getString(i);
 
-                                nyxDatabase.addGyroscopeReading(sessionIdentifier, gyrots, vX, vY, vZ);
+                                //nyxDatabase.addGyroscopeReading(sessionIdentifier, gyrots, vX, vY, vZ);
                             }
 
                             break;
                         case "BATTERY":
                             JSONObject batteryData = dataObject.getJSONObject("data");
                             int batteryLevel = batteryData.getInt("batteryLevel");
-                            nyxDatabase.addBatteryeReading(sessionIdentifier, timeStamp, batteryLevel);
+                            //nyxDatabase.addBatteryeReading(sessionIdentifier, timeStamp, batteryLevel);
                             break;
                         default:
                             break;
@@ -111,17 +113,17 @@ public class CustomWebSocketServer extends WebSocketServer {
                     break;
                 case "INIT_SESSION":
                     String deviceModel = dataObject.getString("deviceModel");
-                    nyxDatabase.createSession(sessionIdentifier,null,null, deviceModel, 0);
+                    //nyxDatabase.createSession(sessionIdentifier,null,null, deviceModel, 0);
                     break;
                 case "START_SESSION":
                     long startTime = dataObject.getLong("startTime");
-                    nyxDatabase.updateSessionStartTime(sessionIdentifier, startTime);
+                    //nyxDatabase.updateSessionStartTime(sessionIdentifier, startTime);
                     webSocketCallback.onSessionStart();
                     break;
                 case "STOP_SESSION":
                     long endTime = dataObject.getLong("endTime");
                     int readingCount = dataObject.getInt("readingsCount");
-                    nyxDatabase.updateSessionEndTime(sessionIdentifier, endTime, readingCount);
+                    //nyxDatabase.updateSessionEndTime(sessionIdentifier, endTime, readingCount);
                     webSocketCallback.onSessionEnd();
                     break;
                 default:

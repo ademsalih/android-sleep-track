@@ -1,28 +1,19 @@
 package com.example.fitbit_tracker.views;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.FileObserver;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.View;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.db.DatabaseContract;
-import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.model.AccelerometerReading;
 import com.example.fitbit_tracker.model.BatteryReading;
 import com.example.fitbit_tracker.model.GyroscopeReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
-import com.example.fitbit_tracker.model.Session;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -42,8 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import static java.security.AccessController.getContext;
 
 public class SessionDetailsActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();

@@ -5,6 +5,8 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 
 import android.os.Bundle;
@@ -24,7 +26,9 @@ public class SessionsActivity extends AppCompatActivity implements LifecycleOwne
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sessions);
 
-        List<Session> sessions = new NyxDatabase(this).getAllSessions();
+        /*NyxDatabase.getDatabase(this);
+
+        List<Session> sessions = db.sessionDAO().getAll();
 
         getSupportActionBar().setTitle("Sessions" + " (" + sessions.size() + ")");
 
@@ -34,7 +38,7 @@ public class SessionsActivity extends AppCompatActivity implements LifecycleOwne
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new SessionRecyclerViewAdapter(this, sessions));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));*/
     }
 
 }

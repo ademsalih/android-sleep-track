@@ -1,59 +1,28 @@
 package com.example.fitbit_tracker.model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class Session {
 
+    @PrimaryKey
     private long _id;
+
+    @ColumnInfo(name = "uuid")
     private String uuid;
+
+    @ColumnInfo(name = "start_time")
     private long startTime;
+
+    @ColumnInfo(name = "end_time")
     private long endTime;
+
+    @ColumnInfo(name = "device_model")
     private String deviceModel;
+
+    @ColumnInfo(name = "readings_count")
     private int readingsCount;
 
-    public long get_id() {
-        return _id;
-    }
-
-    public void set_id(long _id) {
-        this._id = _id;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public long getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getDeviceModel() {
-        return deviceModel;
-    }
-
-    public void setDeviceModel(String deviceModel) {
-        this.deviceModel = deviceModel;
-    }
-
-    public int getReadingsCount() {
-        return readingsCount;
-    }
-
-    public void setReadingsCount(int readingsCount) {
-        this.readingsCount = readingsCount;
-    }
 }

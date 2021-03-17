@@ -1,5 +1,8 @@
 package com.example.fitbit_tracker.model;
 
+import androidx.room.Entity;
+
+@Entity
 public class AccelerometerReading extends Reading {
 
     private double x;
