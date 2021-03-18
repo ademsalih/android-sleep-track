@@ -43,8 +43,6 @@ public class SessionsActivity extends AppCompatActivity {
             }
         });
 
-        Session session = new Session("0lkwfoj123-1231adoi23-123dsakfsd",0,0,"Ionic",0);
-        sessionViewModel.insert(session);
     }
 
 }

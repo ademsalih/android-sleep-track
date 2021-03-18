@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.fitbit_tracker.model.Session;
 
@@ -16,6 +17,9 @@ public interface SessionDao {
     @Query("SELECT * FROM session")
     LiveData<List<Session>> getAll();
 
+    @Query("Select * from session where uuid = :uuid")
+    Session getSession(String uuid);
+
     @Insert
     void insert(Session session);
 
@@ -24,5 +28,8 @@ public interface SessionDao {
 
     @Delete
     void delete(Session session);
+
+    @Update
+    void update(Session session);
 
 }

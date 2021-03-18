@@ -1,11 +1,15 @@
 package com.example.fitbit_tracker.wsserver;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
+import com.example.fitbit_tracker.dao.SessionDao;
+import com.example.fitbit_tracker.dao.SessionDao_Impl;
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import com.example.fitbit_tracker.model.Session;
@@ -20,16 +24,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 public class CustomWebSocketServer extends WebSocketServer {
     private final String TAG = this.getClass().getSimpleName();
 
-    private WebSocketCallback webSocketCallback;
+    private final WebSocketCallback webSocketCallback;
+    private final SessionDao sessionDao;
 
     public CustomWebSocketServer(WebSocketCallback webSocketCallback, Context context, int port) {
         super(new InetSocketAddress(port));
         this.webSocketCallback = webSocketCallback;
-
+        this.sessionDao = NyxDatabase.getDatabase(context).sessionDao();
     }
 
     @Override
@@ -116,17 +122,25 @@ public class CustomWebSocketServer extends WebSocketServer {
                     break;
                 case "INIT_SESSION":
                     String deviceModel = dataObject.getString("deviceModel");
-                    Session session = new Session(sessionIdentifier,0,0,deviceModel,0);
+                    Session session = new Session(sessionIdentifier,0,0, deviceModel,0);
+                    sessionDao.insert(session);
                     break;
                 case "START_SESSION":
                     long startTime = dataObject.getLong("startTime");
-                    //nyxDatabase.updateSessionStartTime(sessionIdentifier, startTime);
+                    Session tempSession = sessionDao.getSession(sessionIdentifier);
+                    tempSession.setStartTime(startTime);
+                    sessionDao.update(tempSession);
                     webSocketCallback.onSessionStart();
                     break;
                 case "STOP_SESSION":
                     long endTime = dataObject.getLong("endTime");
                     int readingCount = dataObject.getInt("readingsCount");
-                    //nyxDatabase.updateSessionEndTime(sessionIdentifier, endTime, readingCount);
+
+                    Session session1 = sessionDao.getSession(sessionIdentifier);
+                    session1.setEndTime(endTime);
+                    session1.setReadingsCount(readingCount);
+                    sessionDao.update(session1);
+
                     webSocketCallback.onSessionEnd();
                     break;
                 default:

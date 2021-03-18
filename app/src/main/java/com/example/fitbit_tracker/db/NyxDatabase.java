@@ -13,7 +13,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Session.class}, version = 2)
+@Database(entities = {Session.class}, version = 1)
 public abstract class NyxDatabase extends RoomDatabase {
 
     public abstract SessionDao sessionDao();

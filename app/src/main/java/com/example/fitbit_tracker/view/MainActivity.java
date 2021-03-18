@@ -72,25 +72,19 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
 
     @Override
     public void onOpen() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                imageView.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.INVISIBLE);
-                textView.setText("Connected to Hypnos");
-            }
+        runOnUiThread(() -> {
+            imageView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+            textView.setText("Connected to Hypnos");
         });
     }
 
     @Override
     public void onClose() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                imageView.setVisibility(View.INVISIBLE);
-                progressBar.setVisibility(View.VISIBLE);
-                textView.setText(R.string.NOT_CONNECTED_TEXT);
-            }
+        runOnUiThread(() -> {
+            imageView.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+            textView.setText(R.string.NOT_CONNECTED_TEXT);
         });
     }
 
@@ -107,26 +101,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
     public void onSettingsButtonClick(View view) {
         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(intent);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
     @Override

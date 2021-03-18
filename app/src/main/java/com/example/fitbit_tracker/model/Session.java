@@ -26,6 +26,8 @@ public class Session {
     @ColumnInfo(name = "readings_count")
     private int readingsCount;
 
+    private int userId;
+
     public Session(String uuid, long startTime, long endTime, String deviceModel, int readingsCount) {
         this.uuid = uuid;
         this.startTime = startTime;
@@ -36,6 +38,22 @@ public class Session {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setReadingsCount(int readingsCount) {
+        this.readingsCount = readingsCount;
     }
 
     public int getId() {
@@ -60,5 +78,9 @@ public class Session {
 
     public int getReadingsCount() {
         return readingsCount;
+    }
+
+    public int getUserId() {
+        return userId;
     }
 }
