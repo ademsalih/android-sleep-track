@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.model.Session;
-import com.example.fitbit_tracker.views.SessionDetailsActivity;
+import com.example.fitbit_tracker.view.SessionDetailsActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,7 +23,7 @@ import java.util.Locale;
 
 import static com.example.fitbit_tracker.utils.TimeUtils.*;
 
-public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecyclerViewAdapter.SessionsViewHolder> {
+public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecyclerViewAdapter.SessionViewHolder> {
     private final List<Session> sessions;
     protected Context context;
 
@@ -34,13 +34,13 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
 
     @NonNull
     @Override
-    public SessionsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SessionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.session_item_2, parent, false);
-        return new SessionsViewHolder(rootView);
+        return new SessionViewHolder(rootView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SessionsViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull SessionViewHolder holder, final int position) {
         Session session = sessions.get(position);
 
         Date sessionStartDate = new Date(session.getStartTime());
@@ -83,7 +83,7 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
         return sessions.size();
     }
 
-    class SessionsViewHolder extends RecyclerView.ViewHolder {
+    class SessionViewHolder extends RecyclerView.ViewHolder {
         TextView sessionStartEndTextView;
         TextView timeDeltaTextView;
         TextView sessionDurationTextView;
@@ -92,7 +92,7 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
 
         ConstraintLayout sessionContainer;
 
-        SessionsViewHolder(View view) {
+        SessionViewHolder(View view) {
             super(view);
             sessionStartEndTextView = view.findViewById(R.id.sessionStartEndTextView);
             timeDeltaTextView = view.findViewById(R.id.timeDeltaTextView);

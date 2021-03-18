@@ -3,10 +3,14 @@ package com.example.fitbit_tracker.wsserver;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
+import com.example.fitbit_tracker.model.Session;
+import com.example.fitbit_tracker.repository.SessionRepository;
+import com.example.fitbit_tracker.viewmodel.SessionViewModel;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -20,13 +24,12 @@ import java.net.InetSocketAddress;
 public class CustomWebSocketServer extends WebSocketServer {
     private final String TAG = this.getClass().getSimpleName();
 
-    private NyxDatabase nyxDatabase;
     private WebSocketCallback webSocketCallback;
 
     public CustomWebSocketServer(WebSocketCallback webSocketCallback, Context context, int port) {
         super(new InetSocketAddress(port));
-        this.nyxDatabase = Room.databaseBuilder(context, NyxDatabase.class, "database-name").build();
         this.webSocketCallback = webSocketCallback;
+
     }
 
     @Override
@@ -113,7 +116,7 @@ public class CustomWebSocketServer extends WebSocketServer {
                     break;
                 case "INIT_SESSION":
                     String deviceModel = dataObject.getString("deviceModel");
-                    //nyxDatabase.createSession(sessionIdentifier,null,null, deviceModel, 0);
+                    Session session = new Session(sessionIdentifier,0,0,deviceModel,0);
                     break;
                 case "START_SESSION":
                     long startTime = dataObject.getLong("startTime");

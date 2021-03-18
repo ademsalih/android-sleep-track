@@ -1,4 +1,4 @@
-package com.example.fitbit_tracker.views;
+package com.example.fitbit_tracker.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
 public class SessionDetailsActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private String sessionUUID;
-    private NyxDatabase db;
+    /*private NyxDatabase db;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,43 +47,43 @@ public class SessionDetailsActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         sessionUUID = b.getString("SESSION_UUID");
 
-        db = new NyxDatabase(this);
+        /*db = new NyxDatabase(this);*/
 
-        Executor executor = Executors.newCachedThreadPool();
+        /*Executor executor = Executors.newCachedThreadPool();
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 List<HeartrateReading> hrReadings = db.getAllHeartrates(sessionUUID);
                 updateHeartrateChart(hrReadings);
             }
-        });
+        });*/
 
-        Executor executor2 = Executors.newCachedThreadPool();
+        /*Executor executor2 = Executors.newCachedThreadPool();
         executor2.execute(new Runnable() {
             @Override
             public void run() {
                 List<AccelerometerReading> accelerometerReadings = db.getAllAccelerometerReadings(sessionUUID);
                 updateAccelerometerChart(accelerometerReadings);
             }
-        });
+        });*/
 
-        Executor executor3 = Executors.newCachedThreadPool();
+        /*Executor executor3 = Executors.newCachedThreadPool();
         executor3.execute(new Runnable() {
             @Override
             public void run() {
                 List<BatteryReading> batteryReadings = db.getAllBatteryLevels(sessionUUID);
                 updateBatteryChart(batteryReadings);
             }
-        });
+        });*/
 
-        Executor executor4 = Executors.newCachedThreadPool();
+        /*Executor executor4 = Executors.newCachedThreadPool();
         executor4.execute(new Runnable() {
             @Override
             public void run() {
                 List<GyroscopeReading> gyroscopeReadings = db.getAllGyroscopeReadings(sessionUUID);
                 updateGyroscopeChart(gyroscopeReadings);
             }
-        });
+        });*/
     }
 
     public void updateHeartrateChart(List<HeartrateReading> heartrateReadings) {
@@ -252,7 +252,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
         gyroscopeChart.invalidate();
     }
 
-    public void onExportButtonClicked(View view) {
+    /*public void onExportButtonClicked(View view) {
         List<HeartrateReading> heartrateReadings = db.getAllHeartrates(sessionUUID);
         List<AccelerometerReading> accelerometerReadings = db.getAllAccelerometerReadings(sessionUUID);
         List<BatteryReading> batteryReadings = db.getAllBatteryLevels(sessionUUID);
@@ -323,6 +323,6 @@ public class SessionDetailsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-    }
+    }*/
 
 }

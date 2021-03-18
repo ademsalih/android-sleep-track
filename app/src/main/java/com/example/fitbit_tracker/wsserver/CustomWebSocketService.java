@@ -23,7 +23,7 @@ import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.handlers.ServiceCallback;
 import com.example.fitbit_tracker.handlers.SessionEndCallback;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
-import com.example.fitbit_tracker.views.RecordingSessionActivity;
+import com.example.fitbit_tracker.view.RecordingSessionActivity;
 
 import java.io.IOException;
 

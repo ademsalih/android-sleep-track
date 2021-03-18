@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.SessionsActivity">
+    tools:context=".view.SessionsActivity">
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/sessionsRecyclerView"
+        android:id="@+id/sessionRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"

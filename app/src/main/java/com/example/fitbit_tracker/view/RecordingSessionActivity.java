@@ -1,4 +1,4 @@
-package com.example.fitbit_tracker.views;
+package com.example.fitbit_tracker.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 

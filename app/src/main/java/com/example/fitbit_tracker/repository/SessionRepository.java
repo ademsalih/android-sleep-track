@@ -2,30 +2,33 @@ package com.example.fitbit_tracker.repository;
 
 import android.app.Application;
 
+import androidx.lifecycle.LiveData;
+
 import com.example.fitbit_tracker.dao.SessionDao;
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.model.Session;
 
 import java.util.List;
 
-public class SessoionRepository {
+public class SessionRepository {
 
     private SessionDao sessionDao;
-    private List<Session> allSessions;
+    private LiveData<List<Session>> allSessions;
 
-    SessoionRepository(Application application) {
+    public SessionRepository(Application application) {
         NyxDatabase db = NyxDatabase.getDatabase(application);
         sessionDao = db.sessionDao();
         allSessions = sessionDao.getAll();
     }
 
-    List<Session> getAllSessions() {
+    public LiveData<List<Session>> getAllSessions() {
         return allSessions;
     }
 
-    void insert(Session session) {
+    public void insert(Session session) {
         NyxDatabase.databaseWriteExecutor.execute(() -> {
             sessionDao.insert(session);
         });
     }
+
 }
