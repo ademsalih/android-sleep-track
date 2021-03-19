@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.example.fitbit_tracker.R;
@@ -50,8 +51,9 @@ public class SessionDetailsActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         sessionUUID = b.getString("SESSION_UUID");
 
+        int threads = 1;
 
-        Executor executor = Executors.newCachedThreadPool();
+        Executor executor = Executors.newFixedThreadPool(threads);
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -60,7 +62,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
             }
         });
 
-        Executor executor2 = Executors.newCachedThreadPool();
+        Executor executor2 = Executors.newFixedThreadPool(threads);
         executor2.execute(new Runnable() {
             @Override
             public void run() {
@@ -69,16 +71,20 @@ public class SessionDetailsActivity extends AppCompatActivity {
             }
         });
 
-        Executor executor3 = Executors.newCachedThreadPool();
+        Executor executor3 = Executors.newFixedThreadPool(threads);
         executor3.execute(new Runnable() {
             @Override
             public void run() {
+                long start = System.currentTimeMillis();
                 List<AccelerometerReading> accelerometerReadings = readingDao.getAccelerometerReadings(sessionUUID);
+                long time = System.currentTimeMillis() - start;
+                Log.d(TAG, "Accelerometer: " + time);
+
                 updateAccelerometerChart(accelerometerReadings);
             }
         });
 
-        Executor executor4 = Executors.newCachedThreadPool();
+        Executor executor4 = Executors.newFixedThreadPool(threads);
         executor4.execute(new Runnable() {
             @Override
             public void run() {

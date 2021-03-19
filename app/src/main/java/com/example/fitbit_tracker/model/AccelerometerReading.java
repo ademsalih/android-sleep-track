@@ -2,8 +2,9 @@ package com.example.fitbit_tracker.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 
-@Entity
+@Entity(indices = {@Index("uuid")})
 public class AccelerometerReading extends Reading {
 
     @ColumnInfo(name = "x_acceleration")
