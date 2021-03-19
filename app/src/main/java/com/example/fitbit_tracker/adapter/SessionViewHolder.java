@@ -1,11 +1,10 @@
-package com.example.fitbit_tracker.viewholder;
+package com.example.fitbit_tracker.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,12 +29,33 @@ public class SessionViewHolder extends RecyclerView.ViewHolder {
         sessionContainer = (ConstraintLayout) itemView;
     }
 
-    public void bind(String text) {
-        deviceModelTextView.setText(text);
+    public void bindDeviceModel(String deviceModel) {
+        deviceModelTextView.setText(deviceModel);
+    }
+
+    public void bindStartEndTime(String time) {
+        sessionStartEndTextView.setText(time);
+    }
+
+    public void bindTimeDelta(String timeDelta) {
+        timeDeltaTextView.setText(timeDelta);
+    }
+
+    public void bindReadingsCount(String readingsCount) {
+        readingCountTextView.setText(readingsCount);
+    }
+
+    public void bindDuration(String duration) {
+        sessionDurationTextView.setText(duration);
+    }
+
+    public void bindOnClickListener(View.OnClickListener onClickListener) {
+        sessionContainer.setOnClickListener(onClickListener);
     }
 
     public static SessionViewHolder create(ViewGroup parent) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.session_item_2, parent, false);
         return new SessionViewHolder(view);
     }
+
 }

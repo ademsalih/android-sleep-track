@@ -1,5 +1,6 @@
 package com.example.fitbit_tracker.adapter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,7 +12,7 @@ import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.view.SessionDetailsActivity;
-import com.example.fitbit_tracker.viewholder.SessionViewHolder;
+import com.example.fitbit_tracker.view.SessionsActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,8 +23,11 @@ import static com.example.fitbit_tracker.utils.TimeUtils.timeDeltaLabel;
 
 public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> {
 
-    public SessionListAdapter(@NonNull DiffUtil.ItemCallback<Session> diffCallback) {
+    private Context context;
+
+    public SessionListAdapter(@NonNull DiffUtil.ItemCallback<Session> diffCallback, Context baseContext) {
         super(diffCallback);
+        this.context = baseContext;
     }
 
     @NonNull
@@ -43,34 +47,28 @@ public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> 
         String sessionStartFormatted = simpleDateFormat.format(sessionStartDate);
         String sessionEndFormatted = simpleDateFormat.format(sessionEndDate);
 
-        /*holder.sessionStartEndTextView.setText(sessionStartFormatted + " – " + sessionEndFormatted);
-
         long timeDelta = System.currentTimeMillis() - session.getEndTime();
-        holder.timeDeltaTextView.setText(timeDeltaLabel(timeDelta));
-
-        holder.readingCountTextView.setText(session.getReadingsCount() + " readings");
 
         long duration = session.getEndTime() - session.getStartTime();
 
-        holder.sessionDurationTextView.setText(formattedTimeLabel(duration));
-
-        holder.deviceModelTextView.setText("Fitbit " + session.getDeviceModel());
-
-        holder.sessionContainer.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, SessionDetailsActivity.class);
-
                 Bundle bundle = new Bundle();
                 bundle.putString("SESSION_UUID", session.getUuid());
-
                 intent.putExtras(bundle);
-
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }
-        });*/
+        };
 
-        holder.bind(session.getDeviceModel());
+        holder.bindDeviceModel(session.getDeviceModel());
+        holder.bindStartEndTime(sessionStartFormatted + " – " + sessionEndFormatted);
+        holder.bindTimeDelta(timeDeltaLabel(timeDelta));
+        holder.bindReadingsCount(session.getReadingsCount() + " readings");
+        holder.bindDuration(formattedTimeLabel(duration));
+        holder.bindOnClickListener(onClickListener);
     }
 
     public static class SessionDiff extends DiffUtil.ItemCallback<Session> {

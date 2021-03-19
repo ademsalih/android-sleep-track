@@ -14,10 +14,10 @@ import java.util.List;
 @Dao
 public interface SessionDao {
 
-    @Query("SELECT * FROM session")
+    @Query("SELECT * FROM Session ORDER BY start_time DESC")
     LiveData<List<Session>> getAll();
 
-    @Query("Select * from session where uuid = :uuid")
+    @Query("SELECT * FROM Session WHERE uuid = :uuid")
     Session getSession(String uuid);
 
     @Insert

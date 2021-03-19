@@ -15,39 +15,43 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/heartrateChart"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="260dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/exportButton" />
+        app:layout_constraintTop_toBottomOf="@+id/exportButton">
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/accelerometerChart"
-        android:layout_width="match_parent"
-        android:layout_height="260dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/heartrateChart" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/batteryChart"
-        android:layout_width="match_parent"
-        android:layout_height="260dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/accelerometerChart" />
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/heartrateChart"
+                android:layout_width="match_parent"
+                android:layout_height="260dp" />
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/gyroscopeChart"
-        android:layout_width="match_parent"
-        android:layout_height="260dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/batteryChart" />
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/accelerometerChart"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:layout_marginTop="10dp" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/gyroscopeChart"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:layout_marginTop="10dp" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/batteryChart"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:layout_marginTop="10dp" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

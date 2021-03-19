@@ -1,20 +1,17 @@
 package com.example.fitbit_tracker.wsserver;
 
-import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.room.Room;
-
+import com.example.fitbit_tracker.dao.ReadingDao;
 import com.example.fitbit_tracker.dao.SessionDao;
-import com.example.fitbit_tracker.dao.SessionDao_Impl;
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
+import com.example.fitbit_tracker.model.AccelerometerReading;
+import com.example.fitbit_tracker.model.BatteryReading;
+import com.example.fitbit_tracker.model.GyroscopeReading;
+import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
-import com.example.fitbit_tracker.repository.SessionRepository;
-import com.example.fitbit_tracker.viewmodel.SessionViewModel;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -24,18 +21,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 
 public class CustomWebSocketServer extends WebSocketServer {
     private final String TAG = this.getClass().getSimpleName();
 
     private final WebSocketCallback webSocketCallback;
     private final SessionDao sessionDao;
+    private final ReadingDao readingDao;
 
     public CustomWebSocketServer(WebSocketCallback webSocketCallback, Context context, int port) {
         super(new InetSocketAddress(port));
         this.webSocketCallback = webSocketCallback;
         this.sessionDao = NyxDatabase.getDatabase(context).sessionDao();
+        this.readingDao = NyxDatabase.getDatabase(context).readingDao();
     }
 
     @Override
@@ -68,13 +66,13 @@ public class CustomWebSocketServer extends WebSocketServer {
                 case "ADD_READING":
 
                     String sensorIdentifier = dataObject.getString("sensorIdentifier");
-                    String timeStamp = dataObject.getString("timeStamp");
+                    long timeStamp = dataObject.getLong("timeStamp");
 
                     switch (sensorIdentifier) {
                         case "HEARTRATE":
                             JSONObject bpmData = dataObject.getJSONObject("data");
                             int bpm = bpmData.getInt("bpm");
-                            //nyxDatabase.addHeartrateReading(sessionIdentifier, timeStamp, bpm);
+                            readingDao.insert(new HeartrateReading(sessionIdentifier, timeStamp, bpm));
                             break;
                         case "ACCELEROMETER":
                             JSONObject items = dataObject.getJSONObject("items");
@@ -88,8 +86,9 @@ public class CustomWebSocketServer extends WebSocketServer {
                                 double xAcceleration = x.getDouble(i);
                                 double yAcceleration = y.getDouble(i);
                                 double zAcceleration = z.getDouble(i);
-                                String ts = timestampArray.getString(i);
-                                //nyxDatabase.addAccelerometerReading(sessionIdentifier, ts, xAcceleration, yAcceleration, zAcceleration);
+                                long ts = timestampArray.getLong(i);
+
+                                readingDao.insert(new AccelerometerReading(sessionIdentifier,ts, xAcceleration,yAcceleration,zAcceleration));
                             }
                             break;
                         case "GYROSCOPE":
@@ -104,16 +103,16 @@ public class CustomWebSocketServer extends WebSocketServer {
                                 double vX = gyroX.getDouble(i);
                                 double vY = gyroY.getDouble(i);
                                 double vZ = gyroZ.getDouble(i);
-                                String gyrots = gyroTimestamp.getString(i);
+                                long gyrots = gyroTimestamp.getLong(i);
 
-                                //nyxDatabase.addGyroscopeReading(sessionIdentifier, gyrots, vX, vY, vZ);
+                                readingDao.insert(new GyroscopeReading(sessionIdentifier, gyrots, vX, vY, vZ));
                             }
 
                             break;
                         case "BATTERY":
                             JSONObject batteryData = dataObject.getJSONObject("data");
                             int batteryLevel = batteryData.getInt("batteryLevel");
-                            //nyxDatabase.addBatteryeReading(sessionIdentifier, timeStamp, batteryLevel);
+                            readingDao.insert(new BatteryReading(sessionIdentifier,0, batteryLevel));
                             break;
                         default:
                             break;

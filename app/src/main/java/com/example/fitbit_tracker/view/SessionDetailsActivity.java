@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.fitbit_tracker.R;
+import com.example.fitbit_tracker.dao.ReadingDao;
+import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.model.AccelerometerReading;
 import com.example.fitbit_tracker.model.BatteryReading;
 import com.example.fitbit_tracker.model.GyroscopeReading;
@@ -37,53 +39,36 @@ import java.util.concurrent.Executors;
 public class SessionDetailsActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private String sessionUUID;
-    /*private NyxDatabase db;*/
+    private ReadingDao readingDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_details);
+        readingDao = NyxDatabase.getDatabase(getBaseContext()).readingDao();
 
         Bundle b = getIntent().getExtras();
         sessionUUID = b.getString("SESSION_UUID");
 
-        /*db = new NyxDatabase(this);*/
 
-        /*Executor executor = Executors.newCachedThreadPool();
+        Executor executor = Executors.newCachedThreadPool();
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                List<HeartrateReading> hrReadings = db.getAllHeartrates(sessionUUID);
+                List<HeartrateReading> hrReadings = readingDao.getHeartrateReadings(sessionUUID);
                 updateHeartrateChart(hrReadings);
             }
-        });*/
+        });
 
-        /*Executor executor2 = Executors.newCachedThreadPool();
+        Executor executor2 = Executors.newCachedThreadPool();
         executor2.execute(new Runnable() {
             @Override
             public void run() {
-                List<AccelerometerReading> accelerometerReadings = db.getAllAccelerometerReadings(sessionUUID);
-                updateAccelerometerChart(accelerometerReadings);
-            }
-        });*/
-
-        /*Executor executor3 = Executors.newCachedThreadPool();
-        executor3.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<BatteryReading> batteryReadings = db.getAllBatteryLevels(sessionUUID);
+                List<BatteryReading> batteryReadings = readingDao.getBatteryReadings(sessionUUID);
                 updateBatteryChart(batteryReadings);
             }
-        });*/
+        });
 
-        /*Executor executor4 = Executors.newCachedThreadPool();
-        executor4.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<GyroscopeReading> gyroscopeReadings = db.getAllGyroscopeReadings(sessionUUID);
-                updateGyroscopeChart(gyroscopeReadings);
-            }
-        });*/
     }
 
     public void updateHeartrateChart(List<HeartrateReading> heartrateReadings) {
@@ -101,7 +86,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
         LineDataSet dataSet = new LineDataSet(entryList, "Heart rate");
         dataSet.setColor(Color.rgb(1,1,1));
         dataSet.setValueTextColor(Color.rgb(1,1,1));
-        dataSet.setCircleHoleRadius(0f);
+        dataSet.setCircleHoleRadius(1f);
         dataSet.setDrawCircleHole(false);
         dataSet.setColor(Color.RED);
         dataSet.setCircleColor(Color.RED);
@@ -152,7 +137,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
         LineDataSet accelerometerZDataSet = new LineDataSet(accelerometerZEntries, "Accelerometer Z");
         accelerometerZDataSet.setColor(Color.rgb(1,1,1));
         accelerometerZDataSet.setValueTextColor(Color.rgb(1,1,1));
-        accelerometerZDataSet.setCircleHoleRadius(0f);
+        accelerometerZDataSet.setCircleHoleRadius(1f);
         accelerometerZDataSet.setDrawCircleHole(false);
         accelerometerZDataSet.setColor(Color.BLUE);
         accelerometerZDataSet.setCircleColor(Color.BLUE);
@@ -184,7 +169,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
         LineDataSet batteryDataSet = new LineDataSet(batteryEntryList, "Battery percentage");
         batteryDataSet.setColor(Color.rgb(1,1,1));
         batteryDataSet.setValueTextColor(Color.rgb(1,1,1));
-        batteryDataSet.setCircleHoleRadius(0f);
+        batteryDataSet.setCircleHoleRadius(1f);
         batteryDataSet.setDrawCircleHole(false);
         batteryDataSet.setColor(0xFFFF9300);
         batteryDataSet.setCircleColor(0xFFFF9300);
@@ -235,7 +220,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
         LineDataSet gyroscopeZDataSet = new LineDataSet(gyroscopeZEntries, "Gyroscope Z");
         gyroscopeZDataSet.setColor(Color.rgb(1,1,1));
         gyroscopeZDataSet.setValueTextColor(Color.rgb(1,1,1));
-        gyroscopeZDataSet.setCircleHoleRadius(0f);
+        gyroscopeZDataSet.setCircleHoleRadius(1f);
         gyroscopeZDataSet.setDrawCircleHole(false);
         gyroscopeZDataSet.setColor(Color.BLUE);
         gyroscopeZDataSet.setCircleColor(Color.BLUE);
@@ -264,10 +249,10 @@ public class SessionDetailsActivity extends AppCompatActivity {
             JSONArray accArray = new JSONArray();
             for (AccelerometerReading accelerometerReading : accelerometerReadings) {
                 JSONObject acc = new JSONObject();
-                acc.put("x",accelerometerReading.getX());
-                acc.put("y",accelerometerReading.getY());
-                acc.put("z",accelerometerReading.getZ());
-                acc.put("timestamp",accelerometerReading.getTimeStamp());
+                acc.put("x", accelerometerReading.getX());
+                acc.put("y", accelerometerReading.getY());
+                acc.put("z", accelerometerReading.getZ());
+                acc.put("timestamp", accelerometerReading.getTimeStamp());
                 accArray.put(acc);
             }
             jsonObject.put("accelerometerReadings", accArray);
@@ -313,7 +298,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
             Intent sendIntent = new Intent(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
             sendIntent.setType("text/plain");
-            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             String title = "Share session";
 
             startActivity(Intent.createChooser(sendIntent, title));
@@ -322,7 +307,6 @@ public class SessionDetailsActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }*/
 
 }

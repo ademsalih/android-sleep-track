@@ -3,6 +3,7 @@ package com.example.fitbit_tracker.view;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,13 +25,13 @@ public class SessionsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sessions);
-        getSupportActionBar().setTitle("Sessions");
 
-        SessionListAdapter sessionListAdapter = new SessionListAdapter(new SessionListAdapter.SessionDiff());
+        SessionListAdapter sessionListAdapter = new SessionListAdapter(new SessionListAdapter.SessionDiff(), getBaseContext());
 
         RecyclerView recyclerView = findViewById(R.id.sessionRecyclerView);
         recyclerView.setAdapter(sessionListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         ViewModelProvider.AndroidViewModelFactory androidViewModelFactory = new ViewModelProvider.AndroidViewModelFactory(getApplication());
         ViewModelProvider viewModelProvider = new ViewModelProvider(this, androidViewModelFactory);
@@ -40,6 +41,7 @@ public class SessionsActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Session> sessions) {
                 sessionListAdapter.submitList(sessions);
+                getSupportActionBar().setTitle("Sessions (" + sessions.size() + ")");
             }
         });
 

@@ -17,8 +17,13 @@ public class Reading {
     @ColumnInfo(name = "timestamp")
     private long timeStamp;
 
-    public Reading() {
+    public Reading(String uuid, long timeStamp) {
+        this.uuid = uuid;
+        this.timeStamp = timeStamp;
+    }
 
+    public int getId() {
+        return id;
     }
 
     public void setId(int id) {
@@ -29,8 +34,16 @@ public class Reading {
         return uuid;
     }
 
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public long getTimeStamp() {
         return timeStamp;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
 }

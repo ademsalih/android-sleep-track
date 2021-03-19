@@ -15,8 +15,11 @@ public class AccelerometerReading extends Reading {
     @ColumnInfo(name = "z_acceleration")
     private double z;
 
-    public AccelerometerReading() {
-
+    public AccelerometerReading(String uuid, long timeStamp, double x, double y, double z) {
+        super(uuid, timeStamp);
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     public double getX() {
