@@ -82,6 +82,7 @@ public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> 
         public boolean areContentsTheSame(@NonNull Session oldItem, @NonNull Session newItem) {
             return oldItem.getUuid().equals(newItem.getUuid());
         }
+
     }
 
 }

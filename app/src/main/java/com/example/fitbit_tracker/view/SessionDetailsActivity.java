@@ -69,6 +69,24 @@ public class SessionDetailsActivity extends AppCompatActivity {
             }
         });
 
+        Executor executor3 = Executors.newCachedThreadPool();
+        executor3.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<AccelerometerReading> accelerometerReadings = readingDao.getAccelerometerReadings(sessionUUID);
+                updateAccelerometerChart(accelerometerReadings);
+            }
+        });
+
+        Executor executor4 = Executors.newCachedThreadPool();
+        executor4.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<GyroscopeReading> gyroscopeReadings = readingDao.getGyroscopeReadings(sessionUUID);
+                updateGyroscopeChart(gyroscopeReadings);
+            }
+        });
+
     }
 
     public void updateHeartrateChart(List<HeartrateReading> heartrateReadings) {
