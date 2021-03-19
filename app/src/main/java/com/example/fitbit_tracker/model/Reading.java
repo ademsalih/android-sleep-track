@@ -12,15 +12,19 @@ public class Reading {
     @ColumnInfo(name = "id")
     private int id;
 
-    @ColumnInfo(name = "uuid")
-    private String uuid;
+    @ColumnInfo(name = "session_id")
+    private int sessionId;
 
     @ColumnInfo(name = "timestamp")
     private long timeStamp;
 
-    public Reading(String uuid, long timeStamp) {
-        this.uuid = uuid;
+    public Reading(int sessionId, long timeStamp) {
+        this.sessionId = sessionId;
         this.timeStamp = timeStamp;
+    }
+
+    public Reading() {
+
     }
 
     public int getId() {
@@ -31,14 +35,6 @@ public class Reading {
         this.id = id;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public long getTimeStamp() {
         return timeStamp;
     }
@@ -47,4 +43,11 @@ public class Reading {
         this.timeStamp = timeStamp;
     }
 
+    public int getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(int sessionId) {
+        this.sessionId = sessionId;
+    }
 }

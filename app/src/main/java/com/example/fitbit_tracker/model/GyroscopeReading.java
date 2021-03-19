@@ -2,8 +2,9 @@ package com.example.fitbit_tracker.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 
-@Entity
+@Entity(indices = {@Index("session_id")})
 public class GyroscopeReading extends Reading {
 
     @ColumnInfo(name = "x_velocity")
@@ -15,8 +16,8 @@ public class GyroscopeReading extends Reading {
     @ColumnInfo(name = "z_velocity")
     private double z;
 
-    public GyroscopeReading(String uuid, long timeStamp, double x, double y, double z) {
-        super(uuid, timeStamp);
+    public GyroscopeReading(int sessionId, long timeStamp, double x, double y, double z) {
+        super(sessionId, timeStamp);
         this.x = x;
         this.y = y;
         this.z = z;

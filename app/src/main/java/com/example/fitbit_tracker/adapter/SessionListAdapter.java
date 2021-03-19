@@ -56,7 +56,7 @@ public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> 
             public void onClick(View v) {
                 Intent intent = new Intent(context, SessionDetailsActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("SESSION_UUID", session.getUuid());
+                bundle.putInt("SESSION_ID", session.getId());
                 intent.putExtras(bundle);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);

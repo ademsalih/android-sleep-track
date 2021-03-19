@@ -62,6 +62,11 @@ public class CustomWebSocketServer extends WebSocketServer {
 
             String sessionIdentifier = dataObject.getString("sessionIdentifier");
 
+            int sessionId = 0;
+            if (sessionDao.getSession(sessionIdentifier) != null) {
+                sessionId = sessionDao.getSession(sessionIdentifier).getId();
+            }
+
             switch (command) {
                 case "ADD_READING":
 
@@ -72,7 +77,7 @@ public class CustomWebSocketServer extends WebSocketServer {
                         case "HEARTRATE":
                             JSONObject bpmData = dataObject.getJSONObject("data");
                             int bpm = bpmData.getInt("bpm");
-                            readingDao.insert(new HeartrateReading(sessionIdentifier, timeStamp, bpm));
+                            readingDao.insert(new HeartrateReading(sessionId, timeStamp, bpm));
                             break;
                         case "ACCELEROMETER":
                             JSONObject items = dataObject.getJSONObject("items");
@@ -88,7 +93,7 @@ public class CustomWebSocketServer extends WebSocketServer {
                                 double zAcceleration = z.getDouble(i);
                                 long ts = timestampArray.getLong(i);
 
-                                readingDao.insert(new AccelerometerReading(sessionIdentifier,ts, xAcceleration,yAcceleration,zAcceleration));
+                                readingDao.insert(new AccelerometerReading(sessionId,ts, xAcceleration,yAcceleration,zAcceleration));
                             }
                             break;
                         case "GYROSCOPE":
@@ -105,14 +110,14 @@ public class CustomWebSocketServer extends WebSocketServer {
                                 double vZ = gyroZ.getDouble(i);
                                 long gyrots = gyroTimestamp.getLong(i);
 
-                                readingDao.insert(new GyroscopeReading(sessionIdentifier, gyrots, vX, vY, vZ));
+                                readingDao.insert(new GyroscopeReading(sessionId, gyrots, vX, vY, vZ));
                             }
 
                             break;
                         case "BATTERY":
                             JSONObject batteryData = dataObject.getJSONObject("data");
                             int batteryLevel = batteryData.getInt("batteryLevel");
-                            readingDao.insert(new BatteryReading(sessionIdentifier,0, batteryLevel));
+                            readingDao.insert(new BatteryReading(sessionId,0, batteryLevel));
                             break;
                         default:
                             break;
