@@ -2,15 +2,16 @@ package com.example.fitbit_tracker.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.dao.ReadingDao;
 import com.example.fitbit_tracker.db.NyxDatabase;
 import com.example.fitbit_tracker.model.AccelerometerReading;
-import com.example.fitbit_tracker.model.AccelerometerViewModel;
 import com.example.fitbit_tracker.model.BatteryReading;
 import com.example.fitbit_tracker.model.GyroscopeReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
@@ -20,6 +21,11 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -39,22 +45,36 @@ public class SessionDetailsActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         sessionID = b.getInt("SESSION_ID");
 
-        int threads = 1;
+        int threads = 100;
 
+        List<HeartrateReading> hrReadings = new ArrayList<>();
         Executor executor = Executors.newFixedThreadPool(threads);
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                List<HeartrateReading> hrReadings = readingDao.getHeartrateReadings(sessionID);
+                long start = System.currentTimeMillis();
+
+                List<HeartrateReading> hrReadings = readingDao.getHeartrateReadings(sessionID, 1);
+
+                long time = System.currentTimeMillis() - start;
+                Log.d(TAG, "Heartrate (" + hrReadings.size() +  ") : " + time + " ms");
                 updateHeartrateChart(hrReadings);
             }
         });
+
+
 
         Executor executor2 = Executors.newFixedThreadPool(threads);
         executor2.execute(new Runnable() {
             @Override
             public void run() {
-                List<BatteryReading> batteryReadings = readingDao.getBatteryReadings(sessionID);
+                long start = System.currentTimeMillis();
+
+                List<BatteryReading> batteryReadings = readingDao.getBatteryReadings(sessionID, 1);
+
+                long time = System.currentTimeMillis() - start;
+                Log.d(TAG, "Battery (" + batteryReadings.size() +  ") : " + time + " ms");
+
                 updateBatteryChart(batteryReadings);
             }
         });
@@ -64,11 +84,23 @@ public class SessionDetailsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 long start = System.currentTimeMillis();
-                List<AccelerometerViewModel> accelerometerReadings = readingDao.getAccelerometerReadings(sessionID);
-                long time = System.currentTimeMillis() - start;
-                Log.d(TAG, "Accelerometer: " + time);
 
-                updateAccelerometerChart(accelerometerReadings);
+                List<AccelerometerReading> accelerometerReadings = readingDao.getAccelerometerReadings(sessionID, 25);
+
+                long time = System.currentTimeMillis() - start;
+                Log.d(TAG, "Accelerometer (" + accelerometerReadings.size() +  ") : " + time + " ms");
+
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        long start2 = System.currentTimeMillis();
+                        updateAccelerometerChart(accelerometerReadings);
+                        long time2 = System.currentTimeMillis() - start2;
+                        Log.d(TAG, "Accelerometer Graph : " + time2 + " ms");
+                    }
+                });
+
             }
         });
 
@@ -76,7 +108,13 @@ public class SessionDetailsActivity extends AppCompatActivity {
         executor4.execute(new Runnable() {
             @Override
             public void run() {
-                List<GyroscopeReading> gyroscopeReadings = readingDao.getGyroscopeReadings(sessionID);
+                long start = System.currentTimeMillis();
+
+                List<GyroscopeReading> gyroscopeReadings = readingDao.getGyroscopeReadings(sessionID, 25);
+
+                long time = System.currentTimeMillis() - start;
+                Log.d(TAG, "Gyroscope (" + gyroscopeReadings.size() +  ") : " + time + " ms");
+
                 updateGyroscopeChart(gyroscopeReadings);
             }
         });
@@ -84,7 +122,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
     }
 
     public void updateHeartrateChart(List<HeartrateReading> heartrateReadings) {
-        LineChart heartrateChart = (LineChart) findViewById(R.id.heartrateChart);
+        LineChart heartrateChart = findViewById(R.id.heartrateChart);
 
         List<Entry> entryList = new ArrayList<Entry>();
 
@@ -108,26 +146,26 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         heartrateChart.setData(lineData);
 
-        XAxis xAxis = heartrateChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
-
         heartrateChart.invalidate();
     }
 
-    public void updateAccelerometerChart(List<AccelerometerViewModel> accelerometerReadings) {
-        LineChart accelerometerChart = (LineChart) findViewById(R.id.accelerometerChart);
+    public void updateAccelerometerChart(List<AccelerometerReading> accelerometerReadings) {
+        LineChart accelerometerChart = findViewById(R.id.accelerometerChart);
+
+        accelerometerChart.setTouchEnabled(true);
+        accelerometerChart.setDragEnabled(true);
+        accelerometerChart.setScaleEnabled(true);
+        accelerometerChart.setDrawGridBackground(false);
+        accelerometerChart.setPinchZoom(true);
 
         List<Entry> accelerometerXEntries = new ArrayList<>();
         List<Entry> accelerometerYEntries = new ArrayList<>();
         List<Entry> accelerometerZEntries = new ArrayList<>();
 
-        int j = 0;
-
-        for (AccelerometerViewModel r: accelerometerReadings) {
-            accelerometerXEntries.add(new Entry(j, (float) r.getX_acceleration()));
-            accelerometerYEntries.add(new Entry(j, (float) r.getY_acceleration()));
-            accelerometerZEntries.add(new Entry(j, (float) r.getZ_acceleration()));
-            j++;
+        for (int i = 0; i < accelerometerReadings.size(); i++) {
+            accelerometerXEntries.add(new Entry(i, (float) accelerometerReadings.get(i).getX()));
+            accelerometerYEntries.add(new Entry(i, (float) accelerometerReadings.get(i).getY()));
+            accelerometerZEntries.add(new Entry(i, (float) accelerometerReadings.get(i).getZ()));
         }
 
         LineDataSet accelerometerXDataSet = new LineDataSet(accelerometerXEntries, "Accelerometer X");
@@ -191,9 +229,6 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         batteryChart.setData(batteryLineData);
 
-        XAxis xAxisBat = batteryChart.getXAxis();
-        xAxisBat.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
-
         batteryChart.invalidate();
     }
 
@@ -204,13 +239,11 @@ public class SessionDetailsActivity extends AppCompatActivity {
         List<Entry> gyroscopeYEntries = new ArrayList<>();
         List<Entry> gyroscopeZEntries = new ArrayList<>();
 
-        int j = 0;
 
-        for (GyroscopeReading r: gyroscopeReadings) {
-            gyroscopeXEntries.add(new Entry(j, (float) r.getX()));
-            gyroscopeYEntries.add(new Entry(j, (float) r.getY()));
-            gyroscopeZEntries.add(new Entry(j, (float) r.getZ()));
-            j++;
+        for (int i = 0; i < gyroscopeReadings.size(); i++) {
+            gyroscopeXEntries.add(new Entry(i, (float) gyroscopeReadings.get(i).getX()));
+            gyroscopeYEntries.add(new Entry(i, (float) gyroscopeReadings.get(i).getY()));
+            gyroscopeZEntries.add(new Entry(i, (float) gyroscopeReadings.get(i).getZ()));
         }
 
         LineDataSet gyroscopeXDataSet = new LineDataSet(gyroscopeXEntries, "Gyroscope X");
@@ -245,7 +278,6 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         gyroscopeChart.setData(gyroscopeLineData);
 
-        gyroscopeChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
         gyroscopeChart.invalidate();
     }
 

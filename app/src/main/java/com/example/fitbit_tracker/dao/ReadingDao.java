@@ -5,7 +5,6 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.example.fitbit_tracker.model.AccelerometerReading;
-import com.example.fitbit_tracker.model.AccelerometerViewModel;
 import com.example.fitbit_tracker.model.BatteryReading;
 import com.example.fitbit_tracker.model.GyroscopeReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
@@ -27,16 +26,16 @@ public interface ReadingDao {
     @Insert
     void insert(GyroscopeReading... gyroscopeReadings);
 
-    @Query("SELECT x_acceleration,y_acceleration,z_acceleration FROM accelerometerreading WHERE session_id = :id")
-    List<AccelerometerViewModel> getAccelerometerReadings(int id);
+    @Query("SELECT * FROM accelerometerreading WHERE session_id = :id AND id % :n = 0")
+    List<AccelerometerReading> getAccelerometerReadings(int id, int n);
 
-    @Query("SELECT * FROM heartratereading WHERE session_id = :id")
-    List<HeartrateReading> getHeartrateReadings(int id);
+    @Query("SELECT * FROM heartratereading WHERE session_id = :id AND id % :n = 0")
+    List<HeartrateReading> getHeartrateReadings(int id, int n);
 
-    @Query("SELECT * FROM batteryreading WHERE session_id = :id")
-    List<BatteryReading> getBatteryReadings(int id);
+    @Query("SELECT * FROM batteryreading WHERE session_id = :id AND id % :n = 0")
+    List<BatteryReading> getBatteryReadings(int id, int n);
 
-    @Query("SELECT * FROM gyroscopereading WHERE session_id = :id")
-    List<GyroscopeReading> getGyroscopeReadings(int id);
+    @Query("SELECT * FROM gyroscopereading WHERE session_id = :id AND id % :n = 0")
+    List<GyroscopeReading> getGyroscopeReadings(int id, int n);
 
 }

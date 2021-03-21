@@ -14,7 +14,6 @@ import com.example.fitbit_tracker.model.GyroscopeReading;
 import com.example.fitbit_tracker.model.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,7 +31,9 @@ public abstract class NyxDatabase extends RoomDatabase {
 
     private static volatile NyxDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
+    private static final int NUMBER_OF_READ_THREADS = 100;
     public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    public static final ExecutorService databaseReadExecutor = Executors.newFixedThreadPool(NUMBER_OF_READ_THREADS);
 
     public static NyxDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {

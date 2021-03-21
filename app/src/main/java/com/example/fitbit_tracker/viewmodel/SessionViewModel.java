@@ -29,4 +29,5 @@ public class SessionViewModel extends AndroidViewModel {
     public void insert(Session session) {
         sessionRepository.insert(session);
     }
+
 }
