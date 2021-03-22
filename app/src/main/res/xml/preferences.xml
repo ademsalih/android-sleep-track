@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreference
+        android:key="prefSampling"
+        android:title="Preview Sampling"
+        android:summary="Only show a sample of the data when previewing a session."
+        android:defaultValue="true"
+        app:iconSpaceReserved="false" />
+
+    <EditTextPreference
+        android:key="prefSamplingThreshold"
+        android:title="Sampling Threshold"
+        android:summary="Choose maximum amount of data points required before sampling is applied."
+        android:defaultValue="25000"
+        android:singleLine="true"
+        android:selectAllOnFocus="true"
+        app:iconSpaceReserved="false" />
+
+</PreferenceScreen>
