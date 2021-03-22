@@ -57,10 +57,11 @@
             android:textSize="22sp" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/settingsButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:height="100dp"
+            android:onClick="onSettingsButtonClick"
             android:text="Settings"
             android:textSize="22sp" />
 
