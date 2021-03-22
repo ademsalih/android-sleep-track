@@ -37,38 +37,44 @@ public class SettingsActivity extends AppCompatActivity {
 
             preferenceManager = getPreferenceManager();
 
-            final SwitchPreference autoTurnOnTVSwitch = (SwitchPreference) getPreferenceManager().findPreference("prefSampling");
+            final SwitchPreference samplingSwitchPreference = (SwitchPreference) getPreferenceManager().findPreference("prefSampling");
             final EditTextPreference samplingThresholdPreference = (EditTextPreference) getPreferenceManager().findPreference("prefSamplingThreshold");
 
-            if (autoTurnOnTVSwitch != null) {
-                autoTurnOnTVSwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        boolean switchState = (boolean) newValue;
-                        FragmentActivity activity = getActivity();
+            boolean thresholdPreferenceEnabled = getActivity().getSharedPreferences("PREFERENCES", MODE_PRIVATE).getBoolean("prefSampling", true);
 
-                        if (activity != null) {
-                            SharedPreferences.Editor sp = activity.getSharedPreferences("PREFERENCES", MODE_PRIVATE).edit();
-                            sp.putBoolean("tvAutoOn",switchState).apply();
-                        }
-                        return true;
+            if (samplingSwitchPreference != null) {
+                samplingSwitchPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+                    boolean switchState = (boolean) newValue;
+
+                    samplingThresholdPreference.setEnabled(switchState);
+
+                    FragmentActivity activity = getActivity();
+
+                    if (activity != null) {
+                        SharedPreferences.Editor sp = activity.getSharedPreferences("PREFERENCES", MODE_PRIVATE).edit();
+                        sp.putBoolean("prefSampling", switchState).apply();
                     }
+                    return true;
                 });
             }
 
             if (samplingThresholdPreference != null) {
-                samplingThresholdPreference.setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {
-                    @Override
-                    public void onBindEditText(@NonNull EditText editText) {
-                        editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
-                        editText.setSelection(0,editText.getText().length());
-                    }
+                samplingThresholdPreference.setEnabled(thresholdPreferenceEnabled);
+
+                samplingThresholdPreference.setOnBindEditTextListener(editText -> {
+                    editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+                    editText.setSelection(0,editText.getText().length());
                 });
-                samplingThresholdPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        return true;
+
+                samplingThresholdPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+                    FragmentActivity activity = getActivity();
+
+                    if (activity != null) {
+                        SharedPreferences.Editor sp = activity.getSharedPreferences("PREFERENCES", MODE_PRIVATE).edit();
+                        int threshold = Integer.parseInt((String) newValue);
+                        sp.putInt("prefSamplingThreshold", threshold).apply();
                     }
+                    return true;
                 });
             }
 
