@@ -54,7 +54,7 @@ public class SessionViewHolder extends RecyclerView.ViewHolder {
     }
 
     public static SessionViewHolder create(ViewGroup parent) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.session_item_2, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.session_item, parent, false);
         return new SessionViewHolder(view);
     }
 

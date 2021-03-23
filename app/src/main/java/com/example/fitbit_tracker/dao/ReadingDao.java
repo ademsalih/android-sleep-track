@@ -4,10 +4,10 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import com.example.fitbit_tracker.model.AccelerometerReading;
-import com.example.fitbit_tracker.model.BatteryReading;
-import com.example.fitbit_tracker.model.GyroscopeReading;
-import com.example.fitbit_tracker.model.HeartrateReading;
+import com.example.fitbit_tracker.model.reading.AccelerometerReading;
+import com.example.fitbit_tracker.model.reading.BatteryReading;
+import com.example.fitbit_tracker.model.reading.GyroscopeReading;
+import com.example.fitbit_tracker.model.reading.HeartrateReading;
 
 import java.util.List;
 

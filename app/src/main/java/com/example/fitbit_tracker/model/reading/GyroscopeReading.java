@@ -1,4 +1,4 @@
-package com.example.fitbit_tracker.model;
+package com.example.fitbit_tracker.model.reading;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

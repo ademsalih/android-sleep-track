@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.fitbit_tracker.model.Session;
+import com.example.fitbit_tracker.view.SessionDetailActivity;
 import com.example.fitbit_tracker.view.SessionDetailsActivity;
 import com.example.fitbit_tracker.view.SessionsActivity;
 
@@ -54,7 +55,7 @@ public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, SessionDetailsActivity.class);
+                Intent intent = new Intent(context, SessionDetailActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putInt("SESSION_ID", session.getId());
                 intent.putExtras(bundle);

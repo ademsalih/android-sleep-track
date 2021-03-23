@@ -1,11 +1,11 @@
-package com.example.fitbit_tracker.model;
+package com.example.fitbit_tracker.model.reading;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index(value = "uuid")})
+@Entity(indices = {@Index(value = "session_id")})
 public class Reading {
 
     @PrimaryKey(autoGenerate = true)
@@ -24,7 +24,6 @@ public class Reading {
     }
 
     public Reading() {
-
     }
 
     public int getId() {

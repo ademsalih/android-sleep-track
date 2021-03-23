@@ -2,30 +2,23 @@ package com.example.fitbit_tracker.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.dao.ReadingDao;
-import com.example.fitbit_tracker.db.NyxDatabase;
-import com.example.fitbit_tracker.model.AccelerometerReading;
-import com.example.fitbit_tracker.model.BatteryReading;
-import com.example.fitbit_tracker.model.GyroscopeReading;
-import com.example.fitbit_tracker.model.HeartrateReading;
+import com.example.fitbit_tracker.database.NyxDatabase;
+import com.example.fitbit_tracker.model.reading.AccelerometerReading;
+import com.example.fitbit_tracker.model.reading.BatteryReading;
+import com.example.fitbit_tracker.model.reading.GyroscopeReading;
+import com.example.fitbit_tracker.model.reading.HeartrateReading;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;

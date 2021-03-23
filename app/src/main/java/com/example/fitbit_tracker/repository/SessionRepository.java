@@ -5,7 +5,7 @@ import android.app.Application;
 import androidx.lifecycle.LiveData;
 
 import com.example.fitbit_tracker.dao.SessionDao;
-import com.example.fitbit_tracker.db.NyxDatabase;
+import com.example.fitbit_tracker.database.NyxDatabase;
 import com.example.fitbit_tracker.model.Session;
 
 import java.util.List;

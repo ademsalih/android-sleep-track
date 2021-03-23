@@ -1,4 +1,4 @@
-package com.example.fitbit_tracker.model;
+package com.example.fitbit_tracker.model.reading;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -17,7 +17,6 @@ public class AccelerometerReading extends Reading {
     private double z;
 
     public AccelerometerReading() {
-
     }
 
     public AccelerometerReading(int sessionId, long timeStamp, double x, double y, double z) {
