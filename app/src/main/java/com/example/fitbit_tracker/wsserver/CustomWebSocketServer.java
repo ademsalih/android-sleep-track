@@ -7,10 +7,6 @@ import com.example.fitbit_tracker.dao.ReadingDao;
 import com.example.fitbit_tracker.dao.SessionDao;
 import com.example.fitbit_tracker.database.NyxDatabase;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
-import com.example.fitbit_tracker.model.reading.AccelerometerReading;
-import com.example.fitbit_tracker.model.reading.BatteryReading;
-import com.example.fitbit_tracker.model.reading.GyroscopeReading;
-import com.example.fitbit_tracker.model.reading.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
 
 import org.java_websocket.WebSocket;

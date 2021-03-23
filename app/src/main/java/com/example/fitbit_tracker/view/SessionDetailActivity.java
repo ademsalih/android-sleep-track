@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.adapter.SessionReadingListAdapater;
+import com.example.fitbit_tracker.adapter.reading.SessionReadingListAdapater;
 import com.example.fitbit_tracker.viewmodel.SessionReadingViewModel;
 
 public class SessionDetailActivity extends AppCompatActivity {

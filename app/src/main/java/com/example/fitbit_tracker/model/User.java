@@ -10,7 +10,7 @@ public class User {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private int id;
+    private long id;
 
     @ColumnInfo(name = "first_name")
     @NonNull
@@ -43,7 +43,7 @@ public class User {
         this.id = id;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -68,4 +68,5 @@ public class User {
     public long getWeight() {
         return weight;
     }
+
 }

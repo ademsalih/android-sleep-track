@@ -1,7 +1,10 @@
-package com.example.fitbit_tracker.model;
+package com.example.fitbit_tracker.model.relation;
 
 import androidx.room.Embedded;
 import androidx.room.Relation;
+
+import com.example.fitbit_tracker.model.Session;
+import com.example.fitbit_tracker.model.User;
 
 import java.util.List;
 

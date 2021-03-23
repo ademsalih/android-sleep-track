@@ -6,15 +6,10 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-import com.example.fitbit_tracker.dao.ReadingBaseDao;
 import com.example.fitbit_tracker.dao.ReadingDao;
 import com.example.fitbit_tracker.dao.SessionDao;
-import com.example.fitbit_tracker.model.reading.AccelerometerReading;
-import com.example.fitbit_tracker.model.reading.BatteryReading;
-import com.example.fitbit_tracker.model.reading.GyroscopeReading;
-import com.example.fitbit_tracker.model.reading.HeartrateReading;
 import com.example.fitbit_tracker.model.Session;
-import com.example.fitbit_tracker.model.reading.Reading;
+import com.example.fitbit_tracker.model.Reading;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

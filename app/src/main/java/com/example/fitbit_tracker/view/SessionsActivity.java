@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.adapter.SessionListAdapter;
+import com.example.fitbit_tracker.adapter.session.SessionListAdapter;
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.viewmodel.SessionViewModel;
 

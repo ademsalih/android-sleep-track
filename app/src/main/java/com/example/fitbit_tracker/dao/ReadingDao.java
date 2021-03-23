@@ -1,13 +1,12 @@
 package com.example.fitbit_tracker.dao;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
-import com.example.fitbit_tracker.model.reading.AccelerometerReading;
-import com.example.fitbit_tracker.model.reading.BatteryReading;
-import com.example.fitbit_tracker.model.reading.GyroscopeReading;
-import com.example.fitbit_tracker.model.reading.HeartrateReading;
+import com.example.fitbit_tracker.model.Reading;
 
 import java.util.List;
 
@@ -15,27 +14,21 @@ import java.util.List;
 public interface ReadingDao {
 
     @Insert
-    void insert(AccelerometerReading... accelerometerReadings);
+    void insert(Reading... readings);
 
-    @Insert
-    void insert(HeartrateReading... heartrateReadings);
+    @Update
+    void update(Reading... readings);
 
-    @Insert
-    void insert(BatteryReading... batteryReadings);
+    @Delete
+    void delete(Reading... readings);
 
-    @Insert
-    void insert(GyroscopeReading... gyroscopeReadings);
+    @Query("SELECT * FROM reading WHERE sessionId = :sessionId")
+    List<Reading> getAllReadings(long sessionId);
 
-    @Query("SELECT * FROM accelerometerreading WHERE session_id = :id AND id % :n = 0")
-    List<AccelerometerReading> getAccelerometerReadings(int id, int n);
+    @Query("SELECT * FROM reading WHERE sessionId = :sessionId AND sensorId = :sensorId")
+    List<Reading> getAllReadingsForSensor(long sessionId, long sensorId );
 
-    @Query("SELECT * FROM heartratereading WHERE session_id = :id AND id % :n = 0")
-    List<HeartrateReading> getHeartrateReadings(int id, int n);
-
-    @Query("SELECT * FROM batteryreading WHERE session_id = :id AND id % :n = 0")
-    List<BatteryReading> getBatteryReadings(int id, int n);
-
-    @Query("SELECT * FROM gyroscopereading WHERE session_id = :id AND id % :n = 0")
-    List<GyroscopeReading> getGyroscopeReadings(int id, int n);
+    @Query("SELECT * FROM reading WHERE sessionId = :sessionId AND sensorId = :sensorId AND id % :n = 0")
+    List<Reading> getSparseReadingsForSensor(long sessionId, long sensorId, int n);
 
 }
