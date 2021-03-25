@@ -5,18 +5,18 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index(value = "session_id")})
+@Entity(indices = {@Index(value = "sessionId")})
 public class Reading {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private int id;
+    private long id;
 
     @ColumnInfo(name = "sessionId")
-    private int sessionId;
+    private long sessionId;
 
-    @ColumnInfo(name = "sensorId")
-    private int sensorId;
+    @ColumnInfo(name = "readingTypeId")
+    private long readingTypeId;
 
     @ColumnInfo(name = "timestamp")
     private long timeStamp;
@@ -28,35 +28,35 @@ public class Reading {
 
     }
 
-    public Reading(int sessionId, int sensorId, long timeStamp, float data) {
+    public Reading(long sessionId, long readingTypeId, long timeStamp, float data) {
         this.sessionId = sessionId;
-        this.sensorId = sensorId;
+        this.readingTypeId = readingTypeId;
         this.timeStamp = timeStamp;
         this.data = data;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public int getSessionId() {
+    public long getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(int sessionId) {
+    public void setSessionId(long sessionId) {
         this.sessionId = sessionId;
     }
 
-    public int getSensorId() {
-        return sensorId;
+    public long getReadingTypeId() {
+        return readingTypeId;
     }
 
-    public void setSensorId(int sensorId) {
-        this.sensorId = sensorId;
+    public void setReadingTypeId(long readingTypeId) {
+        this.readingTypeId = readingTypeId;
     }
 
     public long getTimeStamp() {

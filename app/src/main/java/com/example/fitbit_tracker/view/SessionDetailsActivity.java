@@ -36,7 +36,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         int threads = 100;
 
-        List<HeartrateReading> hrReadings = new ArrayList<>();
+        /*List<HeartrateReading> hrReadings = new ArrayList<>();
         Executor executor = Executors.newFixedThreadPool(threads);
         executor.execute(new Runnable() {
             @Override
@@ -49,11 +49,11 @@ public class SessionDetailsActivity extends AppCompatActivity {
                 Log.d(TAG, "Heartrate (" + hrReadings.size() +  ") : " + time + " ms");
                 updateHeartrateChart(hrReadings);
             }
-        });
+        });*/
 
 
 
-        Executor executor2 = Executors.newFixedThreadPool(threads);
+        /*Executor executor2 = Executors.newFixedThreadPool(threads);
         executor2.execute(new Runnable() {
             @Override
             public void run() {
@@ -66,9 +66,9 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
                 updateBatteryChart(batteryReadings);
             }
-        });
+        });*/
 
-        Executor executor3 = Executors.newFixedThreadPool(threads);
+        /*Executor executor3 = Executors.newFixedThreadPool(threads);
         executor3.execute(new Runnable() {
             @Override
             public void run() {
@@ -91,9 +91,9 @@ public class SessionDetailsActivity extends AppCompatActivity {
                 });
 
             }
-        });
+        });*/
 
-        Executor executor4 = Executors.newFixedThreadPool(threads);
+        /*Executor executor4 = Executors.newFixedThreadPool(threads);
         executor4.execute(new Runnable() {
             @Override
             public void run() {
@@ -106,11 +106,11 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
                 updateGyroscopeChart(gyroscopeReadings);
             }
-        });
+        });*/
 
     }
 
-    public void updateHeartrateChart(List<HeartrateReading> heartrateReadings) {
+    /*public void updateHeartrateChart(List<HeartrateReading> heartrateReadings) {
         LineChart heartrateChart = findViewById(R.id.heartrateChart);
 
         List<Entry> entryList = new ArrayList<Entry>();
@@ -268,7 +268,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
         gyroscopeChart.setData(gyroscopeLineData);
 
         gyroscopeChart.invalidate();
-    }
+    }*/
 
     /*public void onExportButtonClicked(View view) {
         List<HeartrateReading> heartrateReadings = db.getAllHeartrates(sessionUUID);

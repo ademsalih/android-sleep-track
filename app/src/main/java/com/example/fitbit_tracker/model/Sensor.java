@@ -2,15 +2,15 @@ package com.example.fitbit_tracker.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Index;
+
 import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index(value = "session_id")})
+@Entity
 public class Sensor {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private int id;
+    private long id;
 
     @ColumnInfo(name = "sensorName")
     private String sensorName;
@@ -23,11 +23,11 @@ public class Sensor {
         this.sensorName = sensorName;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
