@@ -7,9 +7,9 @@ import java.util.List;
 
 public class AccelerometerRepository extends BaseRepository<AccelerometerReading> {
 
-    @Override
+    /*@Override
     List<AccelerometerReading> findAll() {
         return super.findAll();
-    }
+    }*/
 
 }

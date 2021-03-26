@@ -30,7 +30,6 @@ public abstract class NyxDatabase extends RoomDatabase {
 
     public abstract SessionDao sessionDao();
     public abstract ReadingDao readingDao();
-    public abstract ReadingBaseDao<?> readingBaseDao();
 
     private static volatile NyxDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;

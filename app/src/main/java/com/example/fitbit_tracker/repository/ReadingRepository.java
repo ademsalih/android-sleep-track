@@ -24,7 +24,6 @@ public class ReadingRepository {
     public ReadingRepository(Application application) {
         NyxDatabase db = NyxDatabase.getDatabase(application);
         readingDao = db.readingDao();
-        readingBaseDao = db.readingBaseDao();
         readingBatches = new ArrayList<>();
 
         for (Class<? extends Reading> readingClass : Configuration.READING_CLASSES) {
@@ -42,13 +41,13 @@ public class ReadingRepository {
         // The name should be the same as the model name minus Reading and the readings
         // data should be fetched using the findAll() generic method.
 
-        List<List<? extends Reading>> nall = new ArrayList<>();
+        /*List<List<? extends Reading>> nall = new ArrayList<>();
 
         List<AccelerometerReading> all = accelerometerRepository.findAll();
 
         nall.add(all);
 
-        readingBatches.add(new ReadingBatch("Accelerometer", nall));
+        readingBatches.add(new ReadingBatch("Accelerometer", nall));*/
 
         return readingBatches;
     }

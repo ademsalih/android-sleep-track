@@ -15,8 +15,8 @@ import com.example.fitbit_tracker.model.reading.Reading;
 
 import java.util.List;
 
-@Dao
-public interface ReadingBaseDao<T> {
+
+public interface ReadingBaseDao<T extends Reading>  {
 
     @Insert
     void insert(T object);

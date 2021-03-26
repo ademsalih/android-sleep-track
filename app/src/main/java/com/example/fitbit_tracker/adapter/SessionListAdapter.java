@@ -55,7 +55,7 @@ public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, SessionDetailActivity.class);
+                Intent intent = new Intent(context, SessionDetailsActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putInt("SESSION_ID", session.getId());
                 intent.putExtras(bundle);
