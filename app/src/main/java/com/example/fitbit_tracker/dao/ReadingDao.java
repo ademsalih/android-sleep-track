@@ -31,7 +31,7 @@ public interface ReadingDao {
     @Query("SELECT * FROM reading WHERE sessionId = :sessionId")
     List<Reading> getAllReadings(long sessionId);
 
-    @Query("select r.timestamp, r.data, s.sensorName, rt.type from reading as r, readingtype as rt, sensor as s where sessionId = :sessionId and s.id = :sensorId and s.id = rt.sensorId and r.readingTypeId = rt.id")
+    @Query("select r.timestamp, r.data, rt.type from reading as r, readingtype as rt, sensor as s where sessionId = :sessionId and s.id = :sensorId and s.id = rt.sensorId and r.readingTypeId = rt.id")
     List<ReadingDM> getAllReadingsForSensor(long sessionId, long sensorId);
 
     @Query("SELECT * FROM reading AS r, readingtype AS rt WHERE sessionId = :sessionId AND r.readingTypeId = rt.id AND rt.sensorId = :sensorId AND rt.type = :readingType")

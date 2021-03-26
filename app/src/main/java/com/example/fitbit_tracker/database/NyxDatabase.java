@@ -36,11 +36,12 @@ public abstract class NyxDatabase extends RoomDatabase {
     public abstract SensorDao sensorDao();
 
     private static volatile NyxDatabase INSTANCE;
-    private static final int NUMBER_OF_THREADS = 4;
-    private static final int NUMBER_OF_READ_THREADS = 100;
-    public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-    public static final ExecutorService databaseReadExecutor = Executors.newFixedThreadPool(NUMBER_OF_READ_THREADS);
 
+    private static final int NUMBER_OF_WRITE_THREADS = 4;
+    private static final int NUMBER_OF_READ_THREADS = 100;
+
+    public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_WRITE_THREADS);
+    public static final ExecutorService databaseReadExecutor = Executors.newFixedThreadPool(NUMBER_OF_READ_THREADS);
 
     public static NyxDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {

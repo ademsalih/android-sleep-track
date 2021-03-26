@@ -1,7 +1,6 @@
 package com.example.fitbit_tracker.view;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -11,10 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.adapter.reading.ReadingListAdapter;
-import com.example.fitbit_tracker.domain_model.ReadingBatchDM;
-import com.example.fitbit_tracker.model.Session;
+import com.example.fitbit_tracker.domain_model.Batch;
 import com.example.fitbit_tracker.viewmodel.ReadingBatchDMViewModel;
-import com.example.fitbit_tracker.viewmodel.SessionViewModel;
 
 import java.util.List;
 
@@ -43,10 +40,10 @@ public class SessionDetailActivity extends AppCompatActivity {
 
 
         viewModel = viewModelProvider.get(ReadingBatchDMViewModel.class);
-        viewModel.getAllReadingDomainModels(sessionId).observe(this, new Observer<List<ReadingBatchDM>>() {
+        viewModel.getAllReadingDomainModels(sessionId).observe(this, new Observer<List<Batch>>() {
             @Override
-            public void onChanged(List<ReadingBatchDM> readingBatchDMS) {
-                sessionReadingListAdapater.submitList(readingBatchDMS);
+            public void onChanged(List<Batch> batches) {
+                sessionReadingListAdapater.submitList(batches);
             }
         });
 

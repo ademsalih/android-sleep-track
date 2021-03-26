@@ -4,16 +4,14 @@ public class ReadingDM {
 
     private long timestamp;
     private float data;
-    private String sensorName;
     private String type;
 
     public ReadingDM() {
     }
 
-    public ReadingDM(long timestamp, float data, String sensorName, String type) {
+    public ReadingDM(long timestamp, float data, String type) {
         this.timestamp = timestamp;
         this.data = data;
-        this.sensorName = sensorName;
         this.type = type;
     }
 
@@ -31,14 +29,6 @@ public class ReadingDM {
 
     public void setData(float data) {
         this.data = data;
-    }
-
-    public String getSensorName() {
-        return sensorName;
-    }
-
-    public void setSensorName(String sensorName) {
-        this.sensorName = sensorName;
     }
 
     public String getType() {

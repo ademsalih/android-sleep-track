@@ -8,9 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
-import com.example.fitbit_tracker.domain_model.ReadingBatchDM;
+import com.example.fitbit_tracker.domain_model.Batch;
 import com.example.fitbit_tracker.domain_model.ReadingDM;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -20,11 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-public class ReadingListAdapter extends ListAdapter<ReadingBatchDM, ReadingViewHolder> {
+public class ReadingListAdapter extends ListAdapter<Batch, ReadingViewHolder> {
 
     private Context context;
 
-    public ReadingListAdapter(@NonNull DiffUtil.ItemCallback<ReadingBatchDM> diffCallback, Context baseContext) {
+    public ReadingListAdapter(@NonNull DiffUtil.ItemCallback<Batch> diffCallback, Context baseContext) {
         super(diffCallback);
         this.context = baseContext;
     }
@@ -37,10 +36,10 @@ public class ReadingListAdapter extends ListAdapter<ReadingBatchDM, ReadingViewH
 
     @Override
     public void onBindViewHolder(@NonNull ReadingViewHolder holder, int position) {
-        ReadingBatchDM readingBatchDM = getItem(position);
-        holder.bindChartLabel(readingBatchDM.getName());
+        Batch readingBatchDM = getItem(position);
+        holder.bindChartLabel(readingBatchDM.getBatchSensorName());
 
-        HashMap<String, List<ReadingDM>> batches = readingBatchDM.getReadingList();
+        HashMap<String, List<ReadingDM>> batches = readingBatchDM.getBatchMap();
 
         Set<String> keys = batches.keySet();
 
@@ -48,8 +47,7 @@ public class ReadingListAdapter extends ListAdapter<ReadingBatchDM, ReadingViewH
 
         for (String key : keys) {
             List<ReadingDM> batch = batches.get(key);
-
-            List<Entry> entryList = new ArrayList<Entry>();
+            List<Entry> entryList = new ArrayList<>();
 
             int i = 0;
             for (ReadingDM reading: batch) {
@@ -71,16 +69,16 @@ public class ReadingListAdapter extends ListAdapter<ReadingBatchDM, ReadingViewH
         holder.bindChartData(lineData);
     }
 
-    public static class ReadingDiff extends DiffUtil.ItemCallback<ReadingBatchDM> {
+    public static class ReadingDiff extends DiffUtil.ItemCallback<Batch> {
 
         @Override
-        public boolean areItemsTheSame(@NonNull ReadingBatchDM oldItem, @NonNull ReadingBatchDM newItem) {
+        public boolean areItemsTheSame(@NonNull Batch oldItem, @NonNull Batch newItem) {
             return oldItem == newItem;
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull ReadingBatchDM oldItem, @NonNull ReadingBatchDM newItem) {
-            return oldItem.getName().equals(newItem.getName());
+        public boolean areContentsTheSame(@NonNull Batch oldItem, @NonNull Batch newItem) {
+            return oldItem.getBatchSensorName().equals(newItem.getBatchSensorName());
         }
 
     }

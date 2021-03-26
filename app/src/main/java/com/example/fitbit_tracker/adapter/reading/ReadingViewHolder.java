@@ -33,7 +33,7 @@ public class ReadingViewHolder extends RecyclerView.ViewHolder {
     }
 
     public static ReadingViewHolder create(ViewGroup parent) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.reading_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.batch_item, parent, false);
         return new ReadingViewHolder(view);
     }
 
