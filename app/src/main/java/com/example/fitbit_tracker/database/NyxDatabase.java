@@ -37,7 +37,7 @@ public abstract class NyxDatabase extends RoomDatabase {
 
     private static volatile NyxDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
-    private static final int NUMBER_OF_READ_THREADS = 4;
+    private static final int NUMBER_OF_READ_THREADS = 100;
     public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     public static final ExecutorService databaseReadExecutor = Executors.newFixedThreadPool(NUMBER_OF_READ_THREADS);
 

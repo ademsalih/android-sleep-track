@@ -5,7 +5,7 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index(value = "sessionId")})
+@Entity(indices = {@Index(value = {"id", "sessionId","readingTypeId"})})
 public class Reading {
 
     @PrimaryKey(autoGenerate = true)

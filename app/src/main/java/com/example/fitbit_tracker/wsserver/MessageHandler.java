@@ -16,6 +16,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MessageHandler {
 
     private final SessionDao sessionDao;
@@ -44,8 +47,6 @@ public class MessageHandler {
 
             JSONObject payload = json.getJSONObject("payload");
 
-
-
             switch (command) {
                 case ADD_READING:
                     String sensorIdentifier = payload.getString("sensorIdentifier");
@@ -62,17 +63,38 @@ public class MessageHandler {
                     Sensor sensor = sensorDao.getSensor(sensorIdentifier);
                     long sensorId = sensor.getId();
 
+                    // Iterate over the reading types (e.g. "x", "y", "z")
                     for (int i = 0; i < data.length(); i++) {
                         JSONObject dataItem = data.getJSONObject(i);
 
                         String type = dataItem.getString("type");
-                        double item = dataItem.getDouble("item");
 
                         long readingType = readingTypeDao.getReadingType(sensorId, type);
 
                         if (batchReading) {
+                            JSONArray items = dataItem.getJSONArray("items");
+                            JSONArray timestamps = payload.getJSONArray("timeStamps");
+
+                            List<Reading> readingToInsert = new ArrayList<>();
+
+                            // Iterate over the items in the reading array (e.g. "items": [9.23, 1.023, 2.30])
+                            for (int j = 0; j < items.length(); j++) {
+                                double item = items.getDouble(j);
+                                long timestamp = timestamps.getLong(j);
+
+                                Reading reading = new Reading();
+                                reading.setTimeStamp(timestamp);
+                                reading.setSessionId(sessionId);
+                                reading.setData((float)item);
+                                reading.setReadingTypeId(readingType);
+
+                                readingToInsert.add(reading);
+                            }
+                            readingDao.insertAll(readingToInsert);
                         } else {
+                            double item = dataItem.getDouble("item");
                             long timestamp = payload.getLong("timeStamp");
+
                             Reading reading = new Reading();
                             reading.setTimeStamp(timestamp);
                             reading.setSessionId(sessionId);

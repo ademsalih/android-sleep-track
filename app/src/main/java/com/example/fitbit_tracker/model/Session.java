@@ -5,7 +5,7 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index("uuid")})
+@Entity(indices = {@Index(value = {"id", "uuid"})})
 public class Session {
 
     @PrimaryKey(autoGenerate = true)

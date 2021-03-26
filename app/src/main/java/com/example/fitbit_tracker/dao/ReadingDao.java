@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.example.fitbit_tracker.domain_model.ReadingDM;
@@ -16,6 +17,10 @@ public interface ReadingDao {
 
     @Insert
     void insert(Reading... readings);
+
+    @Insert
+    @Transaction
+    void insertAll(List<Reading> readings);
 
     @Update
     void update(Reading... readings);
