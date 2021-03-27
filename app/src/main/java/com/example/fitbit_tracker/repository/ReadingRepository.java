@@ -6,10 +6,12 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.fitbit_tracker.dao.ReadingDao;
+import com.example.fitbit_tracker.dao.ReadingTypeDao;
 import com.example.fitbit_tracker.dao.SensorDao;
 import com.example.fitbit_tracker.database.NyxDatabase;
 import com.example.fitbit_tracker.domain_model.Batch;
 import com.example.fitbit_tracker.domain_model.ReadingDM;
+import com.example.fitbit_tracker.model.ReadingType;
 import com.example.fitbit_tracker.model.Sensor;
 
 import java.util.ArrayList;
@@ -19,12 +21,14 @@ import java.util.List;
 public class ReadingRepository {
 
     private ReadingDao readingDao;
+    private ReadingTypeDao readingTypeDao;
     private SensorDao sensorDao;
 
     public ReadingRepository(Application application) {
         NyxDatabase db = NyxDatabase.getDatabase(application);
         readingDao = db.readingDao();
         sensorDao = db.sensorDao();
+        readingTypeDao = db.readingTypeDao();
     }
 
     public MutableLiveData<List<Batch>> getReadings(long sessionId) {

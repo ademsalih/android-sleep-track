@@ -42,6 +42,7 @@ public abstract class NyxDatabase extends RoomDatabase {
 
     public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_WRITE_THREADS);
     public static final ExecutorService databaseReadExecutor = Executors.newFixedThreadPool(NUMBER_OF_READ_THREADS);
+    public static final ExecutorService databaseSimpleReadExecutor = Executors.newSingleThreadExecutor();
 
     public static NyxDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {

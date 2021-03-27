@@ -5,6 +5,7 @@ import android.app.Application;
 import com.example.fitbit_tracker.dao.ReadingTypeDao;
 import com.example.fitbit_tracker.dao.SensorDao;
 import com.example.fitbit_tracker.database.NyxDatabase;
+import com.example.fitbit_tracker.model.ReadingType;
 
 import java.util.List;
 

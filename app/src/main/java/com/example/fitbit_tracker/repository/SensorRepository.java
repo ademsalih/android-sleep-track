@@ -11,13 +11,15 @@ import java.util.List;
 public class SensorRepository {
 
     private SensorDao sensorDao;
+    private List<Sensor> sensors;
 
     public SensorRepository(Application application) {
         NyxDatabase db = NyxDatabase.getDatabase(application);
-        sensorDao = db.sensorDao();
+        this.sensorDao = db.sensorDao();
+        this.sensors = sensorDao.getAllSensors();
     }
 
     public List<Sensor> getAllSensors() {
-        return sensorDao.getAllSensors();
+        return this.sensors;
     }
 }
