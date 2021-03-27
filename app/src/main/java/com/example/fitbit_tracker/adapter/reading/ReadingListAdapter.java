@@ -66,7 +66,7 @@ public class ReadingListAdapter extends ListAdapter<Batch, ReadingViewHolder> {
 
             lineData.addDataSet(dataSet);
         }
-        holder.bindChartData(lineData);
+        holder.bindChartData(lineData, 100);
     }
 
     public static class ReadingDiff extends DiffUtil.ItemCallback<Batch> {

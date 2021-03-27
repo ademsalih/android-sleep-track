@@ -26,9 +26,10 @@ public class ReadingViewHolder extends RecyclerView.ViewHolder {
         chartLabel.setText(label);
     }
 
-    public void bindChartData(LineData lineData) {
+    public void bindChartData(LineData lineData, int maxRange) {
         lineChart.setData(lineData);
         lineChart.notifyDataSetChanged();
+        lineChart.setVisibleXRangeMaximum(maxRange);
         lineChart.invalidate();
     }
 
