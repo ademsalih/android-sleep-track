@@ -1,57 +1,37 @@
 package com.example.fitbit_tracker.model;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index(value = {"id", "uuid"})})
-public class Session {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
 
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    private long id;
+public class Session extends RealmObject {
 
-    @ColumnInfo(name = "uuid")
+    @PrimaryKey
+    private long sessionId;
+
+    @Required
     private String uuid;
 
-    @ColumnInfo(name = "start_time")
     private long startTime;
 
-    @ColumnInfo(name = "end_time")
     private long endTime;
 
-    @ColumnInfo(name = "device_model")
-    private String deviceModel;
-
-    /**
-     * This is reported from the connected Fitbit device and
-     * may vary from the collection of Reading-items for a
-     * given session.
-     */
-    @ColumnInfo(name = "readings_count")
     private int readingsCount;
 
-    private long userId;
+    private String deviceModel;
 
     public Session() {
     }
 
-    public Session(String uuid, long startTime, long endTime, String deviceModel, int readingsCount, long userId) {
-        this.uuid = uuid;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.deviceModel = deviceModel;
-        this.readingsCount = readingsCount;
-        this.userId = userId;
+    /** Getters and Setters **/
+
+    public long getSessionId() {
+        return sessionId;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
     }
 
     public String getUuid() {
@@ -78,14 +58,6 @@ public class Session {
         this.endTime = endTime;
     }
 
-    public String getDeviceModel() {
-        return deviceModel;
-    }
-
-    public void setDeviceModel(String deviceModel) {
-        this.deviceModel = deviceModel;
-    }
-
     public int getReadingsCount() {
         return readingsCount;
     }
@@ -94,11 +66,11 @@ public class Session {
         this.readingsCount = readingsCount;
     }
 
-    public long getUserId() {
-        return userId;
+    public String getDeviceModel() {
+        return deviceModel;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setDeviceModel(String deviceModel) {
+        this.deviceModel = deviceModel;
     }
 }

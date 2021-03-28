@@ -9,15 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.adapter.reading.ReadingListAdapter;
-import com.example.fitbit_tracker.domain_model.Batch;
-import com.example.fitbit_tracker.viewmodel.ReadingBatchDMViewModel;
-
 import java.util.List;
 
 public class SessionDetailActivity extends AppCompatActivity {
 
-    private ReadingBatchDMViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +20,7 @@ public class SessionDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_session_detail);
         getSupportActionBar().setTitle("Session Details");
 
-        Bundle b = getIntent().getExtras();
+        /*Bundle b = getIntent().getExtras();
         long sessionId = b.getLong("sessionId");
 
         ReadingListAdapter sessionReadingListAdapater = new ReadingListAdapter(new ReadingListAdapter.ReadingDiff(), getBaseContext());
@@ -45,7 +40,7 @@ public class SessionDetailActivity extends AppCompatActivity {
             public void onChanged(List<Batch> batches) {
                 sessionReadingListAdapater.submitList(batches);
             }
-        });
+        });*/
 
     }
 

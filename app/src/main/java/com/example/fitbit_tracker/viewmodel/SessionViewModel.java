@@ -3,26 +3,26 @@ package com.example.fitbit_tracker.viewmodel;
 import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.repository.SessionRepository;
+import com.example.fitbit_tracker.utils.RealmLiveData;
 
-import java.util.List;
+import io.realm.Realm;
 
 public class SessionViewModel extends AndroidViewModel {
 
     private SessionRepository sessionRepository;
 
-    private final LiveData<List<Session>> allSessions;
+    private final RealmLiveData<Session> allSessions;
 
     public SessionViewModel(Application application) {
         super(application);
-        sessionRepository = new SessionRepository(application);
+        sessionRepository = new SessionRepository(Realm.getDefaultInstance());
         allSessions = sessionRepository.getAllSessions();
     }
 
-    public LiveData<List<Session>> getAllSessions() {
+    public RealmLiveData<Session> getAllSessions() {
         return allSessions;
     }
 

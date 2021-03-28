@@ -8,8 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
-import com.example.fitbit_tracker.domain_model.Batch;
-import com.example.fitbit_tracker.domain_model.ReadingDM;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -18,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+/*
 
 public class ReadingListAdapter extends ListAdapter<Batch, ReadingViewHolder> {
 
@@ -84,3 +83,4 @@ public class ReadingListAdapter extends ListAdapter<Batch, ReadingViewHolder> {
     }
 
 }
+*/

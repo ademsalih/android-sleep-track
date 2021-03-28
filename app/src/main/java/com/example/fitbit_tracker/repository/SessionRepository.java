@@ -1,34 +1,31 @@
 package com.example.fitbit_tracker.repository;
 
-import android.app.Application;
-
 import androidx.lifecycle.LiveData;
 
-import com.example.fitbit_tracker.dao.SessionDao;
-import com.example.fitbit_tracker.database.NyxDatabase;
 import com.example.fitbit_tracker.model.Session;
+import com.example.fitbit_tracker.utils.RealmLiveData;
 
-import java.util.List;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class SessionRepository {
 
-    private SessionDao sessionDao;
-    private LiveData<List<Session>> allSessions;
+    private Realm realm;
 
-    public SessionRepository(Application application) {
-        NyxDatabase db = NyxDatabase.getDatabase(application);
-        sessionDao = db.sessionDao();
-        allSessions = sessionDao.getAll();
+    public SessionRepository(Realm realm) {
+        this.realm = realm;
     }
 
-    public LiveData<List<Session>> getAllSessions() {
-        return allSessions;
+    public RealmLiveData getAllSessions() {
+
+        RealmResults<Session> results = realm.where(Session.class).sort("endTime", Sort.DESCENDING).findAllAsync();
+
+        return new RealmLiveData(results);
     }
 
     public void insert(Session session) {
-        NyxDatabase.databaseWriteExecutor.execute(() -> {
-            sessionDao.insert(session);
-        });
+        realm.insert(session);
     }
 
 }

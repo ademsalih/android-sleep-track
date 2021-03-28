@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.view.SessionDetailActivity;
+import com.example.fitbit_tracker.view.SessionDetailsActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,9 +54,9 @@ public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, SessionDetailActivity.class);
+                Intent intent = new Intent(context, SessionDetailsActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putLong("sessionId", session.getId());
+                bundle.putLong("sessionId", session.getSessionId());
                 intent.putExtras(bundle);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);

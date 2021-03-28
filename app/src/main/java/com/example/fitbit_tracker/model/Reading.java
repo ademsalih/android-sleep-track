@@ -1,46 +1,35 @@
 package com.example.fitbit_tracker.model;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-@Entity(indices = {@Index(value = {"id", "sessionId","readingTypeId"})})
-public class Reading {
+public class Reading extends RealmObject {
 
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    private long id;
+    @PrimaryKey
+    private long readingId;
 
-    @ColumnInfo(name = "sessionId")
     private long sessionId;
 
-    @ColumnInfo(name = "readingTypeId")
-    private long readingTypeId;
-
-    @ColumnInfo(name = "timestamp")
     private long timeStamp;
 
-    @ColumnInfo(name = "data")
+    private String sensorName;
+
+    private String readingType;
+
     private float data;
 
     public Reading() {
 
     }
 
-    public Reading(long sessionId, long readingTypeId, long timeStamp, float data) {
-        this.sessionId = sessionId;
-        this.readingTypeId = readingTypeId;
-        this.timeStamp = timeStamp;
-        this.data = data;
+    /** Getters and Setters **/
+
+    public long getReadingId() {
+        return readingId;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public void setReadingId(long readingId) {
+        this.readingId = readingId;
     }
 
     public long getSessionId() {
@@ -51,20 +40,28 @@ public class Reading {
         this.sessionId = sessionId;
     }
 
-    public long getReadingTypeId() {
-        return readingTypeId;
-    }
-
-    public void setReadingTypeId(long readingTypeId) {
-        this.readingTypeId = readingTypeId;
-    }
-
     public long getTimeStamp() {
         return timeStamp;
     }
 
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public String getSensorName() {
+        return sensorName;
+    }
+
+    public void setSensorName(String sensorName) {
+        this.sensorName = sensorName;
+    }
+
+    public String getReadingType() {
+        return readingType;
+    }
+
+    public void setReadingType(String readingType) {
+        this.readingType = readingType;
     }
 
     public float getData() {
@@ -74,5 +71,4 @@ public class Reading {
     public void setData(float data) {
         this.data = data;
     }
-
 }

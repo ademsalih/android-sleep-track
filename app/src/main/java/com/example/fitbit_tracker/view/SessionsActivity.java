@@ -13,9 +13,14 @@ import android.os.Bundle;
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.adapter.session.SessionListAdapter;
 import com.example.fitbit_tracker.model.Session;
+import com.example.fitbit_tracker.utils.RealmLiveData;
 import com.example.fitbit_tracker.viewmodel.SessionViewModel;
 
 import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class SessionsActivity extends AppCompatActivity {
 
@@ -40,11 +45,11 @@ public class SessionsActivity extends AppCompatActivity {
         sessionViewModel.getAllSessions().observe(this, new Observer<List<Session>>() {
             @Override
             public void onChanged(List<Session> sessions) {
+
                 sessionListAdapter.submitList(sessions);
                 getSupportActionBar().setTitle("Sessions (" + sessions.size() + ")");
             }
         });
-
     }
 
 }
