@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmModel;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -54,7 +56,7 @@ public class MessageHandler {
                             JSONArray items = dataItem.getJSONArray("items");
                             JSONArray timestamps = payload.getJSONArray("timeStamps");
 
-                            List<Reading> readingToInsert = new ArrayList<>();
+                            RealmList<Reading> readingToInsert = new RealmList<>();
                             Number maxId = Realm.getDefaultInstance().where(Reading.class).max("readingId");
 
                             long nextId = (maxId == null) ? 1 : maxId.intValue() + 1;
@@ -75,7 +77,7 @@ public class MessageHandler {
                                 readingToInsert.add(reading);
                             }
 
-                            Realm.getDefaultInstance().executeTransactionAsync(new Realm.Transaction() {
+                            Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
                                     Number maxId = realm.where(Reading.class).max("readingId");
@@ -89,7 +91,11 @@ public class MessageHandler {
 
                                     for (Reading r: readingToInsert) r.setSessionId(sessionId);
 
-                                    realm.insert(readingToInsert);
+
+
+                                    realm.insertOrUpdate(readingToInsert);
+
+                                    int a = 0;
                                 }
                             });
                         } else {
@@ -103,7 +109,7 @@ public class MessageHandler {
                             reading.setReadingType(type);
 
                             // Insert session into Realm DB
-                            Realm.getDefaultInstance().executeTransactionAsync(new Realm.Transaction() {
+                            Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
                                     Number maxId = realm.where(Reading.class).max("readingId");
@@ -126,7 +132,7 @@ public class MessageHandler {
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
                     // Insert session into Realm DB
-                    Realm.getDefaultInstance().executeTransactionAsync(new Realm.Transaction() {
+                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
                             Number maxId = realm.where(Session.class).max("sessionId");
@@ -148,7 +154,7 @@ public class MessageHandler {
                     long startTime = payload.getLong("startTime");
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
-                    Realm.getDefaultInstance().executeTransactionAsync(new Realm.Transaction() {
+                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
                             Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
@@ -164,7 +170,7 @@ public class MessageHandler {
                     int readingCount = payload.getInt("readingsCount");
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
-                    Realm.getDefaultInstance().executeTransactionAsync(new Realm.Transaction() {
+                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
                             Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
