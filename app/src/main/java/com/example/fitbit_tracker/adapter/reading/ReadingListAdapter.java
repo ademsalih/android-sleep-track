@@ -1,28 +1,24 @@
 package com.example.fitbit_tracker.adapter.reading;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
+import com.example.fitbit_tracker.model.Reading;
+import com.example.fitbit_tracker.view.BatchActivity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-/*
 
-public class ReadingListAdapter extends ListAdapter<Batch, ReadingViewHolder> {
+public class ReadingListAdapter extends ListAdapter<Reading, ReadingViewHolder> {
 
     private Context context;
 
-    public ReadingListAdapter(@NonNull DiffUtil.ItemCallback<Batch> diffCallback, Context baseContext) {
+    public ReadingListAdapter(@NonNull DiffUtil.ItemCallback<Reading> diffCallback, Context baseContext) {
         super(diffCallback);
         this.context = baseContext;
     }
@@ -35,52 +31,37 @@ public class ReadingListAdapter extends ListAdapter<Batch, ReadingViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ReadingViewHolder holder, int position) {
-        Batch readingBatchDM = getItem(position);
-        holder.bindChartLabel(readingBatchDM.getBatchSensorName());
+        Reading reading = getItem(position);
+        holder.bindChartLabel(reading.getSensorName());
 
-        HashMap<String, List<ReadingDM>> batches = readingBatchDM.getBatchMap();
-
-        Set<String> keys = batches.keySet();
-
-        LineData lineData = new LineData();
-
-        for (String key : keys) {
-            List<ReadingDM> batch = batches.get(key);
-            List<Entry> entryList = new ArrayList<>();
-
-            int i = 0;
-            for (ReadingDM reading: batch) {
-                entryList.add(new Entry(i, reading.getData()));
-                i++;
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, BatchActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putLong("sessionId", reading.getSessionId());
+                bundle.putString("sensorName", reading.getSensorName());
+                intent.putExtras(bundle);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
             }
+        };
 
-            LineDataSet dataSet = new LineDataSet(entryList, key);
-            dataSet.setColor(Color.rgb(1,1,1));
-            dataSet.setValueTextColor(Color.rgb(1,1,1));
-            dataSet.setCircleHoleRadius(1f);
-            dataSet.setDrawCircleHole(false);
-            dataSet.setColor(Color.RED);
-            dataSet.setCircleColor(Color.RED);
-            dataSet.setCircleRadius(2f);
-
-            lineData.addDataSet(dataSet);
-        }
-        holder.bindChartData(lineData, 100);
+        holder.bindOnClickListener(onClickListener);
     }
 
-    public static class ReadingDiff extends DiffUtil.ItemCallback<Batch> {
+    public static class ReadingDiff extends DiffUtil.ItemCallback<Reading> {
 
         @Override
-        public boolean areItemsTheSame(@NonNull Batch oldItem, @NonNull Batch newItem) {
+        public boolean areItemsTheSame(@NonNull Reading oldItem, @NonNull Reading newItem) {
             return oldItem == newItem;
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull Batch oldItem, @NonNull Batch newItem) {
-            return oldItem.getBatchSensorName().equals(newItem.getBatchSensorName());
+        public boolean areContentsTheSame(@NonNull Reading oldItem, @NonNull Reading newItem) {
+            return oldItem.getSensorName().equals(newItem.getSensorName());
         }
 
     }
 
 }
-*/

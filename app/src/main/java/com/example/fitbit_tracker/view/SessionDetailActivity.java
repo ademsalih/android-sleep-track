@@ -9,10 +9,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import com.example.fitbit_tracker.R;
+import com.example.fitbit_tracker.adapter.reading.ReadingListAdapter;
+import com.example.fitbit_tracker.model.Reading;
+import com.example.fitbit_tracker.viewmodel.ReadingViewModel;
+
 import java.util.List;
 
 public class SessionDetailActivity extends AppCompatActivity {
 
+    private ReadingViewModel readingViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +25,7 @@ public class SessionDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_session_detail);
         getSupportActionBar().setTitle("Session Details");
 
-        /*Bundle b = getIntent().getExtras();
+        Bundle b = getIntent().getExtras();
         long sessionId = b.getLong("sessionId");
 
         ReadingListAdapter sessionReadingListAdapater = new ReadingListAdapter(new ReadingListAdapter.ReadingDiff(), getBaseContext());
@@ -33,14 +38,13 @@ public class SessionDetailActivity extends AppCompatActivity {
         ViewModelProvider.AndroidViewModelFactory androidViewModelFactory = new ViewModelProvider.AndroidViewModelFactory(getApplication());
         ViewModelProvider viewModelProvider = new ViewModelProvider(this, androidViewModelFactory);
 
-
-        viewModel = viewModelProvider.get(ReadingBatchDMViewModel.class);
-        viewModel.getAllReadingDomainModels(sessionId).observe(this, new Observer<List<Batch>>() {
+        readingViewModel = viewModelProvider.get(ReadingViewModel.class);
+        readingViewModel.getAllReadings(sessionId).observe(this, new Observer<List<Reading>>() {
             @Override
-            public void onChanged(List<Batch> batches) {
+            public void onChanged(List<Reading> batches) {
                 sessionReadingListAdapater.submitList(batches);
             }
-        });*/
+        });
 
     }
 

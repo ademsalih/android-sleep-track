@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FitbitTracker">
-        <activity android:name=".view.SessionDetailActivity"></activity>
+        <activity android:name=".view.BatchActivity"></activity>
+        <activity android:name=".view.SessionDetailActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
