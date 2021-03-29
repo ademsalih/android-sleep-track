@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.model.Reading;
@@ -22,6 +23,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class BatchActivity extends AppCompatActivity {
+    private final String TAG = getClass().getSimpleName();
 
     private LineChart lineChart;
 
@@ -37,7 +39,12 @@ public class BatchActivity extends AppCompatActivity {
         String sensorName = b.getString("sensorName");
 
         ReadingRepository readingRepository = new ReadingRepository(Realm.getDefaultInstance());
+
+        long start = System.currentTimeMillis();
         List<Reading> readingList = readingRepository.getReadingForSessionAndSensor(sessionId, sensorName);
+        long time = System.currentTimeMillis() - start;
+        Log.d(TAG, "TIME: " + time);
+
 
         HashMap<String, List<Reading>> hashMap = new HashMap<>();
         List<Long> timestamps = new ArrayList<>();
@@ -83,6 +90,7 @@ public class BatchActivity extends AppCompatActivity {
 
         lineChart.setData(lineData);
         lineChart.notifyDataSetChanged();
+        lineChart.setVisibleXRangeMaximum(5000);
         lineChart.invalidate();
     }
 

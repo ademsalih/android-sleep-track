@@ -1,12 +1,10 @@
 package com.example.fitbit_tracker.repository;
 
 import com.example.fitbit_tracker.model.Reading;
-import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.utils.RealmLiveData;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import io.realm.Sort;
 
 public class ReadingRepository {
 
