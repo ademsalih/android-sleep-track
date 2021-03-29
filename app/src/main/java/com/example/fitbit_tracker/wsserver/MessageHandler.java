@@ -60,9 +60,6 @@ public class MessageHandler {
                             JSONArray timestamps = payload.getJSONArray("timeStamps");
 
                             RealmList<Reading> readingToInsert = new RealmList<>();
-                            Number maxId = Realm.getDefaultInstance().where(Reading.class).max("readingId");
-
-                            long nextId = (maxId == null) ? 1 : maxId.intValue() + 1;
 
                             // Iterate over the items in the reading array (e.g. "items": [9.23, 1.023, 2.30])
                             for (int j = 0; j < items.length(); j++) {
