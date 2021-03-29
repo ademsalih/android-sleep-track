@@ -1,4 +1,4 @@
-package com.example.fitbit_tracker.adapter.session;
+package com.example.fitbit_tracker.adapter.viewholder;
 
 import android.view.LayoutInflater;
 import android.view.View;

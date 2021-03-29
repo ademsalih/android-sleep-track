@@ -14,13 +14,8 @@ public class ReadingRepository {
         this.realm = realm;
     }
 
-    public RealmLiveData<Reading> getDistinctReadings(long sessionId) {
-        RealmResults<Reading> results = realm.where(Reading.class).equalTo("sessionId", sessionId).distinct("sensorName").findAllAsync();
-        return new RealmLiveData(results);
-    }
-
-    public RealmResults<Reading> getReadingForSessionAndSensor(long sessionId, String sensorName) {
-        return realm.where(Reading.class).equalTo("sessionId", sessionId).equalTo("sensorName", sensorName).findAll();
+    public RealmResults<Reading> getReadingForSessionAndSensor(int sessionId, int sensorId) {
+        return realm.where(Reading.class).equalTo("session.sessionId", sessionId).equalTo("sensor.sensorId", sensorId).findAll();
     }
 
     public void insert(Reading reading) {

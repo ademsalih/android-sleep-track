@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.adapter.reading.ReadingListAdapter;
-import com.example.fitbit_tracker.model.Reading;
-import com.example.fitbit_tracker.viewmodel.ReadingViewModel;
+import com.example.fitbit_tracker.adapter.listadapter.SessionSensorListAdapter;
+import com.example.fitbit_tracker.model.SessionSensor;
+import com.example.fitbit_tracker.viewmodel.SessionSensorViewModel;
 
 import java.util.List;
 
 public class SessionDetailActivity extends AppCompatActivity {
 
-    private ReadingViewModel readingViewModel;
+    private SessionSensorViewModel sessionSensorViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +28,7 @@ public class SessionDetailActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         long sessionId = b.getLong("sessionId");
 
-        ReadingListAdapter sessionReadingListAdapater = new ReadingListAdapter(new ReadingListAdapter.ReadingDiff(), getBaseContext());
+        SessionSensorListAdapter sessionReadingListAdapater = new SessionSensorListAdapter(new SessionSensorListAdapter.ReadingDiff(), getBaseContext());
 
         RecyclerView recyclerView = findViewById(R.id.readingRecyclerView);
         recyclerView.setAdapter(sessionReadingListAdapater);
@@ -38,10 +38,10 @@ public class SessionDetailActivity extends AppCompatActivity {
         ViewModelProvider.AndroidViewModelFactory androidViewModelFactory = new ViewModelProvider.AndroidViewModelFactory(getApplication());
         ViewModelProvider viewModelProvider = new ViewModelProvider(this, androidViewModelFactory);
 
-        readingViewModel = viewModelProvider.get(ReadingViewModel.class);
-        readingViewModel.getAllReadings(sessionId).observe(this, new Observer<List<Reading>>() {
+        sessionSensorViewModel = viewModelProvider.get(SessionSensorViewModel.class);
+        sessionSensorViewModel.getAllSessionSensors(sessionId).observe(this, new Observer<List<SessionSensor>>() {
             @Override
-            public void onChanged(List<Reading> batches) {
+            public void onChanged(List<SessionSensor> batches) {
                 sessionReadingListAdapater.submitList(batches);
             }
         });

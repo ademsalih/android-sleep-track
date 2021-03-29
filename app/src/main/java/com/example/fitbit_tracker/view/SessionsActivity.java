@@ -11,16 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.adapter.session.SessionListAdapter;
+import com.example.fitbit_tracker.adapter.listadapter.SessionListAdapter;
 import com.example.fitbit_tracker.model.Session;
-import com.example.fitbit_tracker.utils.RealmLiveData;
 import com.example.fitbit_tracker.viewmodel.SessionViewModel;
 
 import java.util.List;
-
-import io.realm.Realm;
-import io.realm.RealmResults;
-import io.realm.Sort;
 
 public class SessionsActivity extends AppCompatActivity {
 

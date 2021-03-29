@@ -1,6 +1,7 @@
 package com.example.fitbit_tracker.model;
 
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -8,7 +9,7 @@ import io.realm.annotations.Required;
 public class Session extends RealmObject {
 
     @PrimaryKey
-    private long sessionId;
+    private int sessionId;
 
     @Required
     private String uuid;
@@ -21,16 +22,20 @@ public class Session extends RealmObject {
 
     private String deviceModel;
 
+    private User user;
+
+    private RealmList<SessionSensor> sessionSensors;
+
+    private RealmList<Reading> sessionReadings;
+
     public Session() {
     }
 
-    /** Getters and Setters **/
-
-    public long getSessionId() {
+    public int getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(long sessionId) {
+    public void setSessionId(int sessionId) {
         this.sessionId = sessionId;
     }
 
@@ -72,5 +77,29 @@ public class Session extends RealmObject {
 
     public void setDeviceModel(String deviceModel) {
         this.deviceModel = deviceModel;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public RealmList<SessionSensor> getSessionSensors() {
+        return sessionSensors;
+    }
+
+    public void setSessionSensors(RealmList<SessionSensor> sessionSensors) {
+        this.sessionSensors = sessionSensors;
+    }
+
+    public RealmList<Reading> getSessionReadings() {
+        return sessionReadings;
+    }
+
+    public void setSessionReadings(RealmList<Reading> sessionReadings) {
+        this.sessionReadings = sessionReadings;
     }
 }

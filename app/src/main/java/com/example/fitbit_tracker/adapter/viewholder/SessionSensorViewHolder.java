@@ -1,4 +1,4 @@
-package com.example.fitbit_tracker.adapter.reading;
+package com.example.fitbit_tracker.adapter.viewholder;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,28 +10,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fitbit_tracker.R;
 
-public class ReadingViewHolder extends RecyclerView.ViewHolder {
+public class SessionSensorViewHolder extends RecyclerView.ViewHolder {
 
-    private final TextView chartLabel;
+    private final TextView sensorTextView;
     private final ConstraintLayout readingContainer;
 
-    public ReadingViewHolder(View itemView) {
+    public SessionSensorViewHolder(View itemView) {
         super(itemView);
-        chartLabel = itemView.findViewById(R.id.readingTypeTextView);
+        sensorTextView = itemView.findViewById(R.id.readingTypeTextView);
         readingContainer = itemView.findViewById(R.id.readingContainer);
     }
 
     public void bindChartLabel(String label) {
-        chartLabel.setText(label);
+        this.sensorTextView.setText(label);
     }
 
     public void bindOnClickListener(View.OnClickListener onClickListener) {
         readingContainer.setOnClickListener(onClickListener);
     }
 
-    public static ReadingViewHolder create(ViewGroup parent) {
+    public static SessionSensorViewHolder create(ViewGroup parent) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.batch_item, parent, false);
-        return new ReadingViewHolder(view);
+        return new SessionSensorViewHolder(view);
     }
 
 

@@ -5,39 +5,33 @@ import io.realm.annotations.PrimaryKey;
 
 public class Reading extends RealmObject {
 
-    @PrimaryKey
-    private long readingId;
+    private Session session;
 
-    private long sessionId;
+    private Sensor sensor;
 
     private long timeStamp;
-
-    private String sensorName;
 
     private String readingType;
 
     private float data;
 
     public Reading() {
-
     }
 
-    /** Getters and Setters **/
-
-    public long getReadingId() {
-        return readingId;
+    public Session getSession() {
+        return session;
     }
 
-    public void setReadingId(long readingId) {
-        this.readingId = readingId;
+    public void setSession(Session session) {
+        this.session = session;
     }
 
-    public long getSessionId() {
-        return sessionId;
+    public Sensor getSensor() {
+        return sensor;
     }
 
-    public void setSessionId(long sessionId) {
-        this.sessionId = sessionId;
+    public void setSensor(Sensor sensor) {
+        this.sensor = sensor;
     }
 
     public long getTimeStamp() {
@@ -46,14 +40,6 @@ public class Reading extends RealmObject {
 
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
-    }
-
-    public String getSensorName() {
-        return sensorName;
-    }
-
-    public void setSensorName(String sensorName) {
-        this.sensorName = sensorName;
     }
 
     public String getReadingType() {
@@ -71,4 +57,5 @@ public class Reading extends RealmObject {
     public void setData(float data) {
         this.data = data;
     }
+
 }

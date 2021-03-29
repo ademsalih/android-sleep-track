@@ -1,4 +1,4 @@
-package com.example.fitbit_tracker.adapter.session;
+package com.example.fitbit_tracker.adapter.listadapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,9 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
+import com.example.fitbit_tracker.adapter.viewholder.SessionViewHolder;
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.view.SessionDetailActivity;
-import com.example.fitbit_tracker.view.SessionDetailsActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
