@@ -166,7 +166,6 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
 
     @Override
     public void onMessage(String message) {
-        Log.d(TAG, "onMessage");
     }
 
     @Override

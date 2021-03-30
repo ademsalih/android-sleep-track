@@ -43,6 +43,8 @@ public class MessageHandler {
 
             switch (command) {
                 case ADD_READING:
+                    long start = System.currentTimeMillis();
+
                     String sensorIdentifier = payload.getString("sensorIdentifier");
                     String sessionIdentifier = payload.getString("sessionIdentifier");
 
@@ -126,6 +128,9 @@ public class MessageHandler {
                             });
                         }
                     }
+
+                    long time = System.currentTimeMillis() - start;
+                    Log.d("INSERT_TIME", "Insertion time [" + sensorIdentifier + "] : " + time + " ms");
                     break;
                 case INIT_SESSION:
                     String deviceModel = payload.getString("deviceModel");
@@ -153,44 +158,34 @@ public class MessageHandler {
                             session.setDeviceModel(deviceModel);
                             session.setSessionSensors(new RealmList<>());
 
+                            Number sensorMaxId = realm.where(Sensor.class).max("sensorId");
+                            int sensorNextId = (sensorMaxId == null) ? 1 : sensorMaxId.intValue() + 1;
+
+                            Number sessionSensorMaxId = realm.where(SessionSensor.class).max("id");
+                            int sessionSensorNextId = (sessionSensorMaxId == null) ? 1 : sessionSensorMaxId.intValue() + 1;
+
                             for (int i = 0; i < sensorNames.size(); i++) {
                                 SessionSensor sessionSensor = new SessionSensor();
 
                                 Sensor sensor = realm.where(Sensor.class).equalTo("sensorName", sensorNames.get(i)).findFirst();
-
                                 if (sensor == null) {
-                                    Log.d("MessageHandler", "Adding sensor");
-
-                                    Number sensorMaxId = realm.where(Sensor.class).max("sensorId");
-                                    int sensorNextId = (sensorMaxId == null) ? 1 : sensorMaxId.intValue() + 1;
-
                                     sensor = new Sensor();
-                                    sensor.setSensorId(sensorNextId + i);
+                                    sensor.setSensorId(sensorNextId+i);
                                     sensor.setSensorName(sensorNames.get(i));
                                     sensor.setSessionSensors(new RealmList<>());
                                 }
 
-                                Number sessionSensorMaxId = realm.where(Sensor.class).max("sensorId");
-                                int sessionSensorNextId = (sessionSensorMaxId == null) ? 1 : sessionSensorMaxId.intValue() + 1;
-
-                                sessionSensor.setId(sessionSensorNextId + i);
+                                sessionSensor.setId(sessionSensorNextId+i);
                                 sessionSensor.setSensor(sensor);
                                 sessionSensor.setSession(session);
 
-                                sensor.getSessionSensors().add(sessionSensor);
                                 session.getSessionSensors().add(sessionSensor);
+                                sensor.getSessionSensors().add(sessionSensor);
                             }
 
-                            Log.d("MessageHandler", "Max: " + sessionMaxId + " Next: " + sessionNextId);
-
-
                             User user = realm.where(User.class).findFirst();
-
                             session.setUser(user);
-
                             user.getUserSessions().add(session);
-
-                            Log.d("MessageHandler", "INIT successfully");
                         }
                     });
 

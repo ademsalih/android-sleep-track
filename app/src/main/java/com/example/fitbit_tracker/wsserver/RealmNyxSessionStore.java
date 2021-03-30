@@ -13,13 +13,15 @@ public class RealmNyxSessionStore implements NyxSessionStore {
 
     @Override
     public void startSession(String sessionIdentifier, long startTime) {
-        Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
                 session.setStartTime(startTime);
             }
         });
+        realm.close();
     }
 
     @Override
