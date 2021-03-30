@@ -51,17 +51,19 @@ public class MessageHandler {
                     JSONArray data = payload.getJSONArray("data");
                     boolean batchReading = payload.getBoolean("batchReading");
 
-                    // Iterate over the reading types (e.g. "x", "y", "z")
+                    // Readings that should be added to realm are collected first
+                    // independent of whether the reading is a batch or not
+                    RealmList<Reading> readingToInsert = new RealmList<>();
+
+                    // Iterate over the reading types (e.g. "x", "y", "z", "bpm")
                     for (int i = 0; i < data.length(); i++) {
                         JSONObject dataItem = data.getJSONObject(i);
-
                         String type = dataItem.getString("type");
 
                         if (batchReading) {
+                            // If batch reading, each reading type represents an array of readings
                             JSONArray items = dataItem.getJSONArray("items");
                             JSONArray timestamps = payload.getJSONArray("timeStamps");
-
-                            RealmList<Reading> readingToInsert = new RealmList<>();
 
                             // Iterate over the items in the reading array (e.g. "items": [9.23, 1.023, 2.30])
                             for (int j = 0; j < items.length(); j++) {
@@ -74,27 +76,8 @@ public class MessageHandler {
                                 reading.setReadingType(type);
                                 readingToInsert.add(reading);
                             }
-
-                            Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    Session session = realm
-                                            .where(Session.class)
-                                            .equalTo("uuid", sessionIdentifier)
-                                            .findFirst();
-
-                                    Sensor sensor = realm.where(Sensor.class).equalTo("sensorName",sensorIdentifier).findFirst();
-
-                                    for (Reading r: readingToInsert) {
-                                        r.setSession(session);
-                                        r.setSensor(sensor);
-                                    }
-
-                                    session.getSessionReadings().addAll(readingToInsert);
-                                    sensor.getSensorReadings().addAll(readingToInsert);
-                                }
-                            });
                         } else {
+                            // If not batch reading, get the single value item for the reading type
                             double item = dataItem.getDouble("item");
                             long timestamp = payload.getLong("timeStamp");
 
@@ -102,32 +85,26 @@ public class MessageHandler {
                             reading.setTimeStamp(timestamp);
                             reading.setData((float) item);
                             reading.setReadingType(type);
-
-                            // Insert session into Realm DB
-                            Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    // TODO: Factor this part out, it's appearing twice...
-                                    Session session = realm
-                                            .where(Session.class)
-                                            .equalTo("uuid", sessionIdentifier)
-                                            .findFirst();
-
-                                    // TODO: And this...
-                                    Sensor sensor = realm
-                                            .where(Sensor.class)
-                                            .equalTo("sensorName",sensorIdentifier)
-                                            .findFirst();
-
-                                    reading.setSession(session);
-                                    reading.setSensor(sensor);
-
-                                    session.getSessionReadings().add(reading);
-                                    sensor.getSensorReadings().add(reading);
-                                }
-                            });
+                            readingToInsert.add(reading);
                         }
                     }
+
+                    // Add all readings in readingsToInsert array to the realm
+                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
+                            Sensor sensor = realm.where(Sensor.class).equalTo("sensorName",sensorIdentifier).findFirst();
+
+                            for (Reading r: readingToInsert) {
+                                r.setSession(session);
+                                r.setSensor(sensor);
+                            }
+
+                            session.getSessionReadings().addAll(readingToInsert);
+                            sensor.getSensorReadings().addAll(readingToInsert);
+                        }
+                    });
 
                     long time = System.currentTimeMillis() - start;
                     Log.d("INSERT_TIME", "Insertion time [" + sensorIdentifier + "] : " + time + " ms");
