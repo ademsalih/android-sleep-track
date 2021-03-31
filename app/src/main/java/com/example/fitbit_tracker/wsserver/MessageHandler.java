@@ -43,7 +43,7 @@ public class MessageHandler {
 
             switch (command) {
                 case ADD_READING:
-                    long start = System.currentTimeMillis();
+                    //long start = System.currentTimeMillis();
 
                     String sensorIdentifier = payload.getString("sensorIdentifier");
                     String sessionIdentifier = payload.getString("sessionIdentifier");
@@ -106,8 +106,8 @@ public class MessageHandler {
                         }
                     });
 
-                    long time = System.currentTimeMillis() - start;
-                    Log.d("INSERT_TIME", "Insertion time [" + sensorIdentifier + "] : " + time + " ms");
+                    //long time = System.currentTimeMillis() - start;
+                    //Log.d("INSERT_TIME", "Insertion time [" + sensorIdentifier + "] : " + time + " ms");
                     break;
                 case INIT_SESSION:
                     String deviceModel = payload.getString("deviceModel");
