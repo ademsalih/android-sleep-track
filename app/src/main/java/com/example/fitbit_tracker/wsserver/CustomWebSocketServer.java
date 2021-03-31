@@ -44,7 +44,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        Log.d(TAG, "Connection to " + conn.getRemoteSocketAddress() + " closed due to:" + reason);
+        Log.d(TAG,"Reason:" + reason + ", Code: " + code);
         webSocketCallback.onClose();
     }
 
