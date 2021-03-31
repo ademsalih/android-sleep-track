@@ -23,11 +23,11 @@ import io.realm.RealmList;
 public class MessageHandler {
 
     private final WebSocketCallback webSocketCallback;
-    private final RealmNyxSessionStore realmSessionStore;
+    //private final RealmNyxSessionStore realmSessionStore;
 
     public MessageHandler(WebSocketCallback webSocketCallback, Context context) {
         this.webSocketCallback = webSocketCallback;
-        this.realmSessionStore = new RealmNyxSessionStore();
+        //this.realmSessionStore = new RealmNyxSessionStore();
     }
 
     public void handleMessage(String message) {
@@ -171,7 +171,15 @@ public class MessageHandler {
                     long startTime = payload.getLong("startTime");
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
-                    realmSessionStore.startSession(sessionIdentifier, startTime);
+                    //realmSessionStore.startSession(sessionIdentifier, startTime);
+
+                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
+                            session.setStartTime(startTime);
+                        }
+                    });
 
                     webSocketCallback.onSessionStart();
                     break;
@@ -181,7 +189,15 @@ public class MessageHandler {
                     int readingCount = payload.getInt("readingsCount");
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
-                    realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
+                    //realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
+                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
+                            session.setEndTime(endTime);
+                            session.setReadingsCount(readingCount);
+                        }
+                    });
 
                     webSocketCallback.onSessionEnd();
                     break;
