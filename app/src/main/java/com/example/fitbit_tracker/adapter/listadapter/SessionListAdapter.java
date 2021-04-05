@@ -18,8 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.example.fitbit_tracker.utils.TimeUtils.formattedTimeLabel;
-import static com.example.fitbit_tracker.utils.TimeUtils.timeDeltaLabel;
+import static com.example.fitbit_tracker.utils.TimeLabelUtils.formattedTimeLabel;
+import static com.example.fitbit_tracker.utils.TimeLabelUtils.timeDeltaLabel;
 
 public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> {
 

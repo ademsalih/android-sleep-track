@@ -5,9 +5,9 @@ import io.realm.annotations.PrimaryKey;
 
 public class Reading extends RealmObject {
 
-    private Session session;
+    private long sessionId;
 
-    private Sensor sensor;
+    private long sensorId;
 
     private long timeStamp;
 
@@ -18,20 +18,20 @@ public class Reading extends RealmObject {
     public Reading() {
     }
 
-    public Session getSession() {
-        return session;
+    public long getSessionId() {
+        return sessionId;
     }
 
-    public void setSession(Session session) {
-        this.session = session;
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
     }
 
-    public Sensor getSensor() {
-        return sensor;
+    public long getSensorId() {
+        return sensorId;
     }
 
-    public void setSensor(Sensor sensor) {
-        this.sensor = sensor;
+    public void setSensorId(long sensorId) {
+        this.sensorId = sensorId;
     }
 
     public long getTimeStamp() {

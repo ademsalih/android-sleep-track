@@ -9,7 +9,7 @@ import io.realm.annotations.Required;
 public class Session extends RealmObject {
 
     @PrimaryKey
-    private int sessionId;
+    private long sessionId;
 
     @Required
     private String uuid;
@@ -22,20 +22,16 @@ public class Session extends RealmObject {
 
     private String deviceModel;
 
-    private User user;
-
-    private RealmList<SessionSensor> sessionSensors;
-
-    private RealmList<Reading> sessionReadings;
+    private long userId;
 
     public Session() {
     }
 
-    public int getSessionId() {
+    public long getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(int sessionId) {
+    public void setSessionId(long sessionId) {
         this.sessionId = sessionId;
     }
 
@@ -79,27 +75,11 @@ public class Session extends RealmObject {
         this.deviceModel = deviceModel;
     }
 
-    public User getUser() {
-        return user;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public RealmList<SessionSensor> getSessionSensors() {
-        return sessionSensors;
-    }
-
-    public void setSessionSensors(RealmList<SessionSensor> sessionSensors) {
-        this.sessionSensors = sessionSensors;
-    }
-
-    public RealmList<Reading> getSessionReadings() {
-        return sessionReadings;
-    }
-
-    public void setSessionReadings(RealmList<Reading> sessionReadings) {
-        this.sessionReadings = sessionReadings;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 }

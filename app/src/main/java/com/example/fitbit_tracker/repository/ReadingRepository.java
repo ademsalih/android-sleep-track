@@ -14,8 +14,8 @@ public class ReadingRepository {
         this.realm = realm;
     }
 
-    public RealmResults<Reading> getReadingForSessionAndSensor(int sessionId, int sensorId) {
-        return realm.where(Reading.class).equalTo("session.sessionId", sessionId).equalTo("sensor.sensorId", sensorId).findAll();
+    public RealmResults<Reading> getReadingForSessionAndSensor(long sessionId, long sensorId) {
+        return realm.where(Reading.class).equalTo("sessionId", sessionId).equalTo("sensorId", sensorId).findAll();
     }
 
     public void insert(Reading reading) {

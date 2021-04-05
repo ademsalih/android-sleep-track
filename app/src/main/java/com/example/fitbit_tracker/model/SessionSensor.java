@@ -6,39 +6,39 @@ import io.realm.annotations.PrimaryKey;
 public class SessionSensor extends RealmObject {
 
     @PrimaryKey
-    private int id;
+    private long id;
 
-    private Session session;
+    private long sessionId;
 
-    private Sensor sensor;
+    private long sensorId;
 
     private float frequency;
 
     public SessionSensor() {
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public Session getSession() {
-        return session;
+    public long getSessionId() {
+        return sessionId;
     }
 
-    public void setSession(Session session) {
-        this.session = session;
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
     }
 
-    public Sensor getSensor() {
-        return sensor;
+    public long getSensorId() {
+        return sensorId;
     }
 
-    public void setSensor(Sensor sensor) {
-        this.sensor = sensor;
+    public void setSensorId(long sensorId) {
+        this.sensorId = sensorId;
     }
 
     public float getFrequency() {

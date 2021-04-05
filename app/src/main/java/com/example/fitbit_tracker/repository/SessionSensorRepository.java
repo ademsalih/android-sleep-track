@@ -17,7 +17,7 @@ public class SessionSensorRepository {
     }
 
     public RealmLiveData<SessionSensor> getSessionSensors(long sessionId) {
-        RealmResults<SessionSensor> realmResults = realm.where(SessionSensor.class).equalTo("session.sessionId", sessionId).findAllAsync();
+        RealmResults<SessionSensor> realmResults = realm.where(SessionSensor.class).equalTo("sessionId", sessionId).findAllAsync();
         return new RealmLiveData<>(realmResults);
     }
 

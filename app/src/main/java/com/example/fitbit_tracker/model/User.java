@@ -4,12 +4,16 @@ import androidx.annotation.NonNull;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
 
 
 public class User extends RealmObject {
 
-    private int id;
+    @PrimaryKey
+    private long id;
 
+    @Required
     private String first_name;
 
     private String last_name;
@@ -22,16 +26,16 @@ public class User extends RealmObject {
 
     private String notes;
 
-    private RealmList<Session> userSessions;
 
     public User() {
+
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -83,11 +87,4 @@ public class User extends RealmObject {
         this.notes = notes;
     }
 
-    public RealmList<Session> getUserSessions() {
-        return userSessions;
-    }
-
-    public void setUserSessions(RealmList<Session> userSessions) {
-        this.userSessions = userSessions;
-    }
 }

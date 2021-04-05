@@ -38,7 +38,6 @@ public class NyxApplication extends Application {
                     user.setHeight(170);
                     user.setWeight(70);
                     user.setNotes("Testing testing ");
-                    user.setUserSessions(new RealmList<>());
 
                     realm.insert(user);
                 }

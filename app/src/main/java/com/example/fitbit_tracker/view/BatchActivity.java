@@ -9,7 +9,10 @@ import android.util.Log;
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.model.Reading;
 import com.example.fitbit_tracker.repository.ReadingRepository;
+import com.example.fitbit_tracker.utils.XAxisValueFormatter;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.LegendEntry;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -37,10 +40,8 @@ public class BatchActivity extends AppCompatActivity {
         lineChart = findViewById(R.id.chart);
 
         Bundle b = getIntent().getExtras();
-        int sessionId = b.getInt("sessionId");
-        int sensorId = b.getInt("sensorId");
-
-
+        long sessionId = b.getLong("sessionId");
+        long sensorId = b.getLong("sensorId");
 
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
@@ -75,31 +76,48 @@ public class BatchActivity extends AppCompatActivity {
 
         LineData lineData = new LineData();
 
-        for (String key : keys) {
-            List<Reading> batch = batches.get(key);
+        int[] colors = new int[]{
+                Color.RED,
+                Color.GREEN,
+                Color.BLUE
+        };
+
+        long firstTimestamp = 0;
+        List<String> keyList = new ArrayList<>(keys);
+        for (int j = 0; j < keyList.size(); j++) {
+            List<Reading> batch = batches.get(keyList.get(j));
             List<Entry> entryList = new ArrayList<>();
 
-            int i = 0;
+
+            firstTimestamp = batch.get(0).getTimeStamp();
             for (Reading reading: batch) {
-                entryList.add(new Entry(i, reading.getData()));
-                i++;
+                entryList.add(new Entry(reading.getTimeStamp()-firstTimestamp, reading.getData()));
             }
 
-            LineDataSet dataSet = new LineDataSet(entryList, key);
+            LineDataSet dataSet = new LineDataSet(entryList, keyList.get(j));
             dataSet.setColor(Color.rgb(1,1,1));
             dataSet.setValueTextColor(Color.rgb(1,1,1));
-            dataSet.setCircleHoleRadius(1f);
+
+
+            dataSet.setColor(colors[j]);
+            dataSet.setDrawCircles(false);
             dataSet.setDrawCircleHole(false);
-            dataSet.setColor(Color.RED);
-            dataSet.setCircleColor(Color.RED);
-            dataSet.setCircleRadius(2f);
+
+            dataSet.setCircleColor(colors[j]);
 
             lineData.addDataSet(dataSet);
         }
 
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1.5f);
+
+        lineChart.getDescription().setEnabled(false);
         lineChart.setData(lineData);
+
+        xAxis.setValueFormatter(new XAxisValueFormatter(firstTimestamp));
+
         lineChart.notifyDataSetChanged();
-        lineChart.setVisibleXRangeMaximum(5000);
         lineChart.invalidate();
     }
 

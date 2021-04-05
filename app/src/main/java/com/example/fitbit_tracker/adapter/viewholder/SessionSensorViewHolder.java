@@ -13,12 +13,14 @@ import com.example.fitbit_tracker.R;
 public class SessionSensorViewHolder extends RecyclerView.ViewHolder {
 
     private final TextView sensorTextView;
+    private final TextView frequencyTextView;
     private final ConstraintLayout readingContainer;
 
     public SessionSensorViewHolder(View itemView) {
         super(itemView);
         sensorTextView = itemView.findViewById(R.id.readingTypeTextView);
         readingContainer = itemView.findViewById(R.id.readingContainer);
+        frequencyTextView = itemView.findViewById(R.id.frequencyTextView);
     }
 
     public void bindChartLabel(String label) {
@@ -34,5 +36,9 @@ public class SessionSensorViewHolder extends RecyclerView.ViewHolder {
         return new SessionSensorViewHolder(view);
     }
 
+
+    public void bindFrequencyLabel(float frequency) {
+        frequencyTextView.setText(frequency + " Hz");
+    }
 
 }

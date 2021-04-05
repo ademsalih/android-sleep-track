@@ -11,8 +11,12 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.fitbit_tracker.adapter.viewholder.SessionSensorViewHolder;
+import com.example.fitbit_tracker.model.Sensor;
+import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.model.SessionSensor;
 import com.example.fitbit_tracker.view.BatchActivity;
+
+import io.realm.Realm;
 
 
 public class SessionSensorListAdapter extends ListAdapter<SessionSensor, SessionSensorViewHolder> {
@@ -32,16 +36,21 @@ public class SessionSensorListAdapter extends ListAdapter<SessionSensor, Session
 
     @Override
     public void onBindViewHolder(@NonNull SessionSensorViewHolder holder, int position) {
-        SessionSensor sensor = getItem(position);
-        holder.bindChartLabel(sensor.getSensor().getSensorName());
+        SessionSensor sessionSensor = getItem(position);
+
+        Sensor sensor = Realm.getDefaultInstance().where(Sensor.class).equalTo("sensorId", sessionSensor.getSensorId()).findFirst();
+        Session session = Realm.getDefaultInstance().where(Session.class).equalTo("sessionId", sessionSensor.getSessionId()).findFirst();
+
+        holder.bindChartLabel(sensor.getSensorName());
+        holder.bindFrequencyLabel(sessionSensor.getFrequency());
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, BatchActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt("sessionId", sensor.getSession().getSessionId());
-                bundle.putInt("sensorId", sensor.getSensor().getSensorId());
+                bundle.putLong("sessionId", session.getSessionId());
+                bundle.putLong("sensorId", sensor.getSensorId());
                 intent.putExtras(bundle);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);

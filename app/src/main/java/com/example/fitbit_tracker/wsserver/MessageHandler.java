@@ -15,7 +15,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -43,7 +47,7 @@ public class MessageHandler {
 
             switch (command) {
                 case ADD_READING:
-                    //long start = System.currentTimeMillis();
+                    long start = System.currentTimeMillis();
 
                     String sensorIdentifier = payload.getString("sensorIdentifier");
                     String sessionIdentifier = payload.getString("sessionIdentifier");
@@ -55,10 +59,16 @@ public class MessageHandler {
                     // independent of whether the reading is a batch or not
                     RealmList<Reading> readingToInsert = new RealmList<>();
 
+                    Realm realm = Realm.getDefaultInstance();
+                    long sessionId = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst().getSessionId();
+                    long sensorId = realm.where(Sensor.class).equalTo("sensorName",sensorIdentifier).findFirst().getSensorId();
+
                     // Iterate over the reading types (e.g. "x", "y", "z", "bpm")
                     for (int i = 0; i < data.length(); i++) {
                         JSONObject dataItem = data.getJSONObject(i);
                         String type = dataItem.getString("type");
+
+                        long timestamp = payload.getLong("timeStamp");
 
                         if (batchReading) {
                             // If batch reading, each reading type represents an array of readings
@@ -68,63 +78,69 @@ public class MessageHandler {
                             // Iterate over the items in the reading array (e.g. "items": [9.23, 1.023, 2.30])
                             for (int j = 0; j < items.length(); j++) {
                                 double item = items.getDouble(j);
-                                long timestamp = timestamps.getLong(j);
+                                long delta = timestamps.getLong(j);
 
                                 Reading reading = new Reading();
-                                reading.setTimeStamp(timestamp);
+                                reading.setTimeStamp(timestamp + delta);
                                 reading.setData((float) item);
                                 reading.setReadingType(type);
+                                reading.setSessionId(sessionId);
+                                reading.setSensorId(sensorId);
                                 readingToInsert.add(reading);
                             }
                         } else {
                             // If not batch reading, get the single value item for the reading type
                             double item = dataItem.getDouble("item");
-                            long timestamp = payload.getLong("timeStamp");
 
                             Reading reading = new Reading();
                             reading.setTimeStamp(timestamp);
                             reading.setData((float) item);
                             reading.setReadingType(type);
+                            reading.setSessionId(sessionId);
+                            reading.setSensorId(sensorId);
                             readingToInsert.add(reading);
                         }
                     }
 
-                    // Add all readings in readingsToInsert array to the realm
-                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
-                            Sensor sensor = realm.where(Sensor.class).equalTo("sensorName",sensorIdentifier).findFirst();
-
-                            for (Reading r: readingToInsert) {
-                                r.setSession(session);
-                                r.setSensor(sensor);
+                    try {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                realm.insert(readingToInsert);
                             }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        realm.close();
+                    }
 
-                            session.getSessionReadings().addAll(readingToInsert);
-                            sensor.getSensorReadings().addAll(readingToInsert);
-                        }
-                    });
-
-                    //long time = System.currentTimeMillis() - start;
-                    //Log.d("INSERT_TIME", "Insertion time [" + sensorIdentifier + "] : " + time + " ms");
+                    long time = System.currentTimeMillis() - start;
+                    Log.d("INSERT_TIME", "Insertion time [" + sensorIdentifier + "] : " + time + " ms");
                     break;
                 case INIT_SESSION:
                     String deviceModel = payload.getString("deviceModel");
                     sessionIdentifier = payload.getString("sessionIdentifier");
                     JSONArray activeSensors = payload.getJSONArray("activeSensors");
 
-                    List<String> sensorNames = new ArrayList<>();
+                    HashMap<String, Float> sensorNames = new HashMap<>();
                     for (int i = 0; i < activeSensors.length(); i++) {
-                        sensorNames.add(activeSensors.getString(i));
+                        JSONObject sensorObject = activeSensors.getJSONObject(i);
+                        String sensorName = sensorObject.getString("name");
+                        float frequency = (float) sensorObject.getDouble("frequency");
+                        sensorNames.put(sensorName, frequency);
                     }
 
                     // Insert session into Realm DB
                     Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
+                            User user = realm.where(User.class).findFirst();
+
                             Number sessionMaxId = realm.where(Session.class).max("sessionId");
-                            int sessionNextId = (sessionMaxId == null) ? 1 : sessionMaxId.intValue() + 1;
+                            long sessionNextId = (sessionMaxId == null) ? 1 : sessionMaxId.longValue() + 1;
+
+                            Log.d("LOG", "Session id next: " + sessionNextId);
 
                             Session session = new Session();
                             session.setSessionId(sessionNextId);
@@ -133,46 +149,44 @@ public class MessageHandler {
                             session.setReadingsCount(0);
                             session.setUuid(sessionIdentifier);
                             session.setDeviceModel(deviceModel);
-                            session.setSessionSensors(new RealmList<>());
+                            session.setUserId(user.getId());
+                            realm.insert(session);
 
                             Number sensorMaxId = realm.where(Sensor.class).max("sensorId");
-                            int sensorNextId = (sensorMaxId == null) ? 1 : sensorMaxId.intValue() + 1;
+                            long sensorNextId = (sensorMaxId == null) ? 1 : sensorMaxId.longValue() + 1;
 
                             Number sessionSensorMaxId = realm.where(SessionSensor.class).max("id");
-                            int sessionSensorNextId = (sessionSensorMaxId == null) ? 1 : sessionSensorMaxId.intValue() + 1;
+                            long sessionSensorNextId = (sessionSensorMaxId == null) ? 1 : sessionSensorMaxId.longValue() + 1;
 
-                            for (int i = 0; i < sensorNames.size(); i++) {
-                                SessionSensor sessionSensor = new SessionSensor();
 
-                                Sensor sensor = realm.where(Sensor.class).equalTo("sensorName", sensorNames.get(i)).findFirst();
+                            List<String> keyList = new ArrayList<>(sensorNames.keySet());
+
+                            for (int i = 0; i < keyList.size(); i++) {
+                                Sensor sensor = realm.where(Sensor.class).equalTo("sensorName", keyList.get(i)).findFirst();
                                 if (sensor == null) {
+                                    Log.d("LOG", keyList.get(i) + " sensor id next: " + sensorNextId + i);
+
                                     sensor = new Sensor();
                                     sensor.setSensorId(sensorNextId+i);
-                                    sensor.setSensorName(sensorNames.get(i));
-                                    sensor.setSessionSensors(new RealmList<>());
+                                    sensor.setSensorName(keyList.get(i));
+                                    realm.insert(sensor);
                                 }
 
+                                SessionSensor sessionSensor = new SessionSensor();
                                 sessionSensor.setId(sessionSensorNextId+i);
-                                sessionSensor.setSensor(sensor);
-                                sessionSensor.setSession(session);
-
-                                session.getSessionSensors().add(sessionSensor);
-                                sensor.getSessionSensors().add(sessionSensor);
+                                sessionSensor.setFrequency(sensorNames.get(keyList.get(i)));
+                                sessionSensor.setSensorId(sensor.getSensorId());
+                                sessionSensor.setSessionId(session.getSessionId());
+                                realm.insert(sessionSensor);
                             }
-
-                            User user = realm.where(User.class).findFirst();
-                            session.setUser(user);
-                            user.getUserSessions().add(session);
                         }
                     });
-
                     break;
                 case START_SESSION:
                     long startTime = payload.getLong("startTime");
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
                     //realmSessionStore.startSession(sessionIdentifier, startTime);
-
                     Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {

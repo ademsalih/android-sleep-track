@@ -165,10 +165,6 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
     }
 
     @Override
-    public void onMessage(String message) {
-    }
-
-    @Override
     public void onSessionStart() {
         Intent recordingSessionIntent = new Intent(getApplicationContext(), RecordingSessionActivity.class);
         recordingSessionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
