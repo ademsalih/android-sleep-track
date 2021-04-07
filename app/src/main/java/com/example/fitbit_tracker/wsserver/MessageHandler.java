@@ -47,6 +47,7 @@ public class MessageHandler {
 
             switch (command) {
                 case ADD_READING:
+                    long start = System.currentTimeMillis();
                     String sensorIdentifier = payload.getString("sensorIdentifier");
                     String sessionIdentifier = payload.getString("sessionIdentifier");
 
@@ -104,7 +105,8 @@ public class MessageHandler {
                         realm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
-                                realm.insert(readingToInsert);
+                                //realm.insert(readingToInsert);
+                                realm.copyToRealm(readingToInsert);
                             }
                         });
                     } catch (Exception e) {
@@ -112,6 +114,9 @@ public class MessageHandler {
                     } finally {
                         realm.close();
                     }
+
+                    long time = System.currentTimeMillis() - start;
+                    Log.d("INSERT_TIME", "Insertion[" + sensorIdentifier + "]: " + time + " ms");
                     break;
                 case INIT_SESSION:
                     String deviceModel = payload.getString("deviceModel");
