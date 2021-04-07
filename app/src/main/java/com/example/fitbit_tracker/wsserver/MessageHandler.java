@@ -47,8 +47,6 @@ public class MessageHandler {
 
             switch (command) {
                 case ADD_READING:
-                    long start = System.currentTimeMillis();
-
                     String sensorIdentifier = payload.getString("sensorIdentifier");
                     String sessionIdentifier = payload.getString("sessionIdentifier");
 
@@ -68,12 +66,12 @@ public class MessageHandler {
                         JSONObject dataItem = data.getJSONObject(i);
                         String type = dataItem.getString("type");
 
-                        long timestamp = payload.getLong("timeStamp");
+                        long timestamp = payload.getLong("timestamp");
 
                         if (batchReading) {
                             // If batch reading, each reading type represents an array of readings
                             JSONArray items = dataItem.getJSONArray("items");
-                            JSONArray timestamps = payload.getJSONArray("timeStamps");
+                            JSONArray timestamps = payload.getJSONArray("timestamps");
 
                             // Iterate over the items in the reading array (e.g. "items": [9.23, 1.023, 2.30])
                             for (int j = 0; j < items.length(); j++) {
@@ -114,9 +112,6 @@ public class MessageHandler {
                     } finally {
                         realm.close();
                     }
-
-                    long time = System.currentTimeMillis() - start;
-                    Log.d("INSERT_TIME", "Insertion time [" + sensorIdentifier + "] : " + time + " ms");
                     break;
                 case INIT_SESSION:
                     String deviceModel = payload.getString("deviceModel");
