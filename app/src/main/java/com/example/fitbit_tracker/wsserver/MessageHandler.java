@@ -7,19 +7,15 @@ import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import com.example.fitbit_tracker.model.Reading;
 import com.example.fitbit_tracker.model.Sensor;
 import com.example.fitbit_tracker.model.Session;
-import com.example.fitbit_tracker.model.SessionSensor;
-import com.example.fitbit_tracker.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.Queue;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -27,11 +23,12 @@ import io.realm.RealmList;
 public class MessageHandler {
 
     private final WebSocketCallback webSocketCallback;
-    //private final RealmNyxSessionStore realmSessionStore;
+
+    private final RealmNyxSessionStore realmSessionStore;
 
     public MessageHandler(WebSocketCallback webSocketCallback, Context context) {
         this.webSocketCallback = webSocketCallback;
-        //this.realmSessionStore = new RealmNyxSessionStore();
+        this.realmSessionStore = new RealmNyxSessionStore();
     }
 
     public void handleMessage(String message) {
@@ -47,7 +44,7 @@ public class MessageHandler {
 
             switch (command) {
                 case ADD_READING:
-                    long start = System.currentTimeMillis();
+
                     String sensorIdentifier = payload.getString("sensorIdentifier");
                     String sessionIdentifier = payload.getString("sessionIdentifier");
 
@@ -56,11 +53,7 @@ public class MessageHandler {
 
                     // Readings that should be added to realm are collected first
                     // independent of whether the reading is a batch or not
-                    RealmList<Reading> readingToInsert = new RealmList<>();
-
-                    Realm realm = Realm.getDefaultInstance();
-                    long sessionId = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst().getSessionId();
-                    long sensorId = realm.where(Sensor.class).equalTo("sensorName",sensorIdentifier).findFirst().getSensorId();
+                    List<Reading> readingToInsert = new RealmList<>();
 
                     // Iterate over the reading types (e.g. "x", "y", "z", "bpm")
                     for (int i = 0; i < data.length(); i++) {
@@ -83,8 +76,6 @@ public class MessageHandler {
                                 reading.setTimeStamp(timestamp + delta);
                                 reading.setData((float) item);
                                 reading.setReadingType(type);
-                                reading.setSessionId(sessionId);
-                                reading.setSensorId(sensorId);
                                 readingToInsert.add(reading);
                             }
                         } else {
@@ -95,105 +86,33 @@ public class MessageHandler {
                             reading.setTimeStamp(timestamp);
                             reading.setData((float) item);
                             reading.setReadingType(type);
-                            reading.setSessionId(sessionId);
-                            reading.setSensorId(sensorId);
                             readingToInsert.add(reading);
                         }
                     }
 
-                    try {
-                        realm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                //realm.insert(readingToInsert);
-                                realm.copyToRealm(readingToInsert);
-                            }
-                        });
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        realm.close();
-                    }
+                    realmSessionStore.addReading(sessionIdentifier, sensorIdentifier, readingToInsert);
 
-                    long time = System.currentTimeMillis() - start;
-                    Log.d("INSERT_TIME", "Insertion[" + sensorIdentifier + "]: " + time + " ms");
                     break;
                 case INIT_SESSION:
                     String deviceModel = payload.getString("deviceModel");
                     sessionIdentifier = payload.getString("sessionIdentifier");
                     JSONArray activeSensors = payload.getJSONArray("activeSensors");
 
-                    HashMap<String, Float> sensorNames = new HashMap<>();
+                    HashMap<String, Float> sensorConfig = new HashMap<>();
                     for (int i = 0; i < activeSensors.length(); i++) {
                         JSONObject sensorObject = activeSensors.getJSONObject(i);
-                        String sensorName = sensorObject.getString("name");
-                        float frequency = (float) sensorObject.getDouble("frequency");
-                        sensorNames.put(sensorName, frequency);
+                        sensorConfig.put(sensorObject.getString("name"), (float) sensorObject.getDouble("frequency"));
                     }
 
                     // Insert session into Realm DB
-                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            User user = realm.where(User.class).findFirst();
+                    realmSessionStore.initSession(deviceModel, sessionIdentifier, sensorConfig);
 
-                            Number sessionMaxId = realm.where(Session.class).max("sessionId");
-                            long sessionNextId = (sessionMaxId == null) ? 1 : sessionMaxId.longValue() + 1;
-
-                            Log.d("LOG", "Session id next: " + sessionNextId);
-
-                            Session session = new Session();
-                            session.setSessionId(sessionNextId);
-                            session.setEndTime(0);
-                            session.setStartTime(0);
-                            session.setReadingsCount(0);
-                            session.setUuid(sessionIdentifier);
-                            session.setDeviceModel(deviceModel);
-                            session.setUserId(user.getId());
-                            realm.insert(session);
-
-                            Number sensorMaxId = realm.where(Sensor.class).max("sensorId");
-                            long sensorNextId = (sensorMaxId == null) ? 1 : sensorMaxId.longValue() + 1;
-
-                            Number sessionSensorMaxId = realm.where(SessionSensor.class).max("id");
-                            long sessionSensorNextId = (sessionSensorMaxId == null) ? 1 : sessionSensorMaxId.longValue() + 1;
-
-
-                            List<String> keyList = new ArrayList<>(sensorNames.keySet());
-
-                            for (int i = 0; i < keyList.size(); i++) {
-                                Sensor sensor = realm.where(Sensor.class).equalTo("sensorName", keyList.get(i)).findFirst();
-                                if (sensor == null) {
-                                    Log.d("LOG", keyList.get(i) + " sensor id next: " + sensorNextId + i);
-
-                                    sensor = new Sensor();
-                                    sensor.setSensorId(sensorNextId+i);
-                                    sensor.setSensorName(keyList.get(i));
-                                    realm.insert(sensor);
-                                }
-
-                                SessionSensor sessionSensor = new SessionSensor();
-                                sessionSensor.setId(sessionSensorNextId+i);
-                                sessionSensor.setFrequency(sensorNames.get(keyList.get(i)));
-                                sessionSensor.setSensorId(sensor.getSensorId());
-                                sessionSensor.setSessionId(session.getSessionId());
-                                realm.insert(sessionSensor);
-                            }
-                        }
-                    });
                     break;
                 case START_SESSION:
                     long startTime = payload.getLong("startTime");
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
-                    //realmSessionStore.startSession(sessionIdentifier, startTime);
-                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
-                            session.setStartTime(startTime);
-                        }
-                    });
+                    realmSessionStore.startSession(sessionIdentifier, startTime);
 
                     webSocketCallback.onSessionStart();
                     break;
@@ -203,15 +122,7 @@ public class MessageHandler {
                     int readingCount = payload.getInt("readingsCount");
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
-                    //realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
-                    Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
-                            session.setEndTime(endTime);
-                            session.setReadingsCount(readingCount);
-                        }
-                    });
+                    realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
 
                     webSocketCallback.onSessionEnd();
                     break;
