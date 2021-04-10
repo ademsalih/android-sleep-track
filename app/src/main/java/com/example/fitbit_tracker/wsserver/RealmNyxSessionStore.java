@@ -120,10 +120,8 @@ public class RealmNyxSessionStore implements NyxSessionStore {
     @Override
     public void addReading(String sessionIdentifier, String sensorIdentifier, List<Reading> readings) {
 
-        Realm realm = Realm.getDefaultInstance();
-
-        long sessionId = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst().getSessionId();
-        long sensorId = realm.where(Sensor.class).equalTo("sensorName",sensorIdentifier).findFirst().getSensorId();
+        long sessionId = Realm.getDefaultInstance().where(Session.class).equalTo("uuid", sessionIdentifier).findFirst().getSessionId();
+        long sensorId = Realm.getDefaultInstance().where(Sensor.class).equalTo("sensorName",sensorIdentifier).findFirst().getSensorId();
 
         for (Reading r : readings) {
             r.setSensorId(sensorId);
@@ -131,28 +129,29 @@ public class RealmNyxSessionStore implements NyxSessionStore {
             queue.add(r);
         }
 
-        Log.d(TAG, "Queue size: " + queue.size());
-
         if (queue.size() > BATCH_INSERT_THRESHOLD) {
 
+            Log.d(TAG, "Queue size: " + queue.size());
             Log.d(TAG, "Inserting...");
 
             List<Reading> toInsert = new ArrayList<>();
 
-            for (int i=0; i < BATCH_INSERT_THRESHOLD; i++) {
+            for (int i = 0; i < BATCH_INSERT_THRESHOLD; i++) {
                 toInsert.add(queue.poll());
             }
 
             long start = System.currentTimeMillis();
-            try {
-                realm.executeTransaction(realm1 -> realm1.insert(toInsert));
+            try (Realm realm = Realm.getDefaultInstance()) {
+                realm.executeTransactionAsync(r ->
+                        r.insert(toInsert)
+                );
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                realm.close();
             }
+
             long time = System.currentTimeMillis() - start;
             Log.d(TAG, "Insertion Duration: " + time + " ms");
+            Log.d(TAG, "======================================");
 
         }
     }

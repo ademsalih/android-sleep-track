@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.example.fitbit_tracker.R;
@@ -21,8 +22,19 @@ public class RecordingSessionActivity extends AppCompatActivity implements Sessi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording_session);
+
+        // Hide Activity Toolbar
         getSupportActionBar().hide();
+
+        // Hide status bar
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        /*
+         * Hide bottom navigation bar
+         */
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
 
         Intent intent = new Intent(RecordingSessionActivity.this, CustomWebSocketService.class);
 
