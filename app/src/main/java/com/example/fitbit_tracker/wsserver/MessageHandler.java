@@ -1,33 +1,24 @@
 package com.example.fitbit_tracker.wsserver;
 
-import android.content.Context;
-import android.util.Log;
 
-import com.example.fitbit_tracker.handlers.WebSocketCallback;
+import com.example.fitbit_tracker.handlers.SessionCallback;
 import com.example.fitbit_tracker.model.Reading;
-import com.example.fitbit_tracker.model.Sensor;
-import com.example.fitbit_tracker.model.Session;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Queue;
-
-import io.realm.Realm;
 import io.realm.RealmList;
 
 public class MessageHandler {
 
-    private final WebSocketCallback webSocketCallback;
+    private final SessionCallback sessionCallback;
 
     private final RealmNyxSessionStore realmSessionStore;
 
-    public MessageHandler(WebSocketCallback webSocketCallback, Context context) {
-        this.webSocketCallback = webSocketCallback;
+    public MessageHandler(SessionCallback sessionCallback) {
+        this.sessionCallback = sessionCallback;
         this.realmSessionStore = new RealmNyxSessionStore();
     }
 
@@ -114,7 +105,7 @@ public class MessageHandler {
 
                     realmSessionStore.startSession(sessionIdentifier, startTime);
 
-                    webSocketCallback.onSessionStart();
+                    sessionCallback.onSessionStart();
                     break;
 
                 case STOP_SESSION:
@@ -124,7 +115,7 @@ public class MessageHandler {
 
                     realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
 
-                    webSocketCallback.onSessionEnd();
+                    sessionCallback.onSessionEnd();
                     break;
                 default:
                     break;

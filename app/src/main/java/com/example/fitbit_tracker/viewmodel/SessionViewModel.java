@@ -18,7 +18,7 @@ public class SessionViewModel extends AndroidViewModel {
 
     public SessionViewModel(Application application) {
         super(application);
-        sessionRepository = new SessionRepository(Realm.getDefaultInstance());
+        sessionRepository = new SessionRepository();
         allSessions = sessionRepository.getAllSessions();
     }
 

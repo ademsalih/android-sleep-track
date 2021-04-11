@@ -3,6 +3,7 @@ package com.example.fitbit_tracker.wsserver;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.fitbit_tracker.handlers.SessionCallback;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
 
 import org.java_websocket.WebSocket;
@@ -15,12 +16,10 @@ public class CustomWebSocketServer extends WebSocketServer {
     private final String TAG = this.getClass().getSimpleName();
 
     private final WebSocketCallback webSocketCallback;
-    private final MessageHandler messageHandler;
 
-    public CustomWebSocketServer(WebSocketCallback webSocketCallback, Context context, int port) {
+    public CustomWebSocketServer(WebSocketCallback webSocketCallback, int port) {
         super(new InetSocketAddress(port));
         this.webSocketCallback = webSocketCallback;
-        this.messageHandler = new MessageHandler(webSocketCallback, context);
     }
 
     @Override
@@ -38,13 +37,13 @@ public class CustomWebSocketServer extends WebSocketServer {
     @Override
     public void onMessage(WebSocket conn, String message) {
         //Log.d(TAG, message);
-        messageHandler.handleMessage(message);
+        webSocketCallback.onMessage(message);
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         Log.d(TAG,"Reason:" + reason + ", Code: " + code);
-        webSocketCallback.onClose();
+        webSocketCallback.onClose(code);
     }
 
     @Override

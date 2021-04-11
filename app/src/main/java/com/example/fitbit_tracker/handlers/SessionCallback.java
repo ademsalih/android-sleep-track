@@ -1,5 +1,6 @@
 package com.example.fitbit_tracker.handlers;
 
-public interface SessionEndCallback {
+public interface SessionCallback {
+    void onSessionStart();
     void onSessionEnd();
 }

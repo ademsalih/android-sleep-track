@@ -8,18 +8,25 @@ import io.realm.RealmResults;
 
 public class ReadingRepository {
 
-    private Realm realm;
+    private final Realm realm;
 
-    public ReadingRepository(Realm realm) {
-        this.realm = realm;
+    public ReadingRepository() {
+        this.realm = Realm.getDefaultInstance();
     }
 
     public RealmResults<Reading> getReadingForSessionAndSensor(long sessionId, long sensorId) {
-        return realm.where(Reading.class).equalTo("sessionId", sessionId).equalTo("sensorId", sensorId).findAll();
-    }
+        RealmResults<Reading> readings = null;
 
-    public void insert(Reading reading) {
-        realm.insert(reading);
+        try {
+            readings = realm.where(Reading.class)
+                    .equalTo("sessionId", sessionId)
+                    .equalTo("sensorId", sensorId)
+                    .findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return readings;
     }
 
 }

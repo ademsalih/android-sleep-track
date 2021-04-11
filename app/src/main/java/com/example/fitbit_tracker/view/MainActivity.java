@@ -15,14 +15,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.fitbit_tracker.handlers.ServiceCallback;
+import com.example.fitbit_tracker.handlers.SessionCallback;
+import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import com.example.fitbit_tracker.wsserver.CustomWebSocketService;
 import com.example.fitbit_tracker.R;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity implements ServiceCallback {
+public class MainActivity extends AppCompatActivity implements WebSocketCallback {
     private final String TAG = this.getClass().getSimpleName();
     private ProgressBar progressBar;
     private TextView textView;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 Log.d(TAG, "onServiceConnected");
                 CustomWebSocketService.LocalBinder binder = (CustomWebSocketService.LocalBinder) service;
-                binder.getService().registerCallBack((ServiceCallback) context);
+                binder.getService().registerCallBack((WebSocketCallback) context);
             }
 
             @Override
@@ -74,12 +75,12 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
         runOnUiThread(() -> {
             imageView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
-            textView.setText("Connected to Hypnos");
+            textView.setText(R.string.connected_text);
         });
     }
 
     @Override
-    public void onClose() {
+    public void onClose(int code) {
         runOnUiThread(() -> {
             imageView.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);

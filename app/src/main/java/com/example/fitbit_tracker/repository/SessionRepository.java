@@ -11,21 +11,42 @@ import io.realm.Sort;
 
 public class SessionRepository {
 
-    private Realm realm;
+    private final Realm realm;
 
-    public SessionRepository(Realm realm) {
-        this.realm = realm;
+    public SessionRepository() {
+        this.realm = Realm.getDefaultInstance();
     }
 
     public RealmLiveData getAllSessions() {
+        RealmResults<Session> results = null;
 
-        RealmResults<Session> results = realm.where(Session.class).sort("endTime", Sort.DESCENDING).findAllAsync();
+        try {
+            results = realm.where(Session.class)
+                    .sort("endTime", Sort.DESCENDING)
+                    .findAllAsync();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            realm.close();
+        }
 
         return new RealmLiveData(results);
     }
 
     public void insert(Session session) {
-        realm.insert(session);
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm r) {
+                    r.insert(session);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            realm.close();
+        }
     }
 
 }

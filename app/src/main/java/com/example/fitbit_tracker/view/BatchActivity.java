@@ -47,7 +47,7 @@ public class BatchActivity extends AppCompatActivity {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                ReadingRepository readingRepository = new ReadingRepository(Realm.getDefaultInstance());
+                ReadingRepository readingRepository = new ReadingRepository();
                 long start = System.currentTimeMillis();
                 List<Reading> readingList = readingRepository.getReadingForSessionAndSensor(sessionId, sensorId);
                 long time = System.currentTimeMillis() - start;
