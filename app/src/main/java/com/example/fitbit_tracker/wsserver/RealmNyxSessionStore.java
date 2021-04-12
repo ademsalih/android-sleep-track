@@ -31,90 +31,108 @@ public class RealmNyxSessionStore implements NyxSessionStore {
 
     @Override
     public void initSession(String deviceModel, String sessionIdentifier, HashMap<String, Float> sensorConfigs) {
-        Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                User user = realm.where(User.class).findFirst();
+        Realm realm = Realm.getDefaultInstance();
 
-                Number sessionMaxId = realm.where(Session.class).max("sessionId");
-                long sessionNextId = (sessionMaxId == null) ? 1 : sessionMaxId.longValue() + 1;
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    User user = realm.where(User.class).findFirst();
 
-                Log.d("LOG", "Session id next: " + sessionNextId);
+                    Number sessionMaxId = realm.where(Session.class).max("sessionId");
+                    long sessionNextId = (sessionMaxId == null) ? 1 : sessionMaxId.longValue() + 1;
 
-                Session session = new Session();
-                session.setSessionId(sessionNextId);
-                session.setEndTime(0);
-                session.setStartTime(0);
-                session.setReadingsCount(0);
-                session.setUuid(sessionIdentifier);
-                session.setDeviceModel(deviceModel);
-                session.setUserId(user.getId());
-                realm.insert(session);
+                    Log.d("LOG", "Session id next: " + sessionNextId);
 
-                Number sensorMaxId = realm.where(Sensor.class).max("sensorId");
-                long sensorNextId = (sensorMaxId == null) ? 1 : sensorMaxId.longValue() + 1;
+                    Session session = new Session();
+                    session.setSessionId(sessionNextId);
+                    session.setEndTime(0);
+                    session.setStartTime(0);
+                    session.setReadingsCount(0);
+                    session.setUuid(sessionIdentifier);
+                    session.setDeviceModel(deviceModel);
+                    session.setUserId(user.getId());
+                    realm.insert(session);
 
-                Number sessionSensorMaxId = realm.where(SessionSensor.class).max("id");
-                long sessionSensorNextId = (sessionSensorMaxId == null) ? 1 : sessionSensorMaxId.longValue() + 1;
+                    Number sensorMaxId = realm.where(Sensor.class).max("sensorId");
+                    long sensorNextId = (sensorMaxId == null) ? 1 : sensorMaxId.longValue() + 1;
+
+                    Number sessionSensorMaxId = realm.where(SessionSensor.class).max("id");
+                    long sessionSensorNextId = (sessionSensorMaxId == null) ? 1 : sessionSensorMaxId.longValue() + 1;
 
 
-                List<String> keyList = new ArrayList<>(sensorConfigs.keySet());
+                    List<String> keyList = new ArrayList<>(sensorConfigs.keySet());
 
-                for (int i = 0; i < keyList.size(); i++) {
-                    Sensor sensor = realm.where(Sensor.class).equalTo("sensorName", keyList.get(i)).findFirst();
-                    if (sensor == null) {
-                        Log.d("LOG", keyList.get(i) + " sensor id next: " + sensorNextId + i);
+                    for (int i = 0; i < keyList.size(); i++) {
+                        Sensor sensor = realm.where(Sensor.class).equalTo("sensorName", keyList.get(i)).findFirst();
+                        if (sensor == null) {
+                            Log.d("LOG", keyList.get(i) + " sensor id next: " + sensorNextId + i);
 
-                        sensor = new Sensor();
-                        sensor.setSensorId(sensorNextId+i);
-                        sensor.setSensorName(keyList.get(i));
-                        realm.insert(sensor);
+                            sensor = new Sensor();
+                            sensor.setSensorId(sensorNextId+i);
+                            sensor.setSensorName(keyList.get(i));
+                            realm.insert(sensor);
+                        }
+
+                        SessionSensor sessionSensor = new SessionSensor();
+                        sessionSensor.setId(sessionSensorNextId+i);
+                        sessionSensor.setFrequency(sensorConfigs.get(keyList.get(i)));
+                        sessionSensor.setSensorId(sensor.getSensorId());
+                        sessionSensor.setSessionId(session.getSessionId());
+                        realm.insert(sessionSensor);
                     }
-
-                    SessionSensor sessionSensor = new SessionSensor();
-                    sessionSensor.setId(sessionSensorNextId+i);
-                    sessionSensor.setFrequency(sensorConfigs.get(keyList.get(i)));
-                    sessionSensor.setSensorId(sensor.getSensorId());
-                    sessionSensor.setSessionId(session.getSessionId());
-                    realm.insert(sessionSensor);
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            realm.close();
+        }
     }
 
     @Override
     public void startSession(String sessionIdentifier, long startTime) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
-                session.setStartTime(startTime);
-            }
-        });
-        realm.close();
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
+                    session.setStartTime(startTime);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            realm.close();
+        }
     }
 
     @Override
     public void stopSession(String sessionIdentifier, long endTime, int readingsCount) {
-        Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
-                session.setEndTime(endTime);
-                session.setReadingsCount(readingsCount);
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
+                    session.setEndTime(endTime);
+                    session.setReadingsCount(readingsCount);
 
-                Log.d(TAG, "Ending Session with queue size: " + queue.size());
+                    Log.d(TAG, "Ending Session with queue size: " + queue.size());
 
-                if (!queue.isEmpty()) {
-                    realm.insert(queue.subList(0, queue.size()-1));
-                    queue.clear();
-                    Log.d(TAG, "Inserted remaining, queue size: " + queue.size());
+                    if (!queue.isEmpty()) {
+                        realm.insert(queue.subList(0, queue.size()-1));
+                        queue.clear();
+                        Log.d(TAG, "Inserted remaining, queue size: " + queue.size());
+                    }
                 }
-            }
-        });
-
-
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            realm.close();
+        }
     }
 
     @Override
