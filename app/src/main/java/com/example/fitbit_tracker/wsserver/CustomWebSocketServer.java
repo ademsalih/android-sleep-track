@@ -48,7 +48,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
-        Log.d(TAG, "onError" + ex);
+        Log.d(TAG, "ERROR: " + ex);
     }
 
 }

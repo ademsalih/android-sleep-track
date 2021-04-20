@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -23,6 +24,8 @@ import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.handlers.SessionCallback;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import com.example.fitbit_tracker.view.RecordingSessionActivity;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 
@@ -166,6 +169,11 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
     @Override
     public void onMessage(String message) {
         messageHandler.handleMessage(message);
+        Intent intent = new Intent("ADD_READING");
+
+        intent.putExtra("MESSAGE", message);
+
+        sendBroadcast(intent);
     }
 
     @Override

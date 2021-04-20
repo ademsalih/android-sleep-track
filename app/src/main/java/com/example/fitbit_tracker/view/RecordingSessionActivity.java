@@ -19,6 +19,8 @@ public class RecordingSessionActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private BroadcastReceiver broadcastReceiver;
     private TextView recordingTextView;
+    private TextView debugTextView;
+    private boolean connected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +28,7 @@ public class RecordingSessionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recording_session);
 
         recordingTextView = findViewById(R.id.recordingTextView);
+        debugTextView = findViewById(R.id.debugTextView);
 
         // Hide Activity Toolbar
         getSupportActionBar().hide();
@@ -44,12 +47,22 @@ public class RecordingSessionActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                if (intent.getAction().equals("SESSION_ENDED")) {
-                    finish();
-                } else if (intent.getAction().equals("DISCONNECT")) {
-                    recordingTextView.setText(R.string.CONNECTION_LOST_TEXT);
-                } else if (intent.getAction().equals("CONNECT")) {
-                    recordingTextView.setText(R.string.recordingText);
+                switch (intent.getAction()) {
+                    case "ADD_READING":
+                        String s = intent.getStringExtra("MESSAGE");
+                        debugTextView.setText(s);
+                        break;
+                    case "SESSION_ENDED":
+                        finish();
+                        break;
+                    case "DISCONNECT":
+                        recordingTextView.setText(R.string.CONNECTION_LOST_TEXT);
+                        connected = false;
+                        break;
+                    case "CONNECT":
+                        recordingTextView.setText(R.string.recordingText);
+                        connected = true;
+                        break;
                 }
             }
         };
@@ -59,6 +72,7 @@ public class RecordingSessionActivity extends AppCompatActivity {
         intentFilter.addAction("SESSION_ENDED");
         intentFilter.addAction("DISCONNECT");
         intentFilter.addAction("CONNECT");
+        intentFilter.addAction("ADD_READING");
 
         registerReceiver(broadcastReceiver, intentFilter);
     }
@@ -71,10 +85,9 @@ public class RecordingSessionActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        /*
-         * Intentionally left blank to avoid exiting in the
-         * midst of a session if back button is pressed.
-         */
+        if (!connected) {
+            finish();
+        }
     }
 
 }
