@@ -20,7 +20,7 @@ public class RecordingSessionActivity extends AppCompatActivity {
     private BroadcastReceiver broadcastReceiver;
     private TextView recordingTextView;
     private TextView debugTextView;
-    private boolean connected;
+    private boolean connected = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
