@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">Nyx</string>
-    <string name="NOT_CONNECTED_TEXT">Waiting for Fitbit device...</string>
-    <string name="recordingText">Recording...</string>
+    <string name="NOT_CONNECTED_TEXT">Waiting for Fitbit device…</string>
+    <string name="recordingText">Recording…</string>
     <string name="recordingDescriptionText">Make sure to keep the Fitbit watch in proximity during the session. To stop recording, press the End Session button in Hypnos.</string>
     <string name="connected_text">Connected to Hypnos</string>
     <string name="CONNECTION_LOST_TEXT">Connection Lost</string>
+    <string name="SESSION_ACTIVE_TOAST_MESSAGE">A session is active. End the current session from Hypnos to go back.</string>
 </resources>

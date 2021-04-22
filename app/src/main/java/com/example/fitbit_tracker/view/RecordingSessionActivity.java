@@ -10,9 +10,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.handlers.WebSocketCallback;
 
 
 public class RecordingSessionActivity extends AppCompatActivity {
@@ -87,6 +87,8 @@ public class RecordingSessionActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (!connected) {
             finish();
+        } else {
+            Toast.makeText(this, R.string.SESSION_ACTIVE_TOAST_MESSAGE, Toast.LENGTH_SHORT).show();
         }
     }
 
