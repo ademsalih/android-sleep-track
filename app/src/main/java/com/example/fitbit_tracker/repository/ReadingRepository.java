@@ -5,6 +5,7 @@ import com.example.fitbit_tracker.utils.RealmLiveData;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class ReadingRepository {
 
@@ -20,7 +21,7 @@ public class ReadingRepository {
         try {
             readings = realm.where(Reading.class)
                     .equalTo("sessionId", sessionId)
-                    .equalTo("sensorId", sensorId)
+                    .equalTo("sensorId", sensorId).sort("timeStamp", Sort.ASCENDING)
                     .findAll();
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,4 +6,5 @@
     <string name="connected_text">Connected to Hypnos</string>
     <string name="CONNECTION_LOST_TEXT">Connection Lost</string>
     <string name="SESSION_ACTIVE_TOAST_MESSAGE">A session is active. End the current session from Hypnos to go back.</string>
+    <string name="FINALIZING_TEXT">Finalizing...</string>
 </resources>

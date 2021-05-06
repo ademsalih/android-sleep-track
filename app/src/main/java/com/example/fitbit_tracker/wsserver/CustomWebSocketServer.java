@@ -36,7 +36,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        //Log.d(TAG, message);
+        Log.d(TAG, message);
         webSocketCallback.onMessage(message);
     }
 

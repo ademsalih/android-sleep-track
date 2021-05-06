@@ -23,7 +23,7 @@ public class RealmNyxSessionStore implements NyxSessionStore {
 
     private final String TAG = getClass().getSimpleName();
     private LinkedList<Reading> queue;
-    private final int BATCH_INSERT_THRESHOLD = 1000;
+    private final int BATCH_INSERT_THRESHOLD = 5000;
 
     public RealmNyxSessionStore() {
         this.queue = new LinkedList<>();
@@ -122,7 +122,7 @@ public class RealmNyxSessionStore implements NyxSessionStore {
                     Log.d(TAG, "Ending Session with queue size: " + queue.size());
 
                     if (!queue.isEmpty()) {
-                        realm.insert(queue.subList(0, queue.size()-1));
+                        realm.insert(queue.subList(0, queue.size()));
                         queue.clear();
                         Log.d(TAG, "Inserted remaining, queue size: " + queue.size());
                     }

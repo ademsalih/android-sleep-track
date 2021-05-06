@@ -19,7 +19,10 @@ public class NyxApplication extends Application {
         Realm.init(this);
 
         String realmName = "SessionStore";
-        RealmConfiguration config = new RealmConfiguration.Builder().name(realmName).build();
+        RealmConfiguration config = new RealmConfiguration
+                .Builder()
+                .name(realmName)
+                .build();
 
         Realm.setDefaultConfiguration(config);
 

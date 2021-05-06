@@ -1,6 +1,8 @@
 package com.example.fitbit_tracker.wsserver;
 
 
+import android.util.Log;
+
 import com.example.fitbit_tracker.handlers.SessionCallback;
 import com.example.fitbit_tracker.model.Reading;
 
@@ -9,9 +11,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+
 import io.realm.RealmList;
 
 public class MessageHandler {
+    private final String TAG = this.getClass().getSimpleName();
 
     private final SessionCallback sessionCallback;
 
@@ -35,54 +42,31 @@ public class MessageHandler {
 
             switch (command) {
                 case ADD_READING:
-
-                    String sensorIdentifier = payload.getString("sensorIdentifier");
                     String sessionIdentifier = payload.getString("sessionIdentifier");
-
+                    String sensorIdentifier = payload.getString("sensorIdentifier");
+                    JSONArray timestamps = payload.getJSONArray("timestamps");
                     JSONArray data = payload.getJSONArray("data");
-                    boolean batchReading = payload.getBoolean("batchReading");
 
-                    // Readings that should be added to realm are collected first
-                    // independent of whether the reading is a batch or not
                     List<Reading> readingToInsert = new RealmList<>();
 
-                    // Iterate over the reading types (e.g. "x", "y", "z", "bpm")
-                    for (int i = 0; i < data.length(); i++) {
-                        JSONObject dataItem = data.getJSONObject(i);
-                        String type = dataItem.getString("type");
+                    for (int k = 0; k < data.length(); k++) {
 
-                        long timestamp = payload.getLong("timestamp");
+                        JSONObject valuesObject = (JSONObject) data.get(k);
 
-                        if (batchReading) {
-                            // If batch reading, each reading type represents an array of readings
-                            JSONArray items = dataItem.getJSONArray("items");
-                            JSONArray timestamps = payload.getJSONArray("timestamps");
+                        String type = valuesObject.getString("type");
+                        JSONArray items = valuesObject.getJSONArray("items");
 
-                            // Iterate over the items in the reading array (e.g. "items": [9.23, 1.023, 2.30])
-                            for (int j = 0; j < items.length(); j++) {
-                                double item = items.getDouble(j);
-                                long delta = timestamps.getLong(j);
-
-                                Reading reading = new Reading();
-                                reading.setTimeStamp(timestamp + delta);
-                                reading.setData((float) item);
-                                reading.setReadingType(type);
-                                readingToInsert.add(reading);
-                            }
-                        } else {
-                            // If not batch reading, get the single value item for the reading type
-                            double item = dataItem.getDouble("item");
+                        for (int j = 0; j < items.length(); j++) {
+                            double item = items.getDouble(j);
 
                             Reading reading = new Reading();
-                            reading.setTimeStamp(timestamp);
+                            reading.setTimeStamp(timestamps.getLong(j));
                             reading.setData((float) item);
                             reading.setReadingType(type);
                             readingToInsert.add(reading);
                         }
                     }
-
                     realmSessionStore.addReading(sessionIdentifier, sensorIdentifier, readingToInsert);
-
                     break;
                 case INIT_SESSION:
                     String deviceModel = payload.getString("deviceModel");
@@ -103,19 +87,28 @@ public class MessageHandler {
                     long startTime = payload.getLong("startTime");
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
-                    realmSessionStore.startSession(sessionIdentifier, startTime);
-
                     sessionCallback.onSessionStart();
+                    realmSessionStore.startSession(sessionIdentifier, startTime);
                     break;
 
                 case STOP_SESSION:
+                    sessionCallback.onSessionFinalize();
+
                     long endTime = payload.getLong("endTime");
                     int readingCount = payload.getInt("readingsCount");
                     sessionIdentifier = payload.getString("sessionIdentifier");
 
-                    realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
+                    Timer sessionEndTimer = new Timer();
 
-                    sessionCallback.onSessionEnd();
+                    sessionEndTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            sessionCallback.onSessionEnd();
+                            realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
+                            sessionEndTimer.cancel();
+                        }
+                    }, 5000);
+
                     break;
                 default:
                     break;

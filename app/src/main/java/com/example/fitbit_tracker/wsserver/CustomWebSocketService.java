@@ -169,11 +169,9 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
     @Override
     public void onMessage(String message) {
         messageHandler.handleMessage(message);
-        Intent intent = new Intent("ADD_READING");
-
+        /*Intent intent = new Intent("ADD_READING");
         intent.putExtra("MESSAGE", message);
-
-        sendBroadcast(intent);
+        sendBroadcast(intent);*/
     }
 
     @Override
@@ -189,5 +187,9 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
         sendBroadcast(intent);
     }
 
-
+    @Override
+    public void onSessionFinalize() {
+        Intent intent = new Intent("SESSION_FINALIZING");
+        sendBroadcast(intent);
+    }
 }

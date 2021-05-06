@@ -19,7 +19,7 @@ public class RecordingSessionActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private BroadcastReceiver broadcastReceiver;
     private TextView recordingTextView;
-    private TextView debugTextView;
+    //private TextView debugTextView;
     private boolean connected = true;
 
     @Override
@@ -28,7 +28,7 @@ public class RecordingSessionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recording_session);
 
         recordingTextView = findViewById(R.id.recordingTextView);
-        debugTextView = findViewById(R.id.debugTextView);
+        //debugTextView = findViewById(R.id.debugTextView);
 
         // Hide Activity Toolbar
         getSupportActionBar().hide();
@@ -48,12 +48,15 @@ public class RecordingSessionActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
 
                 switch (intent.getAction()) {
-                    case "ADD_READING":
+                    /*case "ADD_READING":
                         String s = intent.getStringExtra("MESSAGE");
                         debugTextView.setText(s);
-                        break;
+                        break;*/
                     case "SESSION_ENDED":
                         finish();
+                        break;
+                    case "SESSION_FINALIZING":
+                        recordingTextView.setText(R.string.FINALIZING_TEXT);
                         break;
                     case "DISCONNECT":
                         recordingTextView.setText(R.string.CONNECTION_LOST_TEXT);
@@ -72,7 +75,8 @@ public class RecordingSessionActivity extends AppCompatActivity {
         intentFilter.addAction("SESSION_ENDED");
         intentFilter.addAction("DISCONNECT");
         intentFilter.addAction("CONNECT");
-        intentFilter.addAction("ADD_READING");
+        //intentFilter.addAction("ADD_READING");
+        intentFilter.addAction("SESSION_FINALIZING");
 
         registerReceiver(broadcastReceiver, intentFilter);
     }
