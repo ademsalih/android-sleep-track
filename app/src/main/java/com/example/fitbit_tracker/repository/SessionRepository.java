@@ -33,6 +33,20 @@ public class SessionRepository {
         return new RealmLiveData(results);
     }
 
+    public Session getSession(long sessionId) {
+        Session session = null;
+
+        try {
+            session = realm.where(Session.class).equalTo("sessionId", sessionId).findFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            realm.close();
+        }
+
+        return session;
+    }
+
     public void insert(Session session) {
         Realm realm = Realm.getDefaultInstance();
         try {

@@ -1,7 +1,11 @@
 package com.example.fitbit_tracker.wsserver;
 
 
+import android.content.Context;
 import android.util.Log;
+
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.example.fitbit_tracker.handlers.SessionCallback;
 import com.example.fitbit_tracker.model.Reading;
@@ -9,11 +13,11 @@ import com.example.fitbit_tracker.model.Reading;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
 
 import io.realm.RealmList;
 
@@ -57,11 +61,9 @@ public class MessageHandler {
                         JSONArray items = valuesObject.getJSONArray("items");
 
                         for (int j = 0; j < items.length(); j++) {
-                            double item = items.getDouble(j);
-
                             Reading reading = new Reading();
                             reading.setTimeStamp(timestamps.getLong(j));
-                            reading.setData((float) item);
+                            reading.setData((float) items.getDouble(j));
                             reading.setReadingType(type);
                             readingToInsert.add(reading);
                         }
@@ -92,23 +94,11 @@ public class MessageHandler {
                     break;
 
                 case STOP_SESSION:
-                    sessionCallback.onSessionFinalize();
-
+                    sessionCallback.onSessionEnd();
                     long endTime = payload.getLong("endTime");
                     int readingCount = payload.getInt("readingsCount");
                     sessionIdentifier = payload.getString("sessionIdentifier");
-
-                    Timer sessionEndTimer = new Timer();
-
-                    sessionEndTimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            sessionCallback.onSessionEnd();
-                            realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
-                            sessionEndTimer.cancel();
-                        }
-                    }, 5000);
-
+                    realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
                     break;
                 default:
                     break;

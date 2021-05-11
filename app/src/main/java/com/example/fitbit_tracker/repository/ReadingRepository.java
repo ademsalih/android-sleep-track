@@ -30,4 +30,19 @@ public class ReadingRepository {
         return readings;
     }
 
+    public RealmResults<Reading> getReadingForSession(long sessionId) {
+        RealmResults<Reading> readings = null;
+
+        try {
+            readings = realm.where(Reading.class)
+                    .equalTo("sessionId", sessionId)
+                    .sort("timeStamp", Sort.ASCENDING)
+                    .findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return readings;
+    }
+
 }

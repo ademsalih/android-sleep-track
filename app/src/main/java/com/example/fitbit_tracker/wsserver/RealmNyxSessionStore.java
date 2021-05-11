@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.realm.Realm;
 
@@ -118,14 +120,6 @@ public class RealmNyxSessionStore implements NyxSessionStore {
                     Session session = realm.where(Session.class).equalTo("uuid", sessionIdentifier).findFirst();
                     session.setEndTime(endTime);
                     session.setReadingsCount(readingsCount);
-
-                    Log.d(TAG, "Ending Session with queue size: " + queue.size());
-
-                    if (!queue.isEmpty()) {
-                        realm.insert(queue.subList(0, queue.size()));
-                        queue.clear();
-                        Log.d(TAG, "Inserted remaining, queue size: " + queue.size());
-                    }
                 }
             });
         } catch (Exception e) {
@@ -133,6 +127,33 @@ public class RealmNyxSessionStore implements NyxSessionStore {
         } finally {
             realm.close();
         }
+
+        Timer sessionEndTimer = new Timer();
+        sessionEndTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+
+                Realm realm = Realm.getDefaultInstance();
+                try {
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            if (!queue.isEmpty()) {
+                                realm.insert(queue.subList(0, queue.size()));
+                                queue.clear();
+                                Log.d(TAG, "Inserted remaining, queue size: " + queue.size());
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    realm.close();
+                }
+
+                sessionEndTimer.cancel();
+            }
+        }, 10000);
     }
 
     @Override
@@ -157,8 +178,6 @@ public class RealmNyxSessionStore implements NyxSessionStore {
                 toInsert.add(queue.poll());
             }
 
-            long start = System.currentTimeMillis();
-
             try {
                 realm.executeTransactionAsync(r ->
                         r.insert(toInsert)
@@ -169,7 +188,6 @@ public class RealmNyxSessionStore implements NyxSessionStore {
             } finally {
                 realm.close();
             }
-            long time = System.currentTimeMillis() - start;
         }
         realm.close();
     }

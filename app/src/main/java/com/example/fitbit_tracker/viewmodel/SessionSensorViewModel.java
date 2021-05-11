@@ -18,7 +18,7 @@ public class SessionSensorViewModel extends AndroidViewModel {
 
     public SessionSensorViewModel(Application application) {
         super(application);
-        sessionSensorRepository = new SessionSensorRepository(Realm.getDefaultInstance());
+        sessionSensorRepository = new SessionSensorRepository();
     }
 
     public RealmLiveData<SessionSensor> getAllSessionSensors(long sessionId) {
