@@ -1,14 +1,19 @@
 package com.example.fitbit_tracker.view;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.example.fitbit_tracker.R;
 import com.example.fitbit_tracker.model.Reading;
+import com.example.fitbit_tracker.model.Sensor;
 import com.example.fitbit_tracker.repository.ReadingRepository;
+import com.example.fitbit_tracker.repository.SensorRepository;
+import com.example.fitbit_tracker.repository.SessionSensorRepository;
 import com.example.fitbit_tracker.utils.XAxisValueFormatter;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.LegendEntry;
@@ -20,9 +25,11 @@ import com.github.mikephil.charting.data.LineDataSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -37,41 +44,60 @@ public class BatchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_batch);
 
-        lineChart = findViewById(R.id.chart);
-
         Bundle b = getIntent().getExtras();
         long sessionId = b.getLong("sessionId");
         long sensorId = b.getLong("sensorId");
 
-        Executor executor = Executors.newSingleThreadExecutor();
+        SensorRepository sensorRepository = new SensorRepository();
+        Sensor sensor = sensorRepository.getSensor(sensorId);
+        getSupportActionBar().setTitle(sensor.getSensorName());
+
+        lineChart = findViewById(R.id.chart);
+
+        Executor executor = Executors.newFixedThreadPool(50);
         executor.execute(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void run() {
                 ReadingRepository readingRepository = new ReadingRepository();
+                SessionSensorRepository sessionSensorRepository = new SessionSensorRepository();
                 long start = System.currentTimeMillis();
                 List<Reading> readingList = readingRepository.getReadingForSessionAndSensor(sessionId, sensorId);
                 long time = System.currentTimeMillis() - start;
                 Log.d(TAG, "TIME: " + time);
 
-
-                HashMap<String, List<Reading>> hashMap = new HashMap<>();
+                HashMap<String, List<Float>> hashMap = new HashMap<>();
                 List<Long> timestamps = new ArrayList<>();
+
+                String firstReadingType = "";
 
                 for (Reading reading : readingList) {
                     String readingType = reading.getReadingType();
+
                     if (!hashMap.containsKey(readingType)) {
+                        if (hashMap.keySet().isEmpty()) {
+                            firstReadingType = reading.getReadingType();
+                        }
                         hashMap.put(readingType, new ArrayList<>());
                     }
 
-                    hashMap.get(readingType).add(reading);
+                    hashMap.get(readingType).add(reading.getData());
+
+                    if (readingType.equals(firstReadingType)) {
+                        timestamps.add(reading.getTimeStamp());
+                    }
                 }
 
-                updateChart(timestamps,hashMap);
+                float frequency = sessionSensorRepository.getSessionSensorFrequency(sessionId,sensorId);
+                updateChart(timestamps,hashMap,frequency);
             }
         });
     }
 
-    public void updateChart(List<Long> timestamps, HashMap<String, List<Reading>> batches) {
+    public void updateChart(List<Long> timestamps, HashMap<String, List<Float>> batches, float frequency) {
+        int prefSamplingThreshold = getApplicationContext().getSharedPreferences("PREFERENCES", MODE_PRIVATE).getInt("prefSamplingThreshold", 50000);
+        boolean prefSampling = getApplicationContext().getSharedPreferences("PREFERENCES", MODE_PRIVATE).getBoolean("prefSampling", true);
+
         Set<String> keys = batches.keySet();
 
         LineData lineData = new LineData();
@@ -85,19 +111,32 @@ public class BatchActivity extends AppCompatActivity {
         long firstTimestamp = 0;
         List<String> keyList = new ArrayList<>(keys);
         for (int j = 0; j < keyList.size(); j++) {
-            List<Reading> batch = batches.get(keyList.get(j));
+            List<Float> batch = batches.get(keyList.get(j));
             List<Entry> entryList = new ArrayList<>();
 
 
-            firstTimestamp = batch.get(0).getTimeStamp();
-            for (Reading reading: batch) {
-                entryList.add(new Entry(reading.getTimeStamp()-firstTimestamp, reading.getData()));
+            firstTimestamp = timestamps.get(0);
+
+            int batchSize = batch.size();
+
+            if (prefSampling && (batchSize > prefSamplingThreshold) && frequency > 1) {
+                int freq = (int) (frequency/5);
+
+                for (int i = 0; i < batchSize; i++) {
+                    if (i % freq == 0) {
+                        entryList.add(new Entry(timestamps.get(i) - firstTimestamp, batch.get(i)));
+                    }
+                }
+            } else {
+                for (int i = 0; i < batchSize; i++) {
+                    entryList.add(new Entry(timestamps.get(i) - firstTimestamp, batch.get(i)));
+                }
             }
+
 
             LineDataSet dataSet = new LineDataSet(entryList, keyList.get(j));
             dataSet.setColor(Color.rgb(1,1,1));
             dataSet.setValueTextColor(Color.rgb(1,1,1));
-
 
             dataSet.setColor(colors[j]);
             dataSet.setDrawCircles(false);

@@ -109,6 +109,8 @@ public class SessionDetailActivity extends AppCompatActivity {
         executor.execute(new Runnable() {
             @Override
             public void run() {
+                long start = System.currentTimeMillis();
+
                 ReadingRepository readingRepository = new ReadingRepository();
                 SessionRepository sessionRepository = new SessionRepository();
                 SessionSensorRepository sessionSensorRepository = new SessionSensorRepository();
@@ -127,9 +129,6 @@ public class SessionDetailActivity extends AppCompatActivity {
                 }
 
                 List<SessionSensor> sessionSensors = sessionSensorRepository.getSessionSensorsAsList(sessionId);
-
-                if (sessionSensors.size() > 0) {
-                }
 
                 JSONArray sensorDataArray = new JSONArray();
 
@@ -213,6 +212,8 @@ public class SessionDetailActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                long time = System.currentTimeMillis() - start;
+                Log.d(TAG, "Export Duartion: " + time + " ms");
             }
         });
     }

@@ -28,4 +28,9 @@ public class SessionSensorRepository {
         return realmResults;
     }
 
+    public float getSessionSensorFrequency(long sessionId, long sensorId) {
+        SessionSensor sessionSensor = realm.where(SessionSensor.class).equalTo("sessionId", sessionId).equalTo("sensorId", sensorId).findFirst();
+        return sessionSensor.getFrequency();
+    }
+
 }

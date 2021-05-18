@@ -69,8 +69,8 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         Notification notification = notificationBuilder.setOngoing(true)
-                .setSmallIcon(R.mipmap.app_icon)
-                .setContentTitle("App is running in background")
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle("Nyx is running in the background")
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
