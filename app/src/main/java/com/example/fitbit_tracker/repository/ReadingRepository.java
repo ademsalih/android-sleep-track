@@ -1,55 +1,48 @@
 package com.example.fitbit_tracker.repository;
 
-import android.app.Application;
+import com.example.fitbit_tracker.model.Reading;
+import com.example.fitbit_tracker.utils.RealmLiveData;
 
-import com.example.fitbit_tracker.dao.ReadingBaseDao;
-import com.example.fitbit_tracker.dao.ReadingDao;
-import com.example.fitbit_tracker.database.Configuration;
-import com.example.fitbit_tracker.database.NyxDatabase;
-import com.example.fitbit_tracker.model.ReadingBatch;
-import com.example.fitbit_tracker.model.reading.AccelerometerReading;
-import com.example.fitbit_tracker.model.reading.Reading;
-
-import java.util.ArrayList;
-import java.util.List;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class ReadingRepository {
 
-    private ReadingDao readingDao;
-    private ReadingBaseDao<AccelerometerReading> readingBaseDao;
-    private List<ReadingBatch> readingBatches;
+    private final Realm realm;
 
-    private AccelerometerRepository accelerometerRepository;
-
-    public ReadingRepository(Application application) {
-        NyxDatabase db = NyxDatabase.getDatabase(application);
-        readingDao = db.readingDao();
-        readingBatches = new ArrayList<>();
-
-        for (Class<? extends Reading> readingClass : Configuration.READING_CLASSES) {
-
-            String a = NyxDatabase.getTableName(readingClass);
-
-        }
-
-        accelerometerRepository.findAll();
+    public ReadingRepository() {
+        this.realm = Realm.getDefaultInstance();
     }
 
-    public List<ReadingBatch> getAllSessionReadings() {
+    public RealmResults<Reading> getReadingForSessionAndSensor(long sessionId, long sensorId) {
+        RealmResults<Reading> readings = null;
 
-        // These elements should be automatically created based on the Configuration
-        // The name should be the same as the model name minus Reading and the readings
-        // data should be fetched using the findAll() generic method.
+        try {
+            readings = realm.where(Reading.class)
+                    .equalTo("sessionId", sessionId)
+                    .equalTo("sensorId", sensorId).sort("timeStamp", Sort.ASCENDING)
+                    .findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        /*List<List<? extends Reading>> nall = new ArrayList<>();
+        return readings;
+    }
 
-        List<AccelerometerReading> all = accelerometerRepository.findAll();
+    public RealmResults<Reading> getReadingForSession(long sessionId) {
+        RealmResults<Reading> readings = null;
 
-        nall.add(all);
+        try {
+            readings = realm.where(Reading.class)
+                    .equalTo("sessionId", sessionId)
+                    .sort("timeStamp", Sort.ASCENDING)
+                    .findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        readingBatches.add(new ReadingBatch("Accelerometer", nall));*/
-
-        return readingBatches;
+        return readings;
     }
 
 }

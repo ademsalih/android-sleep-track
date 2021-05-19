@@ -2,54 +2,98 @@ package com.example.fitbit_tracker.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.handlers.SessionEndCallback;
-import com.example.fitbit_tracker.wsserver.CustomWebSocketService;
 
-public class RecordingSessionActivity extends AppCompatActivity implements SessionEndCallback {
+
+public class RecordingSessionActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
+    private BroadcastReceiver broadcastReceiver;
+    private TextView recordingTextView;
+    //private TextView debugTextView;
+    private boolean connected = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording_session);
+
+        recordingTextView = findViewById(R.id.recordingTextView);
+        //debugTextView = findViewById(R.id.debugTextView);
+
+        // Hide Activity Toolbar
         getSupportActionBar().hide();
+
+        // Hide Status Bar
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        Intent intent = new Intent(RecordingSessionActivity.this, CustomWebSocketService.class);
+        /*
+         * Hide bottom navigation bar
+         */
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
 
-        bindService(intent, new ServiceConnection() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                Log.d(TAG, "onServiceConnected");
-                CustomWebSocketService.LocalBinder binder = (CustomWebSocketService.LocalBinder) service;
-                binder.getService().registerSessionEndCallback(RecordingSessionActivity.this);
-            }
+            public void onReceive(Context context, Intent intent) {
 
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                Log.d(TAG, "onServiceDisconnected");
-                // Handle service disconnection while recording
+                switch (intent.getAction()) {
+                    /*case "ADD_READING":
+                        String s = intent.getStringExtra("MESSAGE");
+                        debugTextView.setText(s);
+                        break;*/
+                    case "SESSION_ENDED":
+                        finish();
+                        break;
+                    case "SESSION_FINALIZING":
+                        recordingTextView.setText(R.string.FINALIZING_TEXT);
+                        break;
+                    case "DISCONNECT":
+                        recordingTextView.setText(R.string.CONNECTION_LOST_TEXT);
+                        connected = false;
+                        break;
+                    case "CONNECT":
+                        recordingTextView.setText(R.string.recordingText);
+                        connected = true;
+                        break;
+                }
             }
-        }, BIND_AUTO_CREATE);
+        };
+
+        IntentFilter intentFilter = new IntentFilter();
+
+        intentFilter.addAction("SESSION_ENDED");
+        intentFilter.addAction("DISCONNECT");
+        intentFilter.addAction("CONNECT");
+        //intentFilter.addAction("ADD_READING");
+        intentFilter.addAction("SESSION_FINALIZING");
+
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     @Override
-    public void onSessionEnd() {
-        finish();
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
     public void onBackPressed() {
-
+        if (!connected) {
+            finish();
+        } else {
+            Toast.makeText(this, R.string.SESSION_ACTIVE_TOAST_MESSAGE, Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

@@ -1,34 +1,66 @@
 package com.example.fitbit_tracker.repository;
 
-import android.app.Application;
-
 import androidx.lifecycle.LiveData;
 
-import com.example.fitbit_tracker.dao.SessionDao;
-import com.example.fitbit_tracker.database.NyxDatabase;
 import com.example.fitbit_tracker.model.Session;
+import com.example.fitbit_tracker.utils.RealmLiveData;
 
-import java.util.List;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class SessionRepository {
 
-    private SessionDao sessionDao;
-    private LiveData<List<Session>> allSessions;
+    private final Realm realm;
 
-    public SessionRepository(Application application) {
-        NyxDatabase db = NyxDatabase.getDatabase(application);
-        sessionDao = db.sessionDao();
-        allSessions = sessionDao.getAll();
+    public SessionRepository() {
+        this.realm = Realm.getDefaultInstance();
     }
 
-    public LiveData<List<Session>> getAllSessions() {
-        return allSessions;
+    public RealmLiveData getAllSessions() {
+        RealmResults<Session> results = null;
+
+        try {
+            results = realm.where(Session.class)
+                    .sort("endTime", Sort.DESCENDING)
+                    .findAllAsync();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            realm.close();
+        }
+
+        return new RealmLiveData(results);
+    }
+
+    public Session getSession(long sessionId) {
+        Session session = null;
+
+        try {
+            session = realm.where(Session.class).equalTo("sessionId", sessionId).findFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            realm.close();
+        }
+
+        return session;
     }
 
     public void insert(Session session) {
-        NyxDatabase.databaseWriteExecutor.execute(() -> {
-            sessionDao.insert(session);
-        });
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm r) {
+                    r.insert(session);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            realm.close();
+        }
     }
 
 }

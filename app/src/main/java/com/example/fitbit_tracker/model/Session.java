@@ -1,87 +1,85 @@
 package com.example.fitbit_tracker.model;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index("uuid")})
-public class Session {
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
 
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    private int id;
+public class Session extends RealmObject {
 
-    @ColumnInfo(name = "uuid")
+    @PrimaryKey
+    private long sessionId;
+
+    @Required
     private String uuid;
 
-    @ColumnInfo(name = "start_time")
     private long startTime;
 
-    @ColumnInfo(name = "end_time")
     private long endTime;
 
-    @ColumnInfo(name = "device_model")
-    private String deviceModel;
-
-    @ColumnInfo(name = "readings_count")
     private int readingsCount;
 
-    private int userId;
+    private String deviceModel;
 
-    public Session(String uuid, long startTime, long endTime, String deviceModel, int readingsCount) {
-        this.uuid = uuid;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.deviceModel = deviceModel;
-        this.readingsCount = readingsCount;
+    private long userId;
+
+    public Session() {
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public long getSessionId() {
+        return sessionId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
-
-    public void setReadingsCount(int readingsCount) {
-        this.readingsCount = readingsCount;
-    }
-
-    public int getId() {
-        return id;
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
     }
 
     public String getUuid() {
         return uuid;
     }
 
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public long getStartTime() {
         return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 
     public long getEndTime() {
         return endTime;
     }
 
-    public String getDeviceModel() {
-        return deviceModel;
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
     }
 
     public int getReadingsCount() {
         return readingsCount;
     }
 
-    public int getUserId() {
+    public void setReadingsCount(int readingsCount) {
+        this.readingsCount = readingsCount;
+    }
+
+    public String getDeviceModel() {
+        return deviceModel;
+    }
+
+    public void setDeviceModel(String deviceModel) {
+        this.deviceModel = deviceModel;
+    }
+
+    public long getUserId() {
         return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 }

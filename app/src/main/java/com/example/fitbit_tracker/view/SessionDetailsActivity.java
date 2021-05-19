@@ -7,40 +7,54 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.dao.ReadingDao;
-import com.example.fitbit_tracker.database.NyxDatabase;
-import com.example.fitbit_tracker.model.reading.AccelerometerReading;
-import com.example.fitbit_tracker.model.reading.BatteryReading;
-import com.example.fitbit_tracker.model.reading.GyroscopeReading;
-import com.example.fitbit_tracker.model.reading.HeartrateReading;
+import com.example.fitbit_tracker.model.Reading;
+import com.example.fitbit_tracker.model.Session;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class SessionDetailsActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private int sessionID;
-    private ReadingDao readingDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_details);
-        readingDao = NyxDatabase.getDatabase(getBaseContext()).readingDao();
 
         Bundle b = getIntent().getExtras();
         sessionID = b.getInt("SESSION_ID");
 
-        int threads = 100;
+        long start = System.currentTimeMillis();
 
-        List<HeartrateReading> hrReadings = new ArrayList<>();
+        Realm.getInstanceAsync(Realm.getDefaultConfiguration(), new Realm.Callback() {
+            @Override
+            public void onSuccess(Realm realm) {
+                RealmResults<Reading> readings = realm
+                        .where(Reading.class)
+                        .equalTo("sessionId",(long) 1)
+                        .and()
+                        .equalTo("sensorName", "BATTERY").findAll();
+
+                long time = System.currentTimeMillis() - start;
+                Log.d(TAG, "Battery (" + readings.size() +  ") : " + time + " ms");
+
+                updateBatteryChart(readings);
+            }
+        });
+
+
+
+        //int threads = 100;
+        /*List<HeartrateReading> hrReadings = new ArrayList<>();
         Executor executor = Executors.newFixedThreadPool(threads);
         executor.execute(new Runnable() {
             @Override
@@ -53,11 +67,11 @@ public class SessionDetailsActivity extends AppCompatActivity {
                 Log.d(TAG, "Heartrate (" + hrReadings.size() +  ") : " + time + " ms");
                 updateHeartrateChart(hrReadings);
             }
-        });
+        });*/
 
 
 
-        Executor executor2 = Executors.newFixedThreadPool(threads);
+        /*Executor executor2 = Executors.newFixedThreadPool(threads);
         executor2.execute(new Runnable() {
             @Override
             public void run() {
@@ -70,9 +84,9 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
                 updateBatteryChart(batteryReadings);
             }
-        });
+        });*/
 
-        Executor executor3 = Executors.newFixedThreadPool(threads);
+        /*Executor executor3 = Executors.newFixedThreadPool(threads);
         executor3.execute(new Runnable() {
             @Override
             public void run() {
@@ -95,9 +109,9 @@ public class SessionDetailsActivity extends AppCompatActivity {
                 });
 
             }
-        });
+        });*/
 
-        Executor executor4 = Executors.newFixedThreadPool(threads);
+        /*Executor executor4 = Executors.newFixedThreadPool(threads);
         executor4.execute(new Runnable() {
             @Override
             public void run() {
@@ -110,11 +124,11 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
                 updateGyroscopeChart(gyroscopeReadings);
             }
-        });
+        });*/
 
     }
 
-    public void updateHeartrateChart(List<HeartrateReading> heartrateReadings) {
+    /*public void updateHeartrateChart(List<HeartrateReading> heartrateReadings) {
         LineChart heartrateChart = findViewById(R.id.heartrateChart);
 
         List<Entry> entryList = new ArrayList<Entry>();
@@ -195,17 +209,18 @@ public class SessionDetailsActivity extends AppCompatActivity {
 
         accelerometerChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
         accelerometerChart.invalidate();
-    }
+    }*/
 
-    public void updateBatteryChart(List<BatteryReading> batteryReadings) {
+
+    public void updateBatteryChart(List<Reading> batteryReadings) {
         LineChart batteryChart = (LineChart) findViewById(R.id.batteryChart);
 
         List<Entry> batteryEntryList = new ArrayList<Entry>();
 
         int k = 0;
 
-        for (BatteryReading batteryReading : batteryReadings) {
-            batteryEntryList.add(new Entry(k, batteryReading.getBatteryPercentage()));
+        for (Reading batteryReading : batteryReadings) {
+            batteryEntryList.add(new Entry(k, batteryReading.getData()));
             k++;
         }
 
@@ -221,10 +236,12 @@ public class SessionDetailsActivity extends AppCompatActivity {
         LineData batteryLineData = new LineData(batteryDataSet);
 
         batteryChart.setData(batteryLineData);
+        batteryChart.setVisibleXRangeMaximum(10000);
 
         batteryChart.invalidate();
     }
 
+    /*
     public void updateGyroscopeChart(List<GyroscopeReading> gyroscopeReadings) {
         LineChart gyroscopeChart = (LineChart) findViewById(R.id.gyroscopeChart);
 
@@ -272,7 +289,7 @@ public class SessionDetailsActivity extends AppCompatActivity {
         gyroscopeChart.setData(gyroscopeLineData);
 
         gyroscopeChart.invalidate();
-    }
+    }*/
 
     /*public void onExportButtonClicked(View view) {
         List<HeartrateReading> heartrateReadings = db.getAllHeartrates(sessionUUID);

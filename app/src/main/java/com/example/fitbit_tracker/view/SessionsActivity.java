@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.adapter.SessionListAdapter;
+import com.example.fitbit_tracker.adapter.listadapter.SessionListAdapter;
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.viewmodel.SessionViewModel;
 
@@ -40,11 +40,11 @@ public class SessionsActivity extends AppCompatActivity {
         sessionViewModel.getAllSessions().observe(this, new Observer<List<Session>>() {
             @Override
             public void onChanged(List<Session> sessions) {
+
                 sessionListAdapter.submitList(sessions);
                 getSupportActionBar().setTitle("Sessions (" + sessions.size() + ")");
             }
         });
-
     }
 
 }

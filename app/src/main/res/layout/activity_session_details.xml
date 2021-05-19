@@ -29,6 +29,12 @@
             android:orientation="vertical">
 
             <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/batteryChart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="10dp" />
+
+            <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/heartrateChart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp" />
@@ -41,12 +47,6 @@
 
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/gyroscopeChart"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_marginTop="10dp" />
-
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/batteryChart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:layout_marginTop="10dp" />

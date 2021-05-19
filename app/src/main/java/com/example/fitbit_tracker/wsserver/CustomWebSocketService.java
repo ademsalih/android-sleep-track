@@ -14,29 +14,31 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.example.fitbit_tracker.R;
-import com.example.fitbit_tracker.handlers.ServiceCallback;
-import com.example.fitbit_tracker.handlers.SessionEndCallback;
+import com.example.fitbit_tracker.handlers.SessionCallback;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import com.example.fitbit_tracker.view.RecordingSessionActivity;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 
 
-public class CustomWebSocketService extends Service implements WebSocketCallback {
+public class CustomWebSocketService extends Service implements WebSocketCallback, SessionCallback {
     private final String TAG = this.getClass().getSimpleName();
 
     private WakeLock wakeLock;
     private final IBinder mBinder = new LocalBinder();
-    private boolean connected = false;
-    private ServiceCallback serviceCallback;
-    private SessionEndCallback sessionEndCallback;
+    private WebSocketCallback webSocketCallback;
     private CustomWebSocketServer customWebSocketServer;
+
+    private final MessageHandler messageHandler;
 
     public class LocalBinder extends Binder {
         public CustomWebSocketService getService() {
@@ -44,15 +46,12 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
         }
     }
 
-    public void registerCallBack(ServiceCallback myCallback){
-        this.serviceCallback = myCallback;
-    }
-
-    public void registerSessionEndCallback(SessionEndCallback sessionEndCallback) {
-        this.sessionEndCallback = sessionEndCallback;
+    public void registerCallBack(WebSocketCallback myCallback){
+        this.webSocketCallback = myCallback;
     }
 
     public CustomWebSocketService() {
+        this.messageHandler = new MessageHandler(this);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -70,8 +69,8 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         Notification notification = notificationBuilder.setOngoing(true)
-                .setSmallIcon(R.mipmap.app_icon)
-                .setContentTitle("App is running in background")
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle("Nyx is running in the background")
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
@@ -92,7 +91,7 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
             startForeground(1, new Notification());
         }
 
-        customWebSocketServer = new CustomWebSocketServer(this,this,8887);
+        customWebSocketServer = new CustomWebSocketServer(this,8887);
         customWebSocketServer.setReuseAddr(true);
         customWebSocketServer.start();
     }
@@ -111,9 +110,7 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
 
         try {
             customWebSocketServer.stop();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         wakeLock.release();
@@ -154,19 +151,27 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
     @Override
     public void onOpen() {
         Log.d(TAG, "onOpen");
-        serviceCallback.onOpen();
+        webSocketCallback.onOpen();
+
+        Intent intent = new Intent("CONNECT");
+        sendBroadcast(intent);
     }
 
     @Override
-    public void onClose() {
+    public void onClose(int code) {
         Log.d(TAG, "onClose");
-        connected = false;
-        serviceCallback.onClose();
+        webSocketCallback.onClose(code);
+
+        Intent intent = new Intent("DISCONNECT");
+        sendBroadcast(intent);
     }
 
     @Override
     public void onMessage(String message) {
-        Log.d(TAG, "onMessage");
+        messageHandler.handleMessage(message);
+        /*Intent intent = new Intent("ADD_READING");
+        intent.putExtra("MESSAGE", message);
+        sendBroadcast(intent);*/
     }
 
     @Override
@@ -178,8 +183,13 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
 
     @Override
     public void onSessionEnd() {
-        sessionEndCallback.onSessionEnd();
+        Intent intent = new Intent("SESSION_ENDED");
+        sendBroadcast(intent);
     }
 
-
+    @Override
+    public void onSessionFinalize() {
+        Intent intent = new Intent("SESSION_FINALIZING");
+        sendBroadcast(intent);
+    }
 }

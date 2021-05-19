@@ -1,4 +1,4 @@
-package com.example.fitbit_tracker.adapter;
+package com.example.fitbit_tracker.adapter.listadapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,17 +10,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
+import com.example.fitbit_tracker.adapter.viewholder.SessionViewHolder;
 import com.example.fitbit_tracker.model.Session;
 import com.example.fitbit_tracker.view.SessionDetailActivity;
-import com.example.fitbit_tracker.view.SessionDetailsActivity;
-import com.example.fitbit_tracker.view.SessionsActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.example.fitbit_tracker.utils.TimeUtils.formattedTimeLabel;
-import static com.example.fitbit_tracker.utils.TimeUtils.timeDeltaLabel;
+import static com.example.fitbit_tracker.utils.TimeLabelUtils.formattedTimeLabel;
+import static com.example.fitbit_tracker.utils.TimeLabelUtils.timeDeltaLabel;
 
 public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> {
 
@@ -55,9 +54,9 @@ public class SessionListAdapter extends ListAdapter<Session, SessionViewHolder> 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, SessionDetailsActivity.class);
+                Intent intent = new Intent(context, SessionDetailActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt("SESSION_ID", session.getId());
+                bundle.putLong("sessionId", session.getSessionId());
                 intent.putExtras(bundle);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
