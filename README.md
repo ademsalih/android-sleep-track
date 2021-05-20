@@ -1,8 +1,7 @@
 # Nyx
 
-
 #### What?
-Android application collecting sensor data from a Fitbit device running Hypnos. The Hypnos app is able to gather data from these sensors and transfer them to Nyx.
+Android application for collecting sensor data from a Fitbit device running Hypnos. The Hypnos app is able to gather data from these sensors and transfer them to Nyx.
 
 
 #### How?
