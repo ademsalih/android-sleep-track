@@ -48,10 +48,6 @@ public class RecordingSessionActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
 
                 switch (intent.getAction()) {
-                    /*case "ADD_READING":
-                        String s = intent.getStringExtra("MESSAGE");
-                        debugTextView.setText(s);
-                        break;*/
                     case "SESSION_ENDED":
                         finish();
                         break;
@@ -66,6 +62,8 @@ public class RecordingSessionActivity extends AppCompatActivity {
                         recordingTextView.setText(R.string.recordingText);
                         connected = true;
                         break;
+                    default:
+                        break;
                 }
             }
         };
@@ -75,8 +73,6 @@ public class RecordingSessionActivity extends AppCompatActivity {
         intentFilter.addAction("SESSION_ENDED");
         intentFilter.addAction("DISCONNECT");
         intentFilter.addAction("CONNECT");
-        //intentFilter.addAction("ADD_READING");
-        intentFilter.addAction("SESSION_FINALIZING");
 
         registerReceiver(broadcastReceiver, intentFilter);
     }

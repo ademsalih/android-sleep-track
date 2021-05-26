@@ -153,7 +153,7 @@ public class RealmNyxSessionStore implements NyxSessionStore {
 
                 sessionEndTimer.cancel();
             }
-        }, 10000);
+        }, 30000);
     }
 
     @Override

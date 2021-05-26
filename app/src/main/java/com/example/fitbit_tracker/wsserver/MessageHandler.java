@@ -100,6 +100,10 @@ public class MessageHandler {
                     sessionIdentifier = payload.getString("sessionIdentifier");
                     realmSessionStore.stopSession(sessionIdentifier, endTime, readingCount);
                     break;
+                case START_SEARCH:
+                    String model = payload.getString("modelName");
+                    int battery = payload.getInt("battery");
+                    sessionCallback.onInfo(model, battery);
                 default:
                     break;
             }

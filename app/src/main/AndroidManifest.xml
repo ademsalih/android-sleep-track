@@ -34,9 +34,6 @@
 
         <activity android:name=".view.SettingsActivity" />
         <activity
-            android:name=".view.SessionDetailsActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".view.SessionsActivity"
             android:screenOrientation="portrait" />
         <activity

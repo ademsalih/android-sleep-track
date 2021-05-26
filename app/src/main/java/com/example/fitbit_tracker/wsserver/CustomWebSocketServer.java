@@ -1,9 +1,8 @@
 package com.example.fitbit_tracker.wsserver;
 
-import android.content.Context;
+
 import android.util.Log;
 
-import com.example.fitbit_tracker.handlers.SessionCallback;
 import com.example.fitbit_tracker.handlers.WebSocketCallback;
 
 import org.java_websocket.WebSocket;

@@ -3,34 +3,31 @@ package com.example.fitbit_tracker.view;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.fitbit_tracker.handlers.SessionCallback;
-import com.example.fitbit_tracker.handlers.WebSocketCallback;
 import com.example.fitbit_tracker.wsserver.CustomWebSocketService;
 import com.example.fitbit_tracker.R;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity implements WebSocketCallback {
+public class MainActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private ProgressBar progressBar;
     private TextView textView;
+    private TextView deviceInfoTextView;
     private ImageView imageView;
     private Context context;
     private Intent websocketServerServiceIntent;
-    private ServiceConnection serviceConnection;
+    private BroadcastReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +35,12 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Welcome to Nyx");
 
+        setupBroadcastReceiver();
+
         context = this;
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textView);
+        deviceInfoTextView = findViewById(R.id.deviceInfoTextView);
         imageView = findViewById(R.id.imageView);
 
         websocketServerServiceIntent = new Intent(context, CustomWebSocketService.class);
@@ -52,45 +52,43 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
                 startService(websocketServerServiceIntent);
             }
         });
+    }
 
-        serviceConnection = new ServiceConnection() {
+    public void setupBroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                Log.d(TAG, "onServiceConnected");
-                CustomWebSocketService.LocalBinder binder = (CustomWebSocketService.LocalBinder) service;
-                binder.getService().registerCallBack((WebSocketCallback) context);
-            }
+            public void onReceive(Context context, Intent intent) {
 
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                Log.d(TAG, "onServiceDisconnected");
+                switch (intent.getAction()) {
+                    case "DISCONNECT":
+                        imageView.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
+                        textView.setText(R.string.NOT_CONNECTED_TEXT);
+                        deviceInfoTextView.setText("");
+                        break;
+                    case "CONNECT":
+                        imageView.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
+                        textView.setText(R.string.connected_text);
+                        break;
+                    case "INFO":
+                        String model = intent.getStringExtra("model");
+                        int battery = intent.getIntExtra("battery",0);
+                        deviceInfoTextView.setText("on Fitbit " + model + " (" + battery + "%)");
+                        break;
+                    default:
+                        break;
+                }
             }
         };
 
-        bindService(websocketServerServiceIntent, serviceConnection, BIND_AUTO_CREATE);
-    }
+        IntentFilter intentFilter = new IntentFilter();
 
-    @Override
-    public void onOpen() {
-        runOnUiThread(() -> {
-            imageView.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.INVISIBLE);
-            textView.setText(R.string.connected_text);
-        });
-    }
+        intentFilter.addAction("DISCONNECT");
+        intentFilter.addAction("CONNECT");
+        intentFilter.addAction("INFO");
 
-    @Override
-    public void onClose(int code) {
-        runOnUiThread(() -> {
-            imageView.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
-            textView.setText(R.string.NOT_CONNECTED_TEXT);
-        });
-    }
-
-    @Override
-    public void onMessage(String message) {
-
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     public void onSessionsButtonClick(View view) {
@@ -108,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         super.onDestroy();
 
         stopService(websocketServerServiceIntent);
-        unbindService(serviceConnection);
+        unregisterReceiver(broadcastReceiver);
     }
 
 }

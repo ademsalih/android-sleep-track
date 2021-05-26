@@ -35,7 +35,6 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
 
     private WakeLock wakeLock;
     private final IBinder mBinder = new LocalBinder();
-    private WebSocketCallback webSocketCallback;
     private CustomWebSocketServer customWebSocketServer;
 
     private final MessageHandler messageHandler;
@@ -44,10 +43,6 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
         public CustomWebSocketService getService() {
             return CustomWebSocketService.this;
         }
-    }
-
-    public void registerCallBack(WebSocketCallback myCallback){
-        this.webSocketCallback = myCallback;
     }
 
     public CustomWebSocketService() {
@@ -151,7 +146,6 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
     @Override
     public void onOpen() {
         Log.d(TAG, "onOpen");
-        webSocketCallback.onOpen();
 
         Intent intent = new Intent("CONNECT");
         sendBroadcast(intent);
@@ -160,7 +154,6 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
     @Override
     public void onClose(int code) {
         Log.d(TAG, "onClose");
-        webSocketCallback.onClose(code);
 
         Intent intent = new Intent("DISCONNECT");
         sendBroadcast(intent);
@@ -172,6 +165,14 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
         /*Intent intent = new Intent("ADD_READING");
         intent.putExtra("MESSAGE", message);
         sendBroadcast(intent);*/
+    }
+
+    @Override
+    public void onInfo(String model, int battery) {
+        Intent intent = new Intent("INFO");
+        intent.putExtra("model", model);
+        intent.putExtra("battery", battery);
+        sendBroadcast(intent);
     }
 
     @Override
@@ -187,9 +188,4 @@ public class CustomWebSocketService extends Service implements WebSocketCallback
         sendBroadcast(intent);
     }
 
-    @Override
-    public void onSessionFinalize() {
-        Intent intent = new Intent("SESSION_FINALIZING");
-        sendBroadcast(intent);
-    }
 }
