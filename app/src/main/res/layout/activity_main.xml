@@ -54,9 +54,13 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="6dp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/button3"
@@ -64,11 +68,11 @@
             android:layout_height="wrap_content"
             android:height="100dp"
             android:onClick="onSessionsButtonClick"
-            app:icon="@drawable/sessions_icon"
+            android:text="Sessions"
             android:textSize="22sp"
+            app:icon="@drawable/sessions_icon"
             app:iconPadding="-30dp"
-            app:iconSize="30dp"
-            android:text="Sessions"/>
+            app:iconSize="30dp" />
 
         <Button
             android:id="@+id/settingsButton"
